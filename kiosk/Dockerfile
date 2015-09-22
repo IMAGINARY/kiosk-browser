@@ -16,12 +16,12 @@ RUN npm install electron-prebuilt -g && \
     npm install asar -g && \
     npm install yargs -g
 
-
 RUN mkdir -p /usr/src/kiosk
 COPY index.html main.js package.json run.sh /usr/src/kiosk/
 
-WORKDIR /usr/src/kiosk
-RUN npm install -g
+# WORKDIR /usr/src/kiosk
+RUN cd  /usr/src/kiosk && npm install -g
 
 # ONBUILD COPY package.json index.html main.js /usr/src/kiosk/
 # CMD [ "npm", "start" ]
+# CMD [ "launch.sh", "/usr/lib/node_modules/kiosk/run.sh" ] ## ??
