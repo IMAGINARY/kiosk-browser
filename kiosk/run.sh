@@ -8,7 +8,7 @@ SELFDIR=`cd "$SELFDIR" && pwd`
 if hash electron 2>/dev/null; then
  D=electron
 else
- D="$HOME/node_modules/electron-prebuilt/dist/electron"
+ D="/usr/lib/node_modules/electron-prebuilt/dist/electron"
 fi
 
-${ELECTRON:-$D}  --enable-unsafe-es3-apis "${SELFDIR}" "$@"
+${ELECTRON:-$D} --enable-unsafe-es3-apis "${SELFDIR}" "$@"
