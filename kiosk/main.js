@@ -3,7 +3,19 @@ global.shellStartTime = Date.now();
 var app = require('app'); // Module to control application life.
 
 app.commandLine.appendArgument('enable-unsafe-es3-apis');
-// app.commandLine.appendArgument('--enable-unsafe-es3-apis'); // ???
+
+//https://github.com/atom/electron/issues/1277
+//https://bugs.launchpad.net/ubuntu/+source/chromium-browser/+bug/1463598
+//https://code.google.com/p/chromium/issues/detail?id=121183
+app.commandLine.appendArgument('disable-gpu-sandbox');
+app.commandLine.appendArgument('ignore-gpu-blacklist');
+
+app.commandLine.appendArgument('enable-pinch');
+app.commandLine.appendArgument('flag-switches-begin');
+app.commandLine.appendArgument('disable-gpu-sandbox');
+app.commandLine.appendArgument('ignore-gpu-blacklist');
+app.commandLine.appendArgument('flag-switches-end');
+
 
 // app.commandLine.appendSwitch('remote-debugging-port', '8315');
 // app.commandLine.appendSwitch('host-rules', 'MAP * 127.0.0.1');
@@ -201,6 +213,18 @@ app.on('ready', function()
     frame: true,
     kiosk: false,
     fullscreen: true,
+    'web-preferences': { 
+       'web-security': false,
+       'javascript': true,
+       'images': true,
+       'webaudio': true,
+       'plugins': true,
+       'webgl': true,
+       'java': true,
+       'overlay-fullscreen-video': true,
+       'experimental-features': true,       
+       'experimental-canvas-features': true
+    }
    });
 //    type: 'desktop',    'standard-window': true,
 //    fullscreen: true,    frame: false,    kiosk: true,     resizable: false,    'always-on-top': true,    'auto-hide-menu-bar': true,    'title-bar-style': 'hidden' 
