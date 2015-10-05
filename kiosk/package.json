@@ -1,6 +1,8 @@
 {
-  "name"    : "kiosk",
-  "version" : "0.1.0",
-  "main"    : "main.js"
+  "name": "kiosk",
+  "version": "0.1.0",
+  "main": "main.js",
+  "devDependencies": {
+    "yargs": "^3.26.0"
+  }
 }
-

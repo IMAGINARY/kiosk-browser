@@ -2,6 +2,13 @@ global.shellStartTime = Date.now();
 
 var app = require('app'); // Module to control application life.
 
+app.commandLine.appendArgument('enable-unsafe-es3-apis');
+// app.commandLine.appendArgument('--enable-unsafe-es3-apis'); // ???
+
+// app.commandLine.appendSwitch('remote-debugging-port', '8315');
+// app.commandLine.appendSwitch('host-rules', 'MAP * 127.0.0.1');
+
+
 var crashReporter = require('crash-reporter');
 crashReporter.start(); // Report crashes to our server: productName: 'Kiosk', companyName: 'IMAGINARY'???
 
@@ -43,30 +50,162 @@ if(args.version){ process.stdout.write(app.getVersion()); process.stdout.write('
 var url = args.url;
 console.log(url);
 
+var Menu = require('menu'); var MenuItem = require('menu-item');
+var menu = Menu.getApplicationMenu();
+if( !menu )
+{
+var template = [
+  {
+    label: 'Edit',
+    submenu: [
+      {
+        label: 'Undo',
+        accelerator: 'CmdOrCtrl+Z',
+        role: 'undo'
+      },
+      {
+        label: 'Redo',
+        accelerator: 'Shift+CmdOrCtrl+Z',
+        role: 'redo'
+      },
+      {
+        type: 'separator'
+      },
+      {
+        label: 'Cut',
+        accelerator: 'CmdOrCtrl+X',
+        role: 'cut'
+      },
+      {
+        label: 'Copy',
+        accelerator: 'CmdOrCtrl+C',
+        role: 'copy'
+      },
+      {
+        label: 'Paste',
+        accelerator: 'CmdOrCtrl+V',
+        role: 'paste'
+      },
+      {
+        label: 'Select All',
+        accelerator: 'CmdOrCtrl+A',
+        role: 'selectall'
+      },
+    ]
+  },
+  {
+    label: 'View',
+    submenu: [
+      {
+        label: 'Reload',
+        accelerator: 'CmdOrCtrl+R',
+        click: function(item, focusedWindow) {
+          if (focusedWindow)
+            focusedWindow.reload();
+        }
+      },
+      {
+        label: 'Toggle Full Screen',
+        accelerator: (function() {
+          if (process.platform == 'darwin')
+            return 'Ctrl+Command+F';
+          else
+            return 'F11';
+        })(),
+        click: function(item, focusedWindow) {
+          if (focusedWindow)
+            focusedWindow.setFullScreen(!focusedWindow.isFullScreen());
+        }
+      },
+      {
+        label: 'Toggle Developer Tools',
+        accelerator: (function() {
+          if (process.platform == 'darwin')
+            return 'Alt+Command+I';
+          else
+            return 'Ctrl+Shift+I';
+        })(),
+        click: function(item, focusedWindow) {
+          if (focusedWindow)
+            focusedWindow.toggleDevTools();
+        }
+      },
+    ]
+  },
+  {
+    label: 'Window',
+    role: 'window',
+    submenu: [
+      {
+        label: 'Minimize',
+        accelerator: 'CmdOrCtrl+M',
+        role: 'minimize'
+      },
+      {
+        label: 'Close',
+        accelerator: 'CmdOrCtrl+W',
+        role: 'close'
+      },
+ {
+   label: 'GoBack',
+   click: function(item, focusedWindow) {
+//      console.log(focusedWindow);
+         if (focusedWindow) { // .webContents.canGoBack()
+            focusedWindow.webContents.goBack();
+        }
+    }
+ },
+ {
+   label: 'Index',
+   click: function(item, focusedWindow) {
+//      console.log(focusedWindow);
+        if (focusedWindow) {
+            focusedWindow.loadUrl('file://' + __dirname + '/index.html');
+        }
+    }
+  },
+  {
+        label: 'Learn More',
+        click: function(item, focusedWindow) { 
+          if (focusedWindow) {
+           focusedWindow.loadUrl('https://github.com/malex984/dockapp/tree/master/kiosk'); 
+        // require('shell').openExternal('https://github.com/malex984/dockapp/tree/master/kiosk') ;
+           }
+        }
+  },
+ ] 
+ }
+];
+
+  menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
+}
+
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.on('ready', function() 
 {   
-   var screen = require('screen');
-   var size = screen.getPrimaryDisplay().workAreaSize;
+
+//   var screen = require('screen');
+//   var size = screen.getPrimaryDisplay().workAreaSize;
+//       width: size.width, height: size.height,
    
    // Create the browser window.   
    mainWindow = new BrowserWindow({
-    show: false,
-    x: 0, y: 0, 
-    width: size.width, height: size.height,
-    fullscreen: true,
-    frame: false, 
-    kiosk: true, 
-    resizable: false,
-    type: 'desktop', 
-    'always-on-top': true,
+    show: false, x: 0, y: 0,
     'accept-first-mouse': true,
-    'auto-hide-menu-bar': true, 
-    'standard-window': true,
-    'title-bar-style': 'hidden' 
+    'always-on-top': true,
+    width: 1024,
+    height: 768,
+    resizable: true,
+    frame: true,
+    kiosk: false,
+    fullscreen: false,
    });
+//    type: 'desktop',    'standard-window': true,
+//    fullscreen: true,    frame: false,    kiosk: true,     resizable: false,    'always-on-top': true,    'auto-hide-menu-bar': true,    'title-bar-style': 'hidden' 
+   // TODO: Switch to kiosk mode upon some option?!
    
    // Emitted when the window is closed.
    mainWindow.on('closed', function() {
@@ -77,7 +216,12 @@ app.on('ready', function()
    });
    
    mainWindow.webContents.on('new-window', function(event, url) { event.preventDefault(); });
-  
+
+   mainWindow.on('app-command', function(e, cmd) {
+      // Navigate the window back when the user hits their mouse back button
+      if (cmd === 'browser-backward' && mainWindow.webContents.canGoBack()) { mainWindow.webContents.goBack(); }
+   });
+
    // and load some URL?!
    mainWindow.loadUrl(url);
 

@@ -8,7 +8,17 @@ SELFDIR=`cd "$SELFDIR" && pwd`
 if hash electron 2>/dev/null; then
  D=electron
 else
- D="/usr/lib/node_modules/electron-prebuilt/dist/electron"
+
+ D="node_modules/electron-prebuilt/dist/electron"
+ if [ -x "$HOME/$D" ]; then 
+   D="$HOME/$D"
+ else
+   D="/usr/lib/$D"
+ fi
 fi
 
-${ELECTRON:-$D} --enable-unsafe-es3-apis "${SELFDIR}" "$@"
+ELECTRON="${ELECTRON:-$D}"
+
+[ -x "${ELECTRON}" ] && "${ELECTRON}" "${SELFDIR}" "$@" || echo "Sorry: cannot detect electron binary on your system ['${ELECTRON}'] :("
+
+### http://blog.soulserv.net/building-a-package-featuring-electron-as-a-stand-alone-application/
