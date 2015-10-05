@@ -24,7 +24,8 @@ RUN npm install electron-prebuilt -g
 ### RUN git clone https://github.com/malex984/dockapp /usr/src/dockapp/
 
 RUN mkdir -p /usr/src/kiosk
-COPY index.html main.js package.json run.sh Films-Slider Gallery-Slider jsqrcode /usr/src/kiosk/
+COPY index.html main.js package.json run.sh /usr/src/kiosk/
+## Films-Slider Gallery-Slider jsqrcode 
 
 RUN cd /usr/src/kiosk && npm install yargs --save-devg
 
