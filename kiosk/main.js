@@ -196,12 +196,11 @@ app.on('ready', function()
     show: false, x: 0, y: 0,
     'accept-first-mouse': true,
     'always-on-top': true,
-    width: 1024,
-    height: 768,
+    width: 1024, height: 768,
     resizable: true,
     frame: true,
     kiosk: false,
-    fullscreen: false,
+    fullscreen: true,
    });
 //    type: 'desktop',    'standard-window': true,
 //    fullscreen: true,    frame: false,    kiosk: true,     resizable: false,    'always-on-top': true,    'auto-hide-menu-bar': true,    'title-bar-style': 'hidden' 
