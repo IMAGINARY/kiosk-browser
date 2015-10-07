@@ -5,17 +5,7 @@
 SELFDIR=`dirname "$0"`
 SELFDIR=`cd "$SELFDIR" && pwd`
 
-if hash electron 2>/dev/null; then
- D=electron
-else
-
- D="node_modules/electron-prebuilt/dist/electron"
- if [ -x "$HOME/$D" ]; then 
-   D="$HOME/$D"
- else
-   D="/usr/lib/$D"
- fi
-fi
+D="$PWD/node_modules/electron-prebuilt/dist/electron"
 
 ELECTRON="${ELECTRON:-$D}"
 
