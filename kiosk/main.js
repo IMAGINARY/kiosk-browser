@@ -2,19 +2,79 @@ global.shellStartTime = Date.now();
 
 var app = require('app'); // Module to control application life.
 
-app.commandLine.appendArgument('enable-unsafe-es3-apis');
+//// http://peter.sh/experiments/chromium-command-line-switches/
+
+/// --enable-pinch --flag-switches-begin 
+//--enable-experimental-canvas-features --enable-gpu-rasterization --javascript-harmony --enable-touch-editing --enable-webgl-draft-extensions --enable-experimental-extension-apis --ignore-gpu-blacklist --show-fps-counter --ash-touch-hud --touch-events=enabled
+// --flag-switches-end
+
+app.commandLine.appendArgument('--enable-pinch');
+app.commandLine.appendArgument('--enable-unsafe-es3-apis');
+app.commandLine.appendArgument('--disable-gpu-sandbox');
+app.commandLine.appendArgument('--ignore-gpu-blacklist');
+app.commandLine.appendArgument('--enable-experimental-canvas-features');
+app.commandLine.appendArgument('--enable-gpu-rasterization');
+app.commandLine.appendArgument('--javascript-harmony');
+app.commandLine.appendArgument('--enable-touch-editing');
+
+app.commandLine.appendArgument('--enable-webgl-draft-extensions');
+app.commandLine.appendArgument('--enable-webgl-image-chromium');
+app.commandLine.appendArgument('--enable-subscribe-uniform-extension');
+
+app.commandLine.appendArgument('--enable-experimental-extension-apis');
+app.commandLine.appendArgument('--show-fps-counter');
+app.commandLine.appendArgument('--ash-touch-hud');
+app.commandLine.appendArgument('--touch-events=enabled');
+
+app.commandLine.appendArgument('--auto');
+app.commandLine.appendArgument('--ash-enable-touch-view-testing');
+
+app.commandLine.appendArgument('--compensate-for-unstable-pinch-zoom');
+app.commandLine.appendArgument('--enable-touch-drag-drop');
+app.commandLine.appendArgument('--enable-touchview');
+app.commandLine.appendArgument('--enable-viewport');
+app.commandLine.appendArgument('--touch-events');
 
 //https://github.com/atom/electron/issues/1277
 //https://bugs.launchpad.net/ubuntu/+source/chromium-browser/+bug/1463598
 //https://code.google.com/p/chromium/issues/detail?id=121183
-app.commandLine.appendArgument('disable-gpu-sandbox');
-app.commandLine.appendArgument('ignore-gpu-blacklist');
+// app.commandLine.appendArgument('disable-gpu-sandbox');
+// app.commandLine.appendArgument('ignore-gpu-blacklist');
 
-app.commandLine.appendArgument('enable-pinch');
-app.commandLine.appendArgument('flag-switches-begin');
-app.commandLine.appendArgument('disable-gpu-sandbox');
-app.commandLine.appendArgument('ignore-gpu-blacklist');
-app.commandLine.appendArgument('flag-switches-end');
+// app.commandLine.appendArgument('enable-pinch');
+app.commandLine.appendArgument('--flag-switches-begin');
+
+app.commandLine.appendArgument('--enable-pinch');
+app.commandLine.appendArgument('--enable-unsafe-es3-apis');
+app.commandLine.appendArgument('--disable-gpu-sandbox');
+app.commandLine.appendArgument('--ignore-gpu-blacklist');
+app.commandLine.appendArgument('--enable-experimental-canvas-features');
+app.commandLine.appendArgument('--enable-gpu-rasterization');
+app.commandLine.appendArgument('--javascript-harmony');
+app.commandLine.appendArgument('--enable-touch-editing');
+
+app.commandLine.appendArgument('--enable-webgl-draft-extensions');
+app.commandLine.appendArgument('--enable-webgl-image-chromium');
+app.commandLine.appendArgument('--enable-subscribe-uniform-extension');
+
+app.commandLine.appendArgument('--enable-experimental-extension-apis');
+app.commandLine.appendArgument('--show-fps-counter');
+app.commandLine.appendArgument('--ash-touch-hud');
+app.commandLine.appendArgument('--touch-events=enabled');
+
+app.commandLine.appendArgument('--auto');
+app.commandLine.appendArgument('--ash-enable-touch-view-testing');
+
+app.commandLine.appendArgument('--compensate-for-unstable-pinch-zoom');
+app.commandLine.appendArgument('--enable-touch-drag-drop');
+app.commandLine.appendArgument('--enable-touchview');
+app.commandLine.appendArgument('--enable-viewport');
+app.commandLine.appendArgument('--touch-events');
+
+// --touch-devices ::  xinput list
+
+//// --material-hybrid  --touch-calibration
+app.commandLine.appendArgument('--flag-switches-end');
 
 
 // app.commandLine.appendSwitch('remote-debugging-port', '8315');
@@ -238,12 +298,12 @@ app.on('ready', function()
      mainWindow = null;
    });
    
-   mainWindow.webContents.on('new-window', function(event, url) { event.preventDefault(); });
+//   mainWindow.webContents.on('new-window', function(event, url) { event.preventDefault(); });
 
-   mainWindow.on('app-command', function(e, cmd) {
-      // Navigate the window back when the user hits their mouse back button
-      if (cmd === 'browser-backward' && mainWindow.webContents.canGoBack()) { mainWindow.webContents.goBack(); }
-   });
+//   mainWindow.on('app-command', function(e, cmd) {
+//      // Navigate the window back when the user hits their mouse back button
+//      if (cmd === 'browser-backward' && mainWindow.webContents.canGoBack()) { mainWindow.webContents.goBack(); }
+//   });
 
    // and load some URL?!
    mainWindow.loadUrl(url);

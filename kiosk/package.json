@@ -1,8 +1,9 @@
 {
   "name": "kiosk",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "main.js",
   "devDependencies": {
-    "yargs": "^3.26.0"
+    "electron-prebuilt": "^0.33.7",
+    "yargs": "^3.27.0"
   }
 }

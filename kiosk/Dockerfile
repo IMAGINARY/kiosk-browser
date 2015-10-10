@@ -13,6 +13,7 @@ RUN chmod +x /tmp/setup_4.sh && bash /tmp/setup_4.sh && rm /tmp/setup_4.sh
 RUN update.sh && \
     install.sh --no-install-recommends \
        nodejs libgtk2.0-0 libgconf-2-4 libasound2 libxtst6 libxss1 libnss3 \
+       mtdev-tools libmtdev-dev libmtdev1 \
     && \
     clean.sh
 
