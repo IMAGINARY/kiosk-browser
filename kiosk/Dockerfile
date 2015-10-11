@@ -3,12 +3,14 @@ FROM malex984/dockapp:test
 MAINTAINER Oleksandr Motsak <malex984@googlemail.com>
 
 # https://github.com/nodesource/distributions
-ADD https://deb.nodesource.com/setup_4.x /tmp/setup_4.sh
 
+RUN wget -qO- https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
+
+ADD https://deb.nodesource.com/setup_4.x /tmp/setup_4.sh
 RUN chmod +x /tmp/setup_4.sh && bash /tmp/setup_4.sh && rm /tmp/setup_4.sh
 
+##  curl --silent --location https://deb.nodesource.com/setup_4.x | sudo -E bash -
 ### wget -qO- https://deb.nodesource.com/setup_4.x | bash -
-### curl --silent --location https://deb.nodesource.com/setup_4.x | sudo bash -
 
 RUN update.sh && \
     install.sh --no-install-recommends \
