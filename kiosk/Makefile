@@ -2,7 +2,7 @@ mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 COPYFILES   := 
 include ../Makefile.inc
 
-CMD=launch.sh
+CMD=launch.sh /usr/local/src/kiosk/run.sh
 
 RUNTERM=-it -a stdin -a stdout -a stderr --ipc=host --privileged --net=host --pid=host
 OPTS=--skip-startup-files --no-kill-all-on-exit --quiet --skip-runit

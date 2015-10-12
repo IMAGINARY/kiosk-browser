@@ -16,6 +16,7 @@ RUN update.sh && \
     install.sh --no-install-recommends \
        nodejs libgtk2.0-0 libgconf-2-4 libasound2 libxtst6 libxss1 libnss3 \
        mtdev-tools libmtdev-dev libmtdev1 \
+       dbus-x11 dbus libdbus-glib-1-2 libdbusmenu-glib4  \
     && \
     clean.sh
 
