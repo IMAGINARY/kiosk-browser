@@ -33,7 +33,7 @@ app.commandLine.appendArgument('--compensate-for-unstable-pinch-zoom');
 app.commandLine.appendArgument('--enable-touch-drag-drop');
 app.commandLine.appendArgument('--enable-touchview');
 app.commandLine.appendArgument('--enable-viewport');
-app.commandLine.appendArgument('--touch-events');
+// app.commandLine.appendArgument('--touch-events');
 
 //https://github.com/atom/electron/issues/1277
 //https://bugs.launchpad.net/ubuntu/+source/chromium-browser/+bug/1463598
@@ -69,11 +69,11 @@ app.commandLine.appendArgument('--compensate-for-unstable-pinch-zoom');
 app.commandLine.appendArgument('--enable-touch-drag-drop');
 app.commandLine.appendArgument('--enable-touchview');
 app.commandLine.appendArgument('--enable-viewport');
-app.commandLine.appendArgument('--touch-events');
+// app.commandLine.appendArgument('--touch-events');
 
 // --touch-devices ::  xinput list
-
 //// --material-hybrid  --touch-calibration
+
 app.commandLine.appendArgument('--flag-switches-end');
 
 
