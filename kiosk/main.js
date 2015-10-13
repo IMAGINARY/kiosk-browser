@@ -8,10 +8,13 @@ var app = require('app'); // Module to control application life.
 //--enable-experimental-canvas-features --enable-gpu-rasterization --javascript-harmony --enable-touch-editing --enable-webgl-draft-extensions --enable-experimental-extension-apis --ignore-gpu-blacklist --show-fps-counter --ash-touch-hud --touch-events=enabled
 // --flag-switches-end
 
+app.commandLine.appendArgument('--ignore-gpu-blacklist');
+app.commandLine.appendArgument('--enable-gpu');
+app.commandLine.appendArgument('--enable-webgl');
+
 app.commandLine.appendArgument('--enable-pinch');
 app.commandLine.appendArgument('--enable-unsafe-es3-apis');
 app.commandLine.appendArgument('--disable-gpu-sandbox');
-app.commandLine.appendArgument('--ignore-gpu-blacklist');
 app.commandLine.appendArgument('--enable-experimental-canvas-features');
 app.commandLine.appendArgument('--enable-gpu-rasterization');
 app.commandLine.appendArgument('--javascript-harmony');
@@ -26,8 +29,11 @@ app.commandLine.appendArgument('--show-fps-counter');
 app.commandLine.appendArgument('--ash-touch-hud');
 app.commandLine.appendArgument('--touch-events=enabled');
 
+
 app.commandLine.appendArgument('--auto');
 app.commandLine.appendArgument('--ash-enable-touch-view-testing');
+
+app.commandLine.appendArgument('--blacklist-accelerated-compositing');
 
 app.commandLine.appendArgument('--compensate-for-unstable-pinch-zoom');
 app.commandLine.appendArgument('--enable-touch-drag-drop');
@@ -62,8 +68,13 @@ app.commandLine.appendArgument('--show-fps-counter');
 app.commandLine.appendArgument('--ash-touch-hud');
 app.commandLine.appendArgument('--touch-events=enabled');
 
+app.commandLine.appendArgument('--enable-gpu');
+app.commandLine.appendArgument('--enable-webgl');
+
 app.commandLine.appendArgument('--auto');
 app.commandLine.appendArgument('--ash-enable-touch-view-testing');
+
+app.commandLine.appendArgument('--blacklist-accelerated-compositing');
 
 app.commandLine.appendArgument('--compensate-for-unstable-pinch-zoom');
 app.commandLine.appendArgument('--enable-touch-drag-drop');
