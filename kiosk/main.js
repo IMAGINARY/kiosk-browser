@@ -2,90 +2,80 @@ global.shellStartTime = Date.now();
 
 var app = require('app'); // Module to control application life.
 
-//// http://peter.sh/experiments/chromium-command-line-switches/
+// http://peter.sh/experiments/chromium-command-line-switches/
 
-/// --enable-pinch --flag-switches-begin 
+// --enable-pinch --flag-switches-begin 
 //--enable-experimental-canvas-features --enable-gpu-rasterization --javascript-harmony --enable-touch-editing --enable-webgl-draft-extensions --enable-experimental-extension-apis --ignore-gpu-blacklist --show-fps-counter --ash-touch-hud --touch-events=enabled
 // --flag-switches-end
 
-app.commandLine.appendArgument('--ignore-gpu-blacklist');
-app.commandLine.appendArgument('--enable-gpu');
-app.commandLine.appendArgument('--enable-webgl');
+function sw() 
+{
 
-app.commandLine.appendArgument('--enable-pinch');
-app.commandLine.appendArgument('--enable-unsafe-es3-apis');
-app.commandLine.appendArgument('--disable-gpu-sandbox');
-app.commandLine.appendArgument('--enable-experimental-canvas-features');
-app.commandLine.appendArgument('--enable-gpu-rasterization');
-app.commandLine.appendArgument('--javascript-harmony');
-app.commandLine.appendArgument('--enable-touch-editing');
+app.commandLine.appendSwitch('disable-threaded-scrolling');
+// app.commandLine.appendSwitch('enable-apps-show-on-first-paint');
+// app.commandLine.appendSwitch('enable-embedded-extension-options');
+// app.commandLine.appendSwitch('enable-experimental-canvas-features');
+// app.commandLine.appendSwitch('enable-gpu-rasterization');
+app.commandLine.appendSwitch('javascript-harmony');
+app.commandLine.appendSwitch('enable-pinch');
+app.commandLine.appendSwitch('enable-settings-window');
+app.commandLine.appendSwitch('enable-touch-editing');
+// app.commandLine.appendSwitch('enable-webgl-draft-extensions');
+// app.commandLine.appendSwitch('enable-experimental-extension-apis');
+app.commandLine.appendSwitch('ignore-gpu-blacklist');
+// app.commandLine.appendSwitch('disable-overlay-scrollbar');
+// app.commandLine.appendSwitch('show-fps-counter');
+// app.commandLine.appendSwitch('ash-touch-hud');
 
-app.commandLine.appendArgument('--enable-webgl-draft-extensions');
-app.commandLine.appendArgument('--enable-webgl-image-chromium');
-app.commandLine.appendArgument('--enable-subscribe-uniform-extension');
+app.commandLine.appendSwitch('touch-events');
+app.commandLine.appendSwitch('touch-events-enabled');
+app.commandLine.appendSwitch('touch-events', 'enabled');
 
-app.commandLine.appendArgument('--enable-experimental-extension-apis');
-app.commandLine.appendArgument('--show-fps-counter');
-app.commandLine.appendArgument('--ash-touch-hud');
-app.commandLine.appendArgument('--touch-events=enabled');
+/// app.commandLine.appendSwitch('ignore-gpu-blacklist');
+/// app.commandLine.appendSwitch('enable-gpu');
+// app.commandLine.appendSwitch('disable-gpu-sandbox');
+// app.commandLine.appendSwitch('enable-gpu-rasterization');
+/// app.commandLine.appendSwitch('enable-pinch');
 
+// app.commandLine.appendSwitch('blacklist-accelerated-compositing');
 
-app.commandLine.appendArgument('--auto');
-app.commandLine.appendArgument('--ash-enable-touch-view-testing');
+/// app.commandLine.appendSwitch('disable-web-security');
+/// app.commandLine.appendSwitch('enable-webgl');
 
-app.commandLine.appendArgument('--blacklist-accelerated-compositing');
+// app.commandLine.appendSwitch('enable-webgl-draft-extensions');
+/// app.commandLine.appendSwitch('enable-webgl-image-chromium');
 
-app.commandLine.appendArgument('--compensate-for-unstable-pinch-zoom');
-app.commandLine.appendArgument('--enable-touch-drag-drop');
-app.commandLine.appendArgument('--enable-touchview');
-app.commandLine.appendArgument('--enable-viewport');
-// app.commandLine.appendArgument('--touch-events');
+// app.commandLine.appendSwitch('enable-touch-editing');
+// app.commandLine.appendSwitch('enable-touch-drag-drop');
+/// app.commandLine.appendSwitch('enable-touchview');
+
+/// app.commandLine.appendSwitch('compensate-for-unstable-pinch-zoom');
+
+/// app.commandLine.appendSwitch('enable-viewport');
+// app.commandLine.appendSwitch('enable-unsafe-es3-apis');
+// app.commandLine.appendSwitch('enable-experimental-canvas-features');
+// app.commandLine.appendSwitch('enable-experimental-extension-apis');
+// app.commandLine.appendSwitch('javascript-harmony');
+// app.commandLine.appendSwitch('enable-subscribe-uniform-extension');
+
+/// app.commandLine.appendSwitch('show-fps-counter');
+/// app.commandLine.appendSwitch('ash-touch-hud');
+// app.commandLine.appendSwitch('ash-enable-touch-view-testing');
+
+/// app.commandLine.appendSwitch('auto');
+}
 
 //https://github.com/atom/electron/issues/1277
 //https://bugs.launchpad.net/ubuntu/+source/chromium-browser/+bug/1463598
 //https://code.google.com/p/chromium/issues/detail?id=121183
-// app.commandLine.appendArgument('disable-gpu-sandbox');
-// app.commandLine.appendArgument('ignore-gpu-blacklist');
 
-// app.commandLine.appendArgument('enable-pinch');
-app.commandLine.appendArgument('--flag-switches-begin');
 
-app.commandLine.appendArgument('--enable-pinch');
-app.commandLine.appendArgument('--enable-unsafe-es3-apis');
-app.commandLine.appendArgument('--disable-gpu-sandbox');
-app.commandLine.appendArgument('--ignore-gpu-blacklist');
-app.commandLine.appendArgument('--enable-experimental-canvas-features');
-app.commandLine.appendArgument('--enable-gpu-rasterization');
-app.commandLine.appendArgument('--javascript-harmony');
-app.commandLine.appendArgument('--enable-touch-editing');
+app.commandLine.appendSwitch('enable-pinch');
 
-app.commandLine.appendArgument('--enable-webgl-draft-extensions');
-app.commandLine.appendArgument('--enable-webgl-image-chromium');
-app.commandLine.appendArgument('--enable-subscribe-uniform-extension');
-
-app.commandLine.appendArgument('--enable-experimental-extension-apis');
-app.commandLine.appendArgument('--show-fps-counter');
-app.commandLine.appendArgument('--ash-touch-hud');
-app.commandLine.appendArgument('--touch-events=enabled');
-
-app.commandLine.appendArgument('--enable-gpu');
-app.commandLine.appendArgument('--enable-webgl');
-
-app.commandLine.appendArgument('--auto');
-app.commandLine.appendArgument('--ash-enable-touch-view-testing');
-
-app.commandLine.appendArgument('--blacklist-accelerated-compositing');
-
-app.commandLine.appendArgument('--compensate-for-unstable-pinch-zoom');
-app.commandLine.appendArgument('--enable-touch-drag-drop');
-app.commandLine.appendArgument('--enable-touchview');
-app.commandLine.appendArgument('--enable-viewport');
-// app.commandLine.appendArgument('--touch-events');
-
-// --touch-devices ::  xinput list
-//// --material-hybrid  --touch-calibration
-
-app.commandLine.appendArgument('--flag-switches-end');
+// sw();
+app.commandLine.appendSwitch('flag-switches-begin');
+sw();
+app.commandLine.appendSwitch('flag-switches-end');
 
 
 // app.commandLine.appendSwitch('remote-debugging-port', '8315');
@@ -270,16 +260,16 @@ var template = [
 app.on('ready', function() 
 {   
 
-//   var screen = require('screen');
-//   var size = screen.getPrimaryDisplay().workAreaSize;
-//       width: size.width, height: size.height,
+   var screen = require('screen');
+   var size = screen.getPrimaryDisplay().workAreaSize;
    
    // Create the browser window.   
+//    width: 1024, height: 768,
    mainWindow = new BrowserWindow({
     show: false, x: 0, y: 0,
     'accept-first-mouse': true,
     'always-on-top': true,
-    width: 1024, height: 768,
+    width: size.width, height: size.height,
     resizable: true,
     frame: true,
     kiosk: false,
@@ -291,12 +281,14 @@ app.on('ready', function()
        'webaudio': true,
        'plugins': true,
        'webgl': true,
-       'java': true,
        'overlay-fullscreen-video': true,
-       'experimental-features': true,       
-       'experimental-canvas-features': true
+       'java': true,
     }
    });
+//       'experimental-features': true,       
+//       'experimental-canvas-features': true
+
+
 //    type: 'desktop',    'standard-window': true,
 //    fullscreen: true,    frame: false,    kiosk: true,     resizable: false,    'always-on-top': true,    'auto-hide-menu-bar': true,    'title-bar-style': 'hidden' 
    // TODO: Switch to kiosk mode upon some option?!
@@ -309,13 +301,24 @@ app.on('ready', function()
      mainWindow = null;
    });
    
-//   mainWindow.webContents.on('new-window', function(event, url) { event.preventDefault(); });
+   
+   mainWindow.webContents.on('new-window', function(event, url) { event.preventDefault(); });
 
 //   mainWindow.on('app-command', function(e, cmd) {
 //      // Navigate the window back when the user hits their mouse back button
 //      if (cmd === 'browser-backward' && mainWindow.webContents.canGoBack()) { mainWindow.webContents.goBack(); }
 //   });
 
+   // In the main process.
+   mainWindow.webContents.session.on('will-download', function(event, item, webContents) {
+    console.log("Trying to Download: ");   
+    console.log(item.getFilename());
+    console.log(item.getMimeType());
+    console.log(item.getTotalBytes());
+    item.cancel(); // Nope... this is a kiosk! 
+   });    
+    
+      
    // and load some URL?!
    mainWindow.loadUrl(url);
 
