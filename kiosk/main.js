@@ -274,7 +274,8 @@ app.on('ready', function()
     frame: true,
     kiosk: false,
     fullscreen: true,
-    'web-preferences': { 
+    'web-preferences': {
+       'nodeIntegration': false,
        'web-security': false,
        'javascript': true,
        'images': true,
