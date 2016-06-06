@@ -1,6 +1,9 @@
 global.shellStartTime = Date.now();
 
-var app = require('app'); // Module to control application life.
+const electron = require('electron');
+
+// Module to control application life.
+const app = electron.app
 
 // http://peter.sh/experiments/chromium-command-line-switches/
 
@@ -81,9 +84,8 @@ app.commandLine.appendSwitch('flag-switches-end');
 // app.commandLine.appendSwitch('remote-debugging-port', '8315');
 // app.commandLine.appendSwitch('host-rules', 'MAP * 127.0.0.1');
 
-
-var crashReporter = require('crash-reporter');
-crashReporter.start(); // Report crashes to our server: productName: 'Kiosk', companyName: 'IMAGINARY'???
+// var crashReporter = require('crash-reporter');
+// crashReporter.start(); // Report crashes to our server: productName: 'Kiosk', companyName: 'IMAGINARY'???
 
 // var nslog = require('nslog');
 // console.log = nslog;
@@ -94,7 +96,8 @@ process.on('uncaughtException', function(error) { // '='? '{}'?
 
 // var path = require('path');
 
-var BrowserWindow = require('browser-window'); // Module to create native browser window.
+// Module to create native browser window.
+const BrowserWindow = electron.BrowserWindow
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -123,7 +126,9 @@ if(args.version){ process.stdout.write(app.getVersion()); process.stdout.write('
 var url = args.url;
 console.log(url);
 
-var Menu = require('menu'); var MenuItem = require('menu-item');
+var {Menu} = electron; //require('menu'); 
+// var MenuItem = require('menu-item');
+
 var menu = Menu.getApplicationMenu();
 if( !menu )
 {
@@ -233,7 +238,7 @@ var template = [
    click: function(item, focusedWindow) {
 //      console.log(focusedWindow);
         if (focusedWindow) {
-            focusedWindow.loadUrl('file://' + __dirname + '/index.html');
+            focusedWindow.loadURL(`file://${ __dirname}/index.html`);
         }
     }
   },
@@ -241,7 +246,7 @@ var template = [
         label: 'Learn More',
         click: function(item, focusedWindow) { 
           if (focusedWindow) {
-           focusedWindow.loadUrl('https://github.com/malex984/dockapp/tree/master/kiosk'); 
+           focusedWindow.loadURL(`https://github.com/malex984/dockapp/tree/master/kiosk`);
         // require('shell').openExternal('https://github.com/malex984/dockapp/tree/master/kiosk') ;
            }
         }
@@ -260,7 +265,7 @@ var template = [
 app.on('ready', function() 
 {   
 
-   var screen = require('screen');
+   var {screen} = electron; // require('screen');
    var size = screen.getPrimaryDisplay().workAreaSize;
    
    // Create the browser window.   
@@ -321,7 +326,7 @@ app.on('ready', function()
     
       
    // and load some URL?!
-   mainWindow.loadUrl(url);
+   mainWindow.loadURL(`${url}`);
 
   // Open the DevTools?
   if(args.dev){ mainWindow.openDevTools(); }

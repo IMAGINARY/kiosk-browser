@@ -2,8 +2,21 @@
   "name": "kiosk",
   "version": "0.1.1",
   "main": "main.js",
+  "scripts": {
+    "start": "electron main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/malex984/dockapp"
+  },
+  "author": "Imaginary",
+  "license": "CC?",
+  "bugs": {
+    "url": "https://github.com/malex984/dockapp/issues"
+  },
+  "homepage": "https://github.com/malex984/dockapp/tree/master/kiosk",
   "devDependencies": {
-    "electron-prebuilt": "^0.36.8",
-    "yargs": "^4.1.0"
+    "electron-prebuilt": "^1.2.1",
+    "yargs": "^4.7.1"
   }
 }
