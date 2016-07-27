@@ -115,6 +115,7 @@ var options = yargs.wrap(yargs.terminalWidth())
 .alias('h', 'help').boolean('h').describe('h', 'Print this usage message.')
 .alias('v', 'version').boolean('v').describe('v', 'Print the version.')
 .alias('d', 'dev').boolean('d').describe('d', 'Run in development mode.')
+.alias('p', 'ping').boolean('p').describe('p', 'Send HB pings by timer.')
 .alias('l', 'url').string('l').default('l', 'file://' + __dirname + '/index.html')
 .usage('Kiosk\n    Usage: kiosk [options]' );
 
@@ -125,6 +126,8 @@ if(args.version){ process.stdout.write(app.getVersion()); process.stdout.write('
 
 var url = args.url;
 console.log(url);
+
+var hb_ping =  args.ping;
 
 var {Menu} = electron; //require('menu'); 
 // var MenuItem = require('menu-item');
