@@ -7,14 +7,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/malex984/dockapp"
+    "url": "git+https://github.com/hilbert/hilbert-docker-images"
   },
   "author": "Imaginary",
   "license": "CC?",
   "bugs": {
-    "url": "https://github.com/malex984/dockapp/issues"
+    "url": "https://github.com/hilbert/hilbert-docker-images/issues"
   },
-  "homepage": "https://github.com/malex984/dockapp/tree/master/kiosk",
+  "homepage": "https://github.com/hilbert/hilbert-docker-images/tree/devel/images/kiosk",
   "devDependencies": {
     "electron-prebuilt": "^1.2.1",
     "yargs": "^4.7.1"
