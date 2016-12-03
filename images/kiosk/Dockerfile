@@ -20,9 +20,6 @@ RUN update.sh && \
 ## && npm install asar -g && \
 ##    npm install yargs -g
 
-### note : will cache... :(
-### RUN git clone https://github.com/malex984/dockapp /usr/local/src/dockapp/
-
 RUN mkdir -p /usr/local/src/kiosk
 # WORKDIR /usr/local/src/kiosk/
 

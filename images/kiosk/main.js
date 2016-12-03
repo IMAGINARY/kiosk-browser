@@ -250,7 +250,7 @@ var template = [
         click: function(item, focusedWindow) { 
           if (focusedWindow) {
            focusedWindow.loadURL(`https://github.com/hilbert/hilbert-docker-images/tree/devel/images/kiosk`);
-        // require('shell').openExternal('https://github.com/malex984/dockapp/tree/master/kiosk') ;
+        // require('shell').openExternal('https://github.com/hilbert/hilbert-docker-images/tree/devel/images/kiosk') ;
            }
         }
   },
