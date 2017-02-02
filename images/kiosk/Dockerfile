@@ -1,4 +1,4 @@
-FROM hilbert/webbase
+FROM hilbert/gui
 
 ARG IMAGE_VERSION=latest
 LABEL IMAGE_VERSION=${IMAGE_VERSION}
@@ -15,9 +15,7 @@ RUN chmod +x /tmp/setup_4.sh && bash /tmp/setup_4.sh
 ##  curl --silent --location https://deb.nodesource.com/setup_4.x | sudo -E bash -
 ### wget -qO- https://deb.nodesource.com/setup_4.x | bash -
 
-RUN update.sh && \
-    install.sh --no-install-recommends nodejs && \
-    clean.sh
+RUN update.sh && install.sh nodejs && clean.sh
 
 #RUN npm install electron-prebuilt -g 
 ## && npm install asar -g && \
