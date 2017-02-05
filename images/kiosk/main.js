@@ -104,7 +104,7 @@ const BrowserWindow = electron.BrowserWindow
 var mainWindow = null;
 
 // Quit when all windows are closed.
-app.on('window-all-closed', function() { app.quit(); }); // also on MAC OS X?
+app.on('window-all-closed', function() { console.log('window-all-closed!'); app.quit(); }); // also on MAC OS X?
 // if (process.platform != 'darwin') // ?
 
 console.log(process.argv); // [1..]; // ????
@@ -262,6 +262,23 @@ var template = [
   Menu.setApplicationMenu(menu);
 }
 
+var signals = {
+  'SIGINT': 2,
+  'SIGTERM': 15
+};
+
+function shutdown(signal, value) {
+  server.close(function () {
+    console.log('Kiosk stopped due to [' + signal + '] signal');
+    process.exit(128 + value);
+  });
+}
+
+Object.keys(signals).forEach(function (signal) {
+  process.on(signal, function () {
+    shutdown(signal, signals[signal]);
+  });
+});
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -307,7 +324,9 @@ app.on('ready', function()
      // Dereference the window object, usually you would store windows
      // in an array if your app supports multi windows, this is the time
      // when you should delete the corresponding element.
+     console.log("closing main window...");
      mainWindow = null;
+     app.quit();
    });
    
    
