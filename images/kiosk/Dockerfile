@@ -1,8 +1,5 @@
 FROM hilbert/gui
 
-ARG IMAGE_VERSION=latest
-LABEL IMAGE_VERSION=${IMAGE_VERSION}
-
 MAINTAINER Oleksandr Motsak <malex984+hilbert.kiosk@gmail.com>
 
 # https://github.com/nodesource/distributions
@@ -32,5 +29,25 @@ COPY browser.sh /usr/local/bin/
 
 # ONBUILD COPY package.json index.html main.js /usr/src/kiosk/
 # CMD [ "npm", "start" ]
-# CMD [ "launch.sh", "/usr/src/kiosk/run.sh" ] ## ??
+# CMD [ "launch.sh", "/usr/src/kiosk/run.sh" ] ## kiosk
 # /usr/local/src/kiosk/run.sh # !
+
+
+
+
+ARG IMAGE_VERSION=latest
+ARG GIT_NOT_CLEAN_CHECK
+# Build-time metadata as defined at http://label-schema.org
+ARG BUILD_DATE=someday
+ARG VCS_REF=HEAD
+ARG VCS_URL="https://github.com/hilbert/hilbert-docker-images"
+
+ARG DOCKERFILE="/images/kiosk/Dockerfile"
+LABEL org.label-schema.description="Kiosk-mode browser using Electron. Base for WebBrowser-related images (as well as hilbert/gui)" \
+      org.label-schema.build-date="${BUILD_DATE}" \
+      org.label-schema.vcs-ref="${VCS_REF}" \
+      org.label-schema.vcs-url="${VCS_URL}" \
+      org.label-schema.version="${IMAGE_VERSION}" \
+      com.microscaling.docker.dockerfile="${DOCKERFILE}" \
+      IMAGE_VERSION="${IMAGE_VERSION}" \
+      GIT_NOT_CLEAN_CHECK="${GIT_NOT_CLEAN_CHECK}"
