@@ -7,9 +7,8 @@ ARGS=
 APP_ID=browser_app
 
 # --privileged
-RUNTERM=--rm -it -a stdin -a stdout -a stderr
-# --ipc=host --net=host --pid=host 
-OPTS=--skip-startup-files --skip-runit
+RUNTERM=--rm -it -a stdin -a stdout -a stderr --ipc=host --net=host 
+OPTS=/sbin/my_init --skip-startup-files --skip-runit
 
 check: $(TS)
 	### [ -z "${DISPLAY}" ] && exit 1

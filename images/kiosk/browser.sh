@@ -6,4 +6,4 @@ ARGS=$@
 #SELFDIR=`dirname "$0"`
 #SELFDIR=`cd "$SELFDIR" && pwd`
 
-/usr/local/src/kiosk/run.sh ${ARGS}
+exec /usr/local/src/kiosk/run.sh ${ARGS}

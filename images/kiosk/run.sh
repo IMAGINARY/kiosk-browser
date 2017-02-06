@@ -12,6 +12,6 @@ ARGS="$@"
 
 cd "$SELFDIR"
 
-[[ -x "${ELECTRON}" ]] && "${ELECTRON}" "${SELFDIR}" $ARGS || (echo "Sorry: cannot detect electron binary on your system ['${ELECTRON}'] :("; exit 1;)
+[[ -x "${ELECTRON}" ]] && exec "${ELECTRON}" "${SELFDIR}" $ARGS || (echo "Sorry: cannot detect electron binary on your system ['${ELECTRON}'] :("; exit 1;)
 
 ### http://blog.soulserv.net/building-a-package-featuring-electron-as-a-stand-alone-application/

@@ -16,7 +16,7 @@
   },
   "homepage": "https://github.com/hilbert/hilbert-docker-images/tree/devel/images/kiosk",
   "devDependencies": {
-    "electron-prebuilt": "^1.2.1",
-    "yargs": "^4.7.1"
+    "electron-prebuilt": "^1.4.13",
+    "yargs": "^6.6.0"
   }
 }
