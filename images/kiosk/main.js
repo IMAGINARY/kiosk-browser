@@ -15,6 +15,7 @@ function sw()
 {
 
 app.commandLine.appendSwitch('disable-threaded-scrolling');
+
 // app.commandLine.appendSwitch('enable-apps-show-on-first-paint');
 // app.commandLine.appendSwitch('enable-embedded-extension-options');
 // app.commandLine.appendSwitch('enable-experimental-canvas-features');
@@ -42,7 +43,7 @@ app.commandLine.appendSwitch('touch-events', 'enabled');
 
 // app.commandLine.appendSwitch('blacklist-accelerated-compositing');
 
-/// app.commandLine.appendSwitch('disable-web-security');
+app.commandLine.appendSwitch('disable-web-security');
 /// app.commandLine.appendSwitch('enable-webgl');
 
 // app.commandLine.appendSwitch('enable-webgl-draft-extensions');
@@ -66,6 +67,7 @@ app.commandLine.appendSwitch('touch-events', 'enabled');
 // app.commandLine.appendSwitch('ash-enable-touch-view-testing');
 
 /// app.commandLine.appendSwitch('auto');
+app.commandLine.appendSwitch('allow-file-access-from-files');
 }
 
 //https://github.com/atom/electron/issues/1277
@@ -74,6 +76,7 @@ app.commandLine.appendSwitch('touch-events', 'enabled');
 
 
 app.commandLine.appendSwitch('enable-pinch');
+app.commandLine.appendSwitch('allow-file-access-from-files');
 
 // sw();
 app.commandLine.appendSwitch('flag-switches-begin');
