@@ -50,4 +50,24 @@ LABEL org.label-schema.description="Kiosk-mode browser using Electron. Base for 
       org.label-schema.version="${IMAGE_VERSION}" \
       com.microscaling.docker.dockerfile="${DOCKERFILE}" \
       IMAGE_VERSION="${IMAGE_VERSION}" \
-      GIT_NOT_CLEAN_CHECK="${GIT_NOT_CLEAN_CHECK}"
+      GIT_NOT_CLEAN_CHECK="${GIT_NOT_CLEAN_CHECK}" \
+      org.label-schema.name="Hilbert" \
+      org.label-schema.vendor="IMAGINARY gGmbH" \
+      org.label-schema.url="https://hilbert.github.io" \
+      org.label-schema.schema-version="1.0" \
+      com.microscaling.license="Apache-2.0"     
+
+ONBUILD LABEL org.label-schema.build-date="" \
+      org.label-schema.name="" \
+      org.label-schema.description="" \
+      org.label-schema.vendor="" \
+      org.label-schema.url="" \
+      org.label-schema.vcs-ref="" \
+      org.label-schema.vcs-url="" \
+      org.label-schema.version="" \
+      org.label-schema.schema-version="" \
+      com.microscaling.license="" \
+      com.microscaling.docker.dockerfile="" \
+      IMAGE_VERSION="" \
+      GIT_NOT_CLEAN_CHECK=""
+
