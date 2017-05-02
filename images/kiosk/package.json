@@ -52,7 +52,12 @@
       "packageCategory": "Internet"
     },
     "files": [
-            "!*.sh"
+            "!.gitignore",
+            "!yarn.lock",
+            "!hooks",
+            "!Makefile",
+            "!*.sh",
+            "!*Dockerfile"
     ],
     "extraResources": [
       {

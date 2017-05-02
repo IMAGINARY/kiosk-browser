@@ -22,7 +22,17 @@
 // -->
 </SCRIPT>
   </head>
-  <body>
+  <body> 
+    <script src="hilbert-heartbeat.js"></script>
+    <script>
+               var heartbeat = new Heartbeat({
+                  url: Heartbeat.getPassedUrl('http://127.0.0.1:8888'),
+                  appId: Heartbeat.getPassedAppId('kiosk_browser_index'),
+                  interval: 10000,
+                  sendInitCommand: false,
+                  sendDoneCommand: false,
+              }); 
+    </script>
 
     <h2>Kiosk Browser Software Versions: </h2>  
     <!-- All of the Node.js APIs are available in this renderer process. -->

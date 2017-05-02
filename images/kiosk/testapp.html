@@ -134,6 +134,17 @@
     </style>
   </head>   
   <body id="body">
+    <script src="hilbert-heartbeat.js"></script>
+    <script>
+               var heartbeat = new Heartbeat({
+                  url: Heartbeat.getPassedUrl('http://127.0.0.1:8888'),
+                  appId: Heartbeat.getPassedAppId('kiosk_browser_testapp'),
+                  interval: 10000,
+                  sendInitCommand: false,
+                  sendDoneCommand: false,
+              }); 
+    </script>
+
 <div id="footer"></div>
 
 <SCRIPT>
