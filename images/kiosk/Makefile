@@ -2,7 +2,7 @@ mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 COPYFILES   := 
 include ../Makefile.inc
 
-CMD=hb_wrapper.sh launch.sh browser.sh
+CMD=hb_wrapper.sh launch.sh testapp.sh
 ARGS=
 APP_ID=browser_app
 
