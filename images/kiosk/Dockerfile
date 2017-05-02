@@ -4,28 +4,29 @@ MAINTAINER Oleksandr Motsak <malex984+hilbert.kiosk@gmail.com>
 
 # https://github.com/nodesource/distributions
 
-RUN wget -qO- https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
+#RUN wget -qO- https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
 
-ADD https://deb.nodesource.com/setup_4.x /tmp/setup_4.sh
-RUN chmod +x /tmp/setup_4.sh && bash /tmp/setup_4.sh
+#ADD https://deb.nodesource.com/setup_6.x  /tmp/setup_6.sh
+#RUN chmod +x /tmp/setup_6.sh && bash /tmp/setup_6.sh
 
 ##  curl --silent --location https://deb.nodesource.com/setup_4.x | sudo -E bash -
 ### wget -qO- https://deb.nodesource.com/setup_4.x | bash -
 
-RUN update.sh && install.sh nodejs && clean.sh
+RUN wget -q "https://cloud.imaginary.org/index.php/s/gwqWQbWu4xTsoQ8/download" -O /tmp/kiosk-browser_0.9.0_amd64.deb && \
+    update.sh && install.sh gconf2 gconf-service libnotify4 libappindicator1 libxtst6 libnss3 && \
+    dpkg -i /tmp/kiosk-browser_0.9.0_amd64.deb && install.sh -fy && clean.sh
 
 #RUN npm install electron-prebuilt -g 
 ## && npm install asar -g && \
 ##    npm install yargs -g
 
-RUN mkdir -p /usr/local/src/kiosk
+#RUN mkdir -p /usr/local/src/kiosk
 # WORKDIR /usr/local/src/kiosk/
 
-COPY package.json /usr/local/src/kiosk/
-RUN cd /usr/local/src/kiosk && npm install electron-prebuilt --save-dev && npm install yargs --save-dev
+#COPY package.json /usr/local/src/kiosk/
+#RUN cd /usr/local/src/kiosk && npm install electron-prebuilt --save-dev && npm install yargs --save-dev
 
-COPY index.html main.js run.sh browser.sh /usr/local/src/kiosk/
-COPY browser.sh /usr/local/bin/
+COPY browser.sh run.sh kiosk.sh testapp.sh /usr/local/bin/
 
 # ONBUILD COPY package.json index.html main.js /usr/src/kiosk/
 # CMD [ "npm", "start" ]

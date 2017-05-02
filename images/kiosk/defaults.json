@@ -1,0 +1,12 @@
+{
+    "fullscreen": false,
+    "kiosk": false,
+    "devTools": false,
+    "cursor": false,
+    "menu": false,
+    "zoom": 1.0,
+    "verbose": 1,
+    "testapp": false,
+    "integration": false,
+    "transparent": false
+}

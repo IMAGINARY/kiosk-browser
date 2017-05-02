@@ -1,22 +1,72 @@
 {
-  "name": "kiosk",
-  "version": "0.1.1",
-  "main": "main.js",
-  "scripts": {
-    "start": "electron main.js"
-  },
+  "name": "kiosk-browser",
+  "productName": "kiosk-browser",
+  "version": "0.9.0",
+  "description": "Hardend Kiosk Web Browser",
+  "homepage": "https://github.com/hilbert/hilbert-docker-images/tree/devel/images/kiosk",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hilbert/hilbert-docker-images"
+    "url": "git+https://github.com/hilbert/hilbert-docker-images.git"
   },
-  "author": "Imaginary",
-  "license": "CC?",
   "bugs": {
-    "url": "https://github.com/hilbert/hilbert-docker-images/issues"
+    "url": "https://github.com/hilbert/hilbert-docker-images/issues",
+    "email": "info@imaginary.org"
   },
-  "homepage": "https://github.com/hilbert/hilbert-docker-images/tree/devel/images/kiosk",
+  "main": "main.js",
+  "keywords": [
+    "kiosk",
+    "web",
+    "browser",
+    "electron"
+  ],
+  "author": "IMAGINARY gGmbH <info@imaginary.org>",
+  "license": "Apache-2.0",
   "devDependencies": {
-    "electron-prebuilt": "^1.4.13",
-    "yargs": "^6.6.0"
+    "electron": "^1.6.2",
+    "electron-builder": "^10.8.1",
+    "electron-rebuild": "^1.4.0"
+  },
+  "dependencies": {
+    "electron-settings": "^2.2.4",
+    "network": "^0.3.2",
+    "yargs": "^6.6.1-candidate.4"
+  },
+  "scripts": {
+    "postinstall": "electron-rebuild",
+    "start": "electron .",
+    "rebuild": "electron-rebuild",
+    "pack": "electron-rebuild && CSC_IDENTITY_AUTO_DISCOVERY=false build --dir",
+    "dist": "electron-rebuild && CSC_IDENTITY_AUTO_DISCOVERY=false build"
+  },
+  "build": {
+    "appId": "org.imaginary.kiosk",
+    "npmRebuild": false,
+    "linux": {
+      "executableName": "kiosk-browser",
+      "target": [
+        "rpm",
+        "AppImage",
+        "deb"
+      ],
+      "category": "Internet",
+      "packageCategory": "Internet"
+    },
+    "files": [
+            "!*.sh"
+    ],
+    "extraResources": [
+      {
+        "from": "build",
+        "to": ".",
+        "filter": "**/icon48x48.png"
+      }
+    ]
+  },
+  "yargs": {
+    "short-option-groups": true,
+    "camel-case-expansion": true,
+    "dot-notation": true,
+    "parse-numbers": true,
+    "boolean-negation": true
   }
 }
