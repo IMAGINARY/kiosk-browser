@@ -27,7 +27,22 @@ if [[ -x "/opt/kiosk-browser/kiosk-browser" ]]; then
 fi
 
 if hash docker 2>/dev/null; then
-  exec docker run -e DISPLAY --rm -it -a stdin -a stdout -a stderr --ipc=host --net=host -v /tmp/:/tmp/:rw -v /dev/shm:/dev/shm hilbert/kiosk /sbin/my_init --skip-startup-files --skip-runit -- /usr/local/bin/run.sh $ARGS
+
+PULSE_SERVER="${PULSE_SERVER:-/run/user/$UID/pulse/native11}"
+PULSE_COOKIE="${PULSE_COOKIE:-$HOME/.config/pulse/cookie11}"
+
+  if [[ -w "${PULSE_COOKIE}" && -S "${PULSE_SERVER}" ]]; then
+    SOUND_OPTS="-e PULSE_COOKIE=/run/pulse/cookie -e PULSE_SERVER=/run/pulse/native -v ${PULSE_SERVER}:/run/pulse/native:rw -v ${PULSE_COOKIE}:/run/pulse/cookie:rw"
+  else
+    SOUND_OPTS="-v ${PWD}/.asoundrc:/root/.asoundrc:ro --privileged=true"
+  fi
+
+  exec docker run -e DISPLAY --rm -it -a stdin -a stdout -a stderr --ipc=host --net=host \
+  ${SOUND_OPTS} \
+  -v /tmp/:/tmp/:rw \
+  -v /dev/shm:/dev/shm \
+  hilbert/kiosk \
+  /sbin/my_init --skip-startup-files --skip-runit -- /usr/local/bin/run.sh $ARGS
 fi
 
 echo "Sorry: cannot detect electron binary on your system :("
