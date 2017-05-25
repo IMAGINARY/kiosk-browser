@@ -1,7 +1,7 @@
 {
   "name": "kiosk-browser",
   "productName": "kiosk-browser",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Hardend Kiosk Web Browser",
   "homepage": "https://github.com/hilbert/hilbert-docker-images/tree/devel/images/kiosk",
   "repository": {
@@ -35,8 +35,8 @@
     "postinstall": "electron-rebuild",
     "start": "electron .",
     "rebuild": "electron-rebuild",
-    "pack": "electron-rebuild && CSC_IDENTITY_AUTO_DISCOVERY=false build --dir",
-    "dist": "electron-rebuild && CSC_IDENTITY_AUTO_DISCOVERY=false build"
+    "pack": "electron-rebuild && CSC_IDENTITY_AUTO_DISCOVERY=false build --linux --x64 --dir",
+    "dist": "electron-rebuild && CSC_IDENTITY_AUTO_DISCOVERY=false build --linux --x64"
   },
   "build": {
     "appId": "org.imaginary.kiosk",
@@ -44,20 +44,21 @@
     "linux": {
       "executableName": "kiosk-browser",
       "target": [
+        "deb",
         "rpm",
-        "AppImage",
-        "deb"
+        "AppImage"
       ],
+      "icon": "icon48x48.png",
       "category": "Internet",
       "packageCategory": "Internet"
     },
     "files": [
-            "!.gitignore",
-            "!yarn.lock",
-            "!hooks",
-            "!Makefile",
-            "!*.sh",
-            "!*Dockerfile"
+      "!.gitignore",
+      "!yarn.lock",
+      "!hooks",
+      "!Makefile",
+      "!*.sh",
+      "!*Dockerfile"
     ],
     "extraResources": [
       {

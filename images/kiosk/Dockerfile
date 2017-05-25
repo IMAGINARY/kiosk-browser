@@ -12,9 +12,10 @@ MAINTAINER Oleksandr Motsak <malex984+hilbert.kiosk@gmail.com>
 ##  curl --silent --location https://deb.nodesource.com/setup_4.x | sudo -E bash -
 ### wget -qO- https://deb.nodesource.com/setup_4.x | bash -
 
-RUN wget -q "https://cloud.imaginary.org/index.php/s/gwqWQbWu4xTsoQ8/download" -O /tmp/kiosk-browser_0.9.0_amd64.deb && \
+# 0.9.1 amd64:
+RUN wget -q "https://cloud.imaginary.org/index.php/s/hHLDBwwlEmwpi9k/download" -O /tmp/kiosk-browser.deb && \
     update.sh && install.sh gconf2 gconf-service libnotify4 libappindicator1 libxtst6 libnss3 && \
-    dpkg -i /tmp/kiosk-browser_0.9.0_amd64.deb && install.sh -fy && clean.sh
+    dpkg -i /tmp/kiosk-browser.deb && install.sh -fy && clean.sh
 
 #RUN npm install electron-prebuilt -g 
 ## && npm install asar -g && \
