@@ -132,21 +132,12 @@
         display: none;
       }
     </style>
-
+    <script src="hilbert-heartbeat.js"></script>
   </head>   
   <body id="body">
-    <script src="hilbert-heartbeat.js"></script>
-    <script type='text/javascript'>
-               var heartbeat = new Heartbeat({
-                  url: Heartbeat.getPassedUrl('http://127.0.0.1:8888'),
-                  appId: Heartbeat.getPassedAppId('kiosk_browser_testapp'),
-                  interval: 10000,
-                  sendInitCommand: false,
-                  sendDoneCommand: false,
-              }); 
-    </script>
-<script type='text/javascript'>
-  require('network').get_interfaces_list(function(err, list) {
+  <script type='text/javascript'>
+  require('network').get_interfaces_list(function(err, list) 
+  {
   if (err) throw err;
 
   /* list should be as follows: [{name: 'eth0', type: 'Wired',
@@ -158,112 +149,19 @@
   var arrayLength = list.length; 
   var t = '<b style="background:#fff;color:#000">'+ (arrayLength)+ ' Network interface(s):</b><br/>';
   for (var i = 0; arrayLength > i; i++) 
-  {
-    var f = list[i];
-    t += '<b>' + f.type + '</b> ' + '<b>' + f.name + '</b>, ' + 
-    'MAC: <b>' + f.mac_address + '</b>, ' + 
-    'IP: <b>' + f.ip_address + '</b>, ' + 
-    'NETMASK: <b>' + f.netmask + '</b>, ' + 
-    'GATEWAY: <b>' + f.gateway_ip + '</b>' + '<br/>';
+  { var f = list[i];
+    t += 'MAC: <b>' + f.mac_address + '</b>, ' + 
+          'IP: <b>' + f.ip_address + '</b>, ' + 
+     'NETMASK: <b>' + f.netmask + '</b>, ' + 
+     'GATEWAY: <b>' + f.gateway_ip + '</b>, ' + 
+              '<b>' + f.type + '</b> ' + 
+              '<b>' + f.name + '</b><br/>';
   };
 
   var d = document.getElementById('footer'); if(d) d.innerHTML += t;
-}); 
-
-function footerText()
-{
-  var t = '';
-
-  var displays = require('electron').screen.getAllDisplays(); var ndisplays = displays.length;
-  t += '<b style="background:#fff;color:#000">' + (ndisplays) + ' Display(s):</b><br/>';
-
-  for (var i = 0; i < ndisplays; i++)
-  {
-    var display = displays[i];
-
-//[ { id: 13761487533244416,
-//    bounds: { x: 0, y: 0, width: 1920, height: 1080 },
-//    workArea: { x: 0, y: 0, width: 1920, height: 1080 },
-//    size: { width: 1920, height: 1080 },
-//    workAreaSize: { width: 1920, height: 1080 },
-//    scaleFactor: 1,
-//    rotation: 0,
-//    touchSupport: 'unknown' } ]
-
-    t += '<b>0x' + (display.id.toString(16)) + '</b>'+
-    ', Bounds: <b>' + (display.bounds.x) + '</b>x<b>' + (display.bounds.y) + '</b>' + ' - <b>' + (display.bounds.width) + '</b>x<b>' + (display.bounds.height) + '</b>' +
-    ', Size: <b>' + (display.scaleFactor*display.size.width) + '</b>x<b>' + (display.scaleFactor*display.size.height) + '</b>' +
-    ', WorkAreaSize: <b>' + (display.scaleFactor*display.workAreaSize.width) + '</b>x<b>' + (display.scaleFactor*display.workAreaSize.height) + '</b>' +
-    ', Rotation: <b>' + (display.rotation) + '</b>' +
-    ', TouchSupport: <b>' + (display.touchSupport) + '</b>' +
-'<br/>';
-  }
-
-  t += '<b style="background:#fff;color:#000">Sound Test:</b><br/><br/><table width="100%" align="center"><tr><th><b>Left</b></th><th><b>Center</b></th><th><b>Right</b></th></tr></table> <br/>';
-  return (t);
-};
-
-
-function create(file){ var A = new Audio(file); A.muted = false; A.loop = false; A.currentTime = 0; return (A); };
-
-var L = create("Left.mp3"); 
-var C = create("Center.mp3"); 
-var R = create("Right.mp3");
-
-function play(P){ P.pause(); P.currentTime = 0; P.play(); };
-
-function playR(){play(R);}; 
-function playC(){play(C);}; 
-function playL(){play(L);};
-
-function talkAt(d, X, Y)
-{ 
-        if(!d) d = document.getElementById('footer'); 
-        if(!d) return; 
-
-//        console.log("Footer: " + (d)); // HTMLDivElement
-        d = d.getBoundingClientRect();
-//        console.log("Footer at " + (d.left) +"x" + (d.top) + "::" + (d.width) +"x" + (d.height));
-
-        var dx = (X - d.left);
-        var dy = (Y - d.top);
-        var ww = d.width;
-
-//        console.log("Delta " + (dx) +"x" + (dy));
-        if( (dx >= 0) && (dy >= 0) && (ww > dx) && (d.height > dy)) // inside footer? 
-        { 
-            if( ww > 3*dx ){ playL(); } else 
-            { 
-              if( 3*dx > 2*ww ){ playR(); } else { playC(); }; 
-            };
-            return (true); 
-        };
-        return (false);
-};
-
-function talkOnMouse(d, event)
-{
-//  console.log("Talk due to " + (event)); // MouseEvent // TouchEvent
-//  console.log("Talk at " + (event.clientX) +"x" + (event.clientY));
-
-  talkAt(d, event.clientX, event.clientY);
-}
-
-function talkOnTouch(d, event)
-{
-//  console.log("Talk due to " + (event)); // MouseEvent // TouchEvent
-  var l = event.changedTouches;
-//  console.log("Talk due to " + (l)); // MouseEvent // TouchEvent
-
-  for( var i = l.length - 1; i >= 0; i-- )
-  {
-//    console.log("Touch " + (l[i]));
-    talkAt(d, l[i].pageX, l[i].pageY);
-  }
-}
-
-// window.nodeRequire = require;delete window.require;delete window.exports;delete window.module;
-</script> 
+  }); 
+  // window.nodeRequire = require;delete window.require;delete window.exports;delete window.module;
+  </script> 
 
     <div id="footer"></div>
     <div id="panspeed"><div></div></div>
@@ -283,17 +181,83 @@ function talkOnTouch(d, event)
     <div id="f2" class="touch"></div>
     <div id="f3" class="touch"></div>
     <div id="f4" class="touch"></div>
+    <div id="f5" class="touch"></div>
+    <div id="f6" class="touch"></div>
+    <div id="f7" class="touch"></div>
+    <div id="f8" class="touch"></div>
+    <div id="f9" class="touch"></div>
     
     <script type="text/javascript">
       (function(){
+        var heartbeat = new Heartbeat({
+                  url: Heartbeat.getPassedUrl('http://127.0.0.1:8888'),
+                  appId: Heartbeat.getPassedAppId('kiosk_browser_testapp'),
+                  interval: 10000,
+                  sendInitCommand: false,
+                  sendDoneCommand: false,
+        });
+
         var b = document.body, indicator = $('indicator'), mouse,
           colors = $w('#0f0 #f00 #00f #f0f #ff0 #0ff #8f8 #f88 #88f #f8f #0f0 #f00 #00f #f0f #ff0 #0ff #8f8 #f88 #88f #f8f'),
           touchcounter = 0, transformactioncounter = 0, mousecounter = 0,
-          panspeed = $('panspeed'), panspeedDiv = panspeed.down('div'), inc = 0;
+          panspeed = $('panspeed'), panspeedDiv = panspeed.down('div'), inc = 0;   
 
-        var footer = $('footer'); 
-//         var d = document.getElementById('footer'); if(d) 
-        footer.innerHTML = footer.innerHTML + footerText();
+        var footer = $('footer'); // var d = document.getElementById('footer'); 
+
+        function createAudio(file){ var A = new Audio(file); A.muted = false; A.loop = false; A.currentTime = 0; return (A); };
+        var L = createAudio("Left.mp3"), C = createAudio("Center.mp3"), R = createAudio("Right.mp3");
+
+        function restartAudio(P){ P.pause(); P.currentTime = 0; P.play(); };
+
+        function talkAt(d, X, Y) // d: HTMLDivElement
+        { 
+          if(!d) d = document.getElementById('footer'); 
+          if(!d) return; 
+
+          d = d.getBoundingClientRect(); // console.log("Footer at " + (d.left) +"x" + (d.top) + "::" + (d.width) +"x" + (d.height));
+
+          var dx = (X - d.left), dy = (Y - d.top), ww = d.width; // console.log("Delta " + (dx) +"x" + (dy));
+          if( (dx >= 0) && (dy >= 0) && (ww > dx) && (d.height > dy)) // inside footer? 
+          { 
+            if( ww > 3*dx ){ restartAudio(L); } else 
+            { 
+              if( 3*dx > 2*ww ){ restartAudio(R); } else { restartAudio(C); }; 
+            };
+            return (true); 
+          };
+          return (false);
+        };
+
+        function footerText(){ 
+          var displays = require('electron').screen.getAllDisplays(); var ndisplays = displays.length;
+
+          var t = '<b style="background:#fff;color:#000">' + (ndisplays) + ' Display(s):</b><br/>';
+
+          for (var i = 0; ndisplays > i; i++)
+          {
+            var display = displays[i];
+            /* [ { id: 13761487533244416,
+                  bounds: { x: 0, y: 0, width: 1920, height: 1080 },
+                  workArea: { x: 0, y: 0, width: 1920, height: 1080 },
+                  size: { width: 1920, height: 1080 },
+                  workAreaSize: { width: 1920, height: 1080 },
+                   scaleFactor: 1,
+                   rotation: 0,
+                   touchSupport: 'unknown' } ]
+            */
+
+            t += '<b>0x' + (display.id.toString(16)) + '</b>'+
+                 ', Bounds: <b>' + (display.bounds.x) + '</b>x<b>' + (display.bounds.y) + '</b>' + ' - <b>' + (display.bounds.width) + '</b>x<b>' + (display.bounds.height) + '</b>' +
+                 ', Size: <b>' + (display.scaleFactor*display.size.width) + '</b>x<b>' + (display.scaleFactor*display.size.height) + '</b>' +
+                 ', WorkAreaSize: <b>' + (display.scaleFactor*display.workAreaSize.width) + '</b>x<b>' + (display.scaleFactor*display.workAreaSize.height) + '</b>' +
+                 ', Rotation: <b>' + (display.rotation) + '</b>' +
+                 ', TouchSupport: <b>' + (display.touchSupport) + '</b>' +
+                 '<br/>';
+          }
+
+          t += '<b style="background:#fff;color:#000">Sound Test:</b><br/><br/><table width="100%" align="center"><tr><th><b>Left</b></th><th><b>Center</b></th><th><b>Right</b></th></tr></table> <br/>';
+          return (t);
+        };
 
         //setInterval(function(){
         //  $('debug').innerHTML = ['|','/','-','\\'][inc%4];
@@ -315,7 +279,7 @@ function talkOnTouch(d, event)
           //  panspeedDiv.setStyle('width:'+length+'px');
           //}
         }
-        
+
         function track(event){
           //var el = new Element('div', { className: 'trackpoint' });
           //el.setStyle('background-color:'+colors[event.id]+';'+
@@ -339,13 +303,9 @@ function talkOnTouch(d, event)
         
         function renderInfoForTouches(touches){
           var info = '';
-          
-          touchfingers[0].addClassName('off');
-          touchfingers[1].addClassName('off');
-          touchfingers[2].addClassName('off');
-          touchfingers[3].addClassName('off');
-          touchfingers[4].addClassName('off');
-          
+
+          for( var i = 9; i >= 0; i-- ){ touchfingers[i].addClassName('off'); }
+
           $A(touches).each(function(touch,index){
             info += infoForTouch(touch,index);
             setPos(touchfingers[touch.identifier].removeClassName('off'), touch);            
@@ -357,7 +317,6 @@ function talkOnTouch(d, event)
         function start(event){
           touchcounter++;
           $('touch').removeClassName('inactive').show().innerHTML = infoForTouchEvent(event, 'start');
-          talkOnTouch(footer, event);
           event.preventDefault();
         }
         function move(event){
@@ -415,7 +374,6 @@ function talkOnTouch(d, event)
         function mouseDown(event){
           setPos(mouse, event);
           $('mouse').show().removeClassName('inactive').innerHTML = infoForMouseEvent(event, 'down');
-          talkOnMouse(footer, event);
         }
         function mouseMove(event){
           setPos(mouse, event);
@@ -424,7 +382,8 @@ function talkOnTouch(d, event)
         function mouseUp(event){
           setPos(mouse, event);
           $('mouse').show().addClassName('inactive').innerHTML = infoForMouseEvent(event, 'up');
-        }       
+        }
+
         function ignore(event){ event.stop(); }
 
         $('screen').observe('touchstart', start);
@@ -438,14 +397,29 @@ function talkOnTouch(d, event)
         $('screen').observe('mousedown', mouseDown);
         $('screen').observe('mouseup', mouseUp);
         $('screen').observe('mousemove', mouseMove);
-        
+
+        $('screen').observe('mousedown', function(event){ // event: MouseEvent
+          talkAt(footer, event.clientX, event.clientY);	  
+        });
+
+        $('screen').observe('touchstart', function(event){  // event: TouchEvent
+          var l = event.changedTouches; // l: TouchList
+          for( var i = l.length - 1; i >= 0; i-- )
+          { 
+            talkAt(footer, l[i].pageX, l[i].pageY); // l[i]: Touch
+          }
+          event.preventDefault();
+        });
+
         indicator.hide();
         panspeed.hide();
-        
+
         mouse = new Element('div', { className: 'mouse' });
         $('mouse').addClassName('inactive');
         mouse.innerHTML = '<span>mouse</span>';
         b.insert(mouse);
+
+        footer.innerHTML += footerText();
       })();
     </script>
   </body>
