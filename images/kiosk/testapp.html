@@ -132,10 +132,11 @@
         display: none;
       }
     </style>
+
   </head>   
   <body id="body">
     <script src="hilbert-heartbeat.js"></script>
-    <script>
+    <script type='text/javascript'>
                var heartbeat = new Heartbeat({
                   url: Heartbeat.getPassedUrl('http://127.0.0.1:8888'),
                   appId: Heartbeat.getPassedAppId('kiosk_browser_testapp'),
@@ -144,15 +145,36 @@
                   sendDoneCommand: false,
               }); 
     </script>
+<script type='text/javascript'>
+  require('network').get_interfaces_list(function(err, list) {
+  if (err) throw err;
 
-<div id="footer"></div>
+  /* list should be as follows: [{name: 'eth0', type: 'Wired',
+    ip_address: '10.0.1.3', mac_address: '56:e5:f9:e4:38:1d',
+    netmask: '255.255.255.0', gateway_ip: '10.0.1.1' // only on OS X and Linux
+   }, { ... }, { ... }] 
+   */
 
-<SCRIPT>
+  var arrayLength = list.length; 
+  var t = '<b style="background:#fff;color:#000">'+ (arrayLength)+ ' Network interface(s):</b><br/>';
+  for (var i = 0; arrayLength > i; i++) 
+  {
+    var f = list[i];
+    t += '<b>' + f.type + '</b> ' + '<b>' + f.name + '</b>, ' + 
+    'MAC: <b>' + f.mac_address + '</b>, ' + 
+    'IP: <b>' + f.ip_address + '</b>, ' + 
+    'NETMASK: <b>' + f.netmask + '</b>, ' + 
+    'GATEWAY: <b>' + f.gateway_ip + '</b>' + '<br/>';
+  };
+
+  var d = document.getElementById('footer'); if(d) d.innerHTML += t;
+}); 
+
+function footerText()
+{
   var t = '';
-//  t += '<a href="index.html"><b style="background:#000;color:#00f">List of helpfull links</b></a></br>'; // TODO?
 
   var displays = require('electron').screen.getAllDisplays(); var ndisplays = displays.length;
-
   t += '<b style="background:#fff;color:#000">' + (ndisplays) + ' Display(s):</b><br/>';
 
   for (var i = 0; i < ndisplays; i++)
@@ -177,47 +199,73 @@
 '<br/>';
   }
 
-  require('network').get_interfaces_list(function(err, list) {
-  if (err) throw err;
-
-  /* list should be
-  [{
-    name: 'eth0',
-    ip_address: '10.0.1.3',
-    mac_address: '56:e5:f9:e4:38:1d',
-    type: 'Wired',
-    netmask: '255.255.255.0',
-    gateway_ip: '10.0.1.1' // only on OS X and Linux
-   },
-   { ... }, { ... }] 
-  */
-
-  var d = document.getElementById('footer');
-  var arrayLength = list.length; 
-
-  t += '<b style="background:#fff;color:#000">'+ (arrayLength)+ ' Network interface(s):</b><br/>';
-
-  for (var i = 0; i < arrayLength; i++) 
-  {
-  var f = list[i];
-  t += 
-'<b>' + f.type + '</b> ' + 
-'<b>' + f.name + '</b>, ' + 
-'MAC: <b>' + f.mac_address + '</b>, ' + 
-'IP: <b>' + f.ip_address + '</b>, ' + 
-'NETMASK: <b>' + f.netmask + '</b>, ' + 
-'GATEWAY: <b>' + f.gateway_ip + '</b>' + 
-'<br/>';
+  t += '<b style="background:#fff;color:#000">Sound Test:</b><br/><br/><table width="100%" align="center"><tr><th><b>Left</b></th><th><b>Center</b></th><th><b>Right</b></th></tr></table> <br/>';
+  return (t);
 };
 
-d.innerHTML += t;
-}); 
 
-window.nodeRequire = require;delete window.require;delete window.exports;delete window.module;
-</SCRIPT>
+function create(file){ var A = new Audio(file); A.muted = false; A.loop = false; A.currentTime = 0; return (A); };
 
+var L = create("Left.mp3"); 
+var C = create("Center.mp3"); 
+var R = create("Right.mp3");
 
+function play(P){ P.pause(); P.currentTime = 0; P.play(); };
 
+function playR(){play(R);}; 
+function playC(){play(C);}; 
+function playL(){play(L);};
+
+function talkAt(d, X, Y)
+{ 
+        if(!d) d = document.getElementById('footer'); 
+        if(!d) return; 
+
+//        console.log("Footer: " + (d)); // HTMLDivElement
+        d = d.getBoundingClientRect();
+//        console.log("Footer at " + (d.left) +"x" + (d.top) + "::" + (d.width) +"x" + (d.height));
+
+        var dx = (X - d.left);
+        var dy = (Y - d.top);
+        var ww = d.width;
+
+//        console.log("Delta " + (dx) +"x" + (dy));
+        if( (dx >= 0) && (dy >= 0) && (ww > dx) && (d.height > dy)) // inside footer? 
+        { 
+            if( ww > 3*dx ){ playL(); } else 
+            { 
+              if( 3*dx > 2*ww ){ playR(); } else { playC(); }; 
+            };
+            return (true); 
+        };
+        return (false);
+};
+
+function talkOnMouse(d, event)
+{
+//  console.log("Talk due to " + (event)); // MouseEvent // TouchEvent
+//  console.log("Talk at " + (event.clientX) +"x" + (event.clientY));
+
+  talkAt(d, event.clientX, event.clientY);
+}
+
+function talkOnTouch(d, event)
+{
+//  console.log("Talk due to " + (event)); // MouseEvent // TouchEvent
+  var l = event.changedTouches;
+//  console.log("Talk due to " + (l)); // MouseEvent // TouchEvent
+
+  for( var i = l.length - 1; i >= 0; i-- )
+  {
+//    console.log("Touch " + (l[i]));
+    talkAt(d, l[i].pageX, l[i].pageY);
+  }
+}
+
+// window.nodeRequire = require;delete window.require;delete window.exports;delete window.module;
+</script> 
+
+    <div id="footer"></div>
     <div id="panspeed"><div></div></div>
     <div id="events">
       <div id="mouse"></div>
@@ -242,12 +290,15 @@ window.nodeRequire = require;delete window.require;delete window.exports;delete 
           colors = $w('#0f0 #f00 #00f #f0f #ff0 #0ff #8f8 #f88 #88f #f8f #0f0 #f00 #00f #f0f #ff0 #0ff #8f8 #f88 #88f #f8f'),
           touchcounter = 0, transformactioncounter = 0, mousecounter = 0,
           panspeed = $('panspeed'), panspeedDiv = panspeed.down('div'), inc = 0;
-          
+
+        var footer = $('footer'); 
+//         var d = document.getElementById('footer'); if(d) 
+        footer.innerHTML = footer.innerHTML + footerText();
+
         //setInterval(function(){
         //  $('debug').innerHTML = ['|','/','-','\\'][inc%4];
         //},10);
-        
-        
+
         function setPos(element, event){
           if(!element) return;
           element.setStyle('left:'+event.clientX+'px;top:'+event.clientY+'px;'+
@@ -302,10 +353,11 @@ window.nodeRequire = require;delete window.require;delete window.exports;delete 
           
           $('touches').innerHTML = info;
         }
-        
+
         function start(event){
           touchcounter++;
           $('touch').removeClassName('inactive').show().innerHTML = infoForTouchEvent(event, 'start');
+          talkOnTouch(footer, event);
           event.preventDefault();
         }
         function move(event){
@@ -363,6 +415,7 @@ window.nodeRequire = require;delete window.require;delete window.exports;delete 
         function mouseDown(event){
           setPos(mouse, event);
           $('mouse').show().removeClassName('inactive').innerHTML = infoForMouseEvent(event, 'down');
+          talkOnMouse(footer, event);
         }
         function mouseMove(event){
           setPos(mouse, event);
@@ -373,7 +426,7 @@ window.nodeRequire = require;delete window.require;delete window.exports;delete 
           $('mouse').show().addClassName('inactive').innerHTML = infoForMouseEvent(event, 'up');
         }       
         function ignore(event){ event.stop(); }
-        
+
         $('screen').observe('touchstart', start);
         $('screen').observe('touchmove', move);
         $('screen').observe('touchend', end);
