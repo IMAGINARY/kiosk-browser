@@ -12,8 +12,8 @@ MAINTAINER Oleksandr Motsak <malex984+hilbert.kiosk@gmail.com>
 ##  curl --silent --location https://deb.nodesource.com/setup_4.x | sudo -E bash -
 ### wget -qO- https://deb.nodesource.com/setup_4.x | bash -
 
-# 0.9.1 amd64:
-RUN wget -q "https://cloud.imaginary.org/index.php/s/hHLDBwwlEmwpi9k/download" -O /tmp/kiosk-browser.deb && \
+# 0.9.2 amd64:
+RUN wget -q "https://cloud.imaginary.org/index.php/s/NVanCv5U3sZXZBY/download" -O /tmp/kiosk-browser.deb && \
     update.sh && install.sh gconf2 gconf-service libnotify4 libappindicator1 libxtst6 libnss3 && \
     dpkg -i /tmp/kiosk-browser.deb && install.sh -fy && clean.sh
 
