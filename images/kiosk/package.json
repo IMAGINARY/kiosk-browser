@@ -42,7 +42,7 @@
     "appId": "org.imaginary.kiosk",
     "npmRebuild": false,
     "linux": {
-      "icon": "icon48x48.png",
+      "icon": "build/48x48.png",
       "executableName": "kiosk-browser",
       "target": [
         "deb",
@@ -51,6 +51,12 @@
       ],
       "category": "Internet",
       "packageCategory": "Internet"
+    },
+    "deb": {},
+    "rpm": {},
+    "appimage": {},
+    "win": { 
+      "icon": "build/icon.ico"
     },
     "files": [
       "!.gitignore",
@@ -64,7 +70,7 @@
       {
         "from": "build",
         "to": ".",
-        "filter": "**/icon48x48.png"
+        "filter": "**/48x48.png"
       }
     ]
   },

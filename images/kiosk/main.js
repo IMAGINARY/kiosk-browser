@@ -17,9 +17,9 @@ settings.applyDefaultsSync({
 
 function getLinuxIcon() {
     if(process.mainModule.filename.indexOf('app.asar') === -1)
-        return path.resolve(__dirname, 'build', 'icon48x48.png');
+        return path.resolve(__dirname, 'build', '48x48.png');
     else
-        return path.resolve(__dirname, '..', 'icon48x48.png');
+        return path.resolve(__dirname, '..', '48x48.png');
 }
 
 const yargs = require('yargs'); // https://www.npmjs.com/package/yargs
