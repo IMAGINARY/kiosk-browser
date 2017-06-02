@@ -81,6 +81,7 @@
         position: absolute;
         color: #fff;
         font-size: 15px;
+	line-height: 110%;
         top: 7px;
         left: 5px;
         right: 5px;
@@ -146,32 +147,26 @@
    */
 
   var arrayLength = list.length; 
-  var t = '<li>Hostname: <b>' + require('os').hostname() + '</b></li>';
+  var t = '<li>hostname: <b>' + require('os').hostname() + '</b></li>';
   for (var i = 0; arrayLength > i; i++) 
   { var f = list[i];
-    t +=  '<li><span style="float:left;"><b>' + f.type + '</b> interface <b>' + f.name + '</b></span><span style="float:right;">' +
-         'MAC: <b>' + f.mac_address + '</b>, ' + 
-          'IP: <b>' + f.ip_address + '</b>, ' + 
-     'NETMASK: <b>' + f.netmask + '</b>, ' + 
-     'GATEWAY: <b>' + f.gateway_ip + '</b></span></li>';
+    t +=  '<li><span style="float:left;"><b>' + f.type.toUpperCase() + '</b> interface <b>' + f.name + '</b></span><span style="float:right;">' +
+         'mac: <b>' + f.mac_address.toUpperCase() + '</b>, ' +
+          'ip: <b>' + f.ip_address.toUpperCase() + '</b>, ' + 
+     'netmask: <b>' + f.netmask + '</b>, ' + 
+     'gateway: <b>' + f.gateway_ip + '</b></span></li>';
   };
   t = '<ul>' + t + '</ul>';
 
   var d = document.getElementById('network_data'); if(d) d.innerHTML = t;
   }); 
-  // window.nodeRequire = require;delete window.require;delete window.exports;delete window.module;
   </script> 
 
-    <div id="footer">
-          <br/>
-          <b style="background:#eee;color:#111">Network details:</b> <br/><span id="network_data"></span><hr/>
-          <b style="background:#eee;color:#111">Display(s):</b> </br><span id="display_data"></span><hr/>
-          <b style="background:#eee;color:#111">Sound Test:</b> <br/>
-          <table width="100%" align="center"><tr><th><b>Left</b></th><th><b>Center</b></th><th><b>Right</b></th></tr></table><br/>
-          <hr/>
-          <b style="background:#eee;color:#111">Local Clock:</b> <br/>
-          <ul><li><b><span id="clock_time" style="float:left;"></span></b></li></ul>
-          <hr/>
+    <div id="footer"><br/>
+          <b style="background:#eee;color:#111">NETWORK DETAILS:</b><span id="network_data"></span><hr/>
+          <b style="background:#eee;color:#111">DISPLAY(S):</b><span id="display_data"></span><hr/>
+          <b style="background:#eee;color:#111">SOUND TEST:</b><table width="100%" align="center"><tr><th><i>left</i></th><th><i>center</i></th><th><i>right</i></th></tr></table><br/><hr/>
+          <b style="background:#eee;color:#111">LOCAL CLOCK:</b><ul><li><b><span id="clock_time" style="float:left;"></span></b></li></ul><hr/>
     </div>
     <div id="panspeed"><div></div></div>
     <div id="events">
@@ -255,12 +250,14 @@
                   scaleFactor: 1, rotation: 0, touchSupport: 'unknown' }
             */
 
-            t += '<li><span style="float:left;"><b>0x' + (display.id.toString(16)) + '</b>' +
-                 ', Rotation: <b>' + (display.rotation) + '</b>' +
-                 ', TouchSupport: <b>' + (display.touchSupport) + '</b>' +
-                 '</span><span style="float:right;">Size: <b>' + (display.scaleFactor*display.size.width) + '</b>x<b>' + (display.scaleFactor*display.size.height) + '</b>' +
-                 ', WorkAreaSize: <b>' + (display.scaleFactor*display.workAreaSize.width) + '</b>x<b>' + (display.scaleFactor*display.workAreaSize.height) + '</b>' +
-                 ', Bounds: <b>' + (display.bounds.x) + '</b>x<b>' + (display.bounds.y) + '</b>' +
+            t += '<li><span style="float:left;"><b>0x' + (display.id.toString(16).toUpperCase()) + '</b>' +
+                 ', rotation: <b>' + (display.rotation) + '</b>&deg; &#x21bb;' +
+                 ', touch support: <b>' + (display.touchSupport.toUpperCase()) + '</b>' +
+                 '</span><span style="float:right;">' +
+                 'scale factor: <b>' + (display.scaleFactor) + '</b>' +
+                 ', size: <b>' + (display.size.width) + '</b>x<b>' + (display.size.height) + '</b>' +
+                 ', work area size: <b>' + (display.workAreaSize.width) + '</b>x<b>' + (display.workAreaSize.height) + '</b>' +
+                 ', bounds: <b>' + (display.bounds.x) + '</b>x<b>' + (display.bounds.y) + '</b>' +
                  ' - <b>' + (display.bounds.width) + '</b>x<b>' + (display.bounds.height) + '</b>' +
 		 '</span></li>';
           }
@@ -429,6 +426,7 @@
 
         display_data.innerHTML = displaysText();
         window.setInterval(function() { clock_time.innerHTML = Date(); }, 500);	
+	// window.nodeRequire = require;delete window.require;delete window.exports;delete window.module;
       })();
     </script>
   </body>
