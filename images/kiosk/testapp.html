@@ -136,38 +136,6 @@
     <script src="hilbert-heartbeat.js"></script>
   </head>   
   <body id="body">
-  <script type='text/javascript'>
-  require('network').get_interfaces_list(function(err, list) 
-  { if (err) throw err;
-
-  /* list should be as follows: [{name: 'eth0', type: 'Wired',
-    ip_address: '10.0.1.3', mac_address: '56:e5:f9:e4:38:1d',
-    netmask: '255.255.255.0', gateway_ip: '10.0.1.1' // only on OS X and Linux
-   }, { ... }, { ... }] 
-   */
-
-  var arrayLength = list.length; 
-  var t = '<li>hostname: <b>' + require('os').hostname() + '</b></li>';
-  for (var i = 0; arrayLength > i; i++) 
-  { var f = list[i];
-    t +=  '<li><span style="float:left;"><b>' + f.type.toUpperCase() + '</b> interface <b>' + f.name + '</b></span><span style="float:right;">' +
-         'mac: <b>' + f.mac_address.toUpperCase() + '</b>, ' +
-          'ip: <b>' + f.ip_address.toUpperCase() + '</b>, ' + 
-     'netmask: <b>' + f.netmask + '</b>, ' + 
-     'gateway: <b>' + f.gateway_ip + '</b></span></li>';
-  };
-  t = '<ul>' + t + '</ul>';
-
-  var d = document.getElementById('network_data'); if(d) d.innerHTML = t;
-  }); 
-  </script> 
-
-    <div id="footer"><br/>
-          <b style="background:#eee;color:#111">NETWORK DETAILS:</b><span id="network_data"></span><hr/>
-          <b style="background:#eee;color:#111">DISPLAY(S):</b><span id="display_data"></span><hr/>
-          <b style="background:#eee;color:#111">SOUND TEST:</b><table width="100%" align="center"><tr><th><i>left</i></th><th><i>center</i></th><th><i>right</i></th></tr></table><br/><hr/>
-          <b style="background:#eee;color:#111">LOCAL CLOCK:</b><ul><li><b><span id="clock_time" style="float:left;"></span></b></li></ul><hr/>
-    </div>
     <div id="panspeed"><div></div></div>
     <div id="events">
       <div id="mouse"></div>
@@ -190,7 +158,19 @@
     <div id="f7" class="touch"></div>
     <div id="f8" class="touch"></div>
     <div id="f9" class="touch"></div>
-    
+
+    <div id="footer"><br/>
+          <b style="background:#eee;color:#111">LOCAL INFO:</b>
+          <ul style="list-style: square;">
+            <li>HOSTNAME: <b><span id="local_hostname"></span></b></li>
+            <li>DATETIME: <b><span id="local_datetime"></span></b></li>
+            <li>DISPLAYS: <span id="display_data"></span></li>
+            <li>NETWORK INTERFACES: <span id="network_data"></span></li>
+          </ul>
+          <hr/>
+          <b style="background:#eee;color:#111">SOUND TEST:</b><table width="100%" align="center"><tr><th><i>left</i></th><th><i>center</i></th><th><i>right</i></th></tr></table>
+          <br/><hr/>
+    </div>
     <script type="text/javascript">
       document.addEventListener("DOMContentLoaded", function() { // (function(){
         var heartbeat = new Heartbeat({
@@ -201,15 +181,13 @@
                   sendDoneCommand: false,
         });
 
-        var b = document.body, indicator = $('indicator'), mouse,
-          colors = $w('#0f0 #f00 #00f #f0f #ff0 #0ff #8f8 #f88 #88f #f8f #0f0 #f00 #00f #f0f #ff0 #0ff #8f8 #f88 #88f #f8f'),
-          touchcounter = 0, transformactioncounter = 0, mousecounter = 0,
-          panspeed = $('panspeed'), panspeedDiv = panspeed.down('div'), inc = 0;   
-
         var footer = $('footer'); // var footer = document.getElementById('footer'); 
-        var clock_time = document.getElementById('clock_time');
-	var display_data = document.getElementById('display_data');
-	
+        var clock_time = document.getElementById('local_datetime');
+        var local_hostname = document.getElementById('local_hostname');
+        var display_data = document.getElementById('display_data');
+
+        function getHostName(){ return (require('os').hostname()); }
+
         function createAudio(file){ var A = new Audio(file); A.muted = false; A.loop = false; A.currentTime = 0; return (A); };
         var L = createAudio("Left.mp3"), C = createAudio("Center.mp3"), R = createAudio("Right.mp3");
 
@@ -233,6 +211,29 @@
           };
           return (false);
         };
+
+  require('network').get_interfaces_list(function(err, list) 
+  { if (err) throw err;
+
+  /* list should be as follows: [{name: 'eth0', type: 'Wired',
+    ip_address: '10.0.1.3', mac_address: '56:e5:f9:e4:38:1d',
+    netmask: '255.255.255.0', gateway_ip: '10.0.1.1' // only on OS X and Linux
+   }, { ... }, { ... }] 
+   */
+
+  var arrayLength = list.length; 
+  var t = '';
+  for (var i = 0; arrayLength > i; i++) 
+  { var f = list[i];
+    t +=  '<li><span style="float:left;"><b>' + f.type.toUpperCase() + '</b> interface <b>' + f.name + '</b></span><span style="float:right;">' +
+         'mac: <b>' + f.mac_address.toUpperCase() + '</b>, ' +
+          'ip: <b>' + f.ip_address.toUpperCase() + '</b>, ' + 
+     'netmask: <b>' + f.netmask + '</b>, ' + 
+     'gateway: <b>' + f.gateway_ip + '</b></span></li>';
+  };
+  t = '<ul>' + t + '</ul>';
+  var d = document.getElementById('network_data'); if(d) d.innerHTML = t;
+  });
 
         function displaysText(){ 
           var displays = require('electron').screen.getAllDisplays(); var ndisplays = displays.length;
@@ -259,10 +260,38 @@
                  ', work area size: <b>' + (display.workAreaSize.width) + '</b>x<b>' + (display.workAreaSize.height) + '</b>' +
                  ', bounds: <b>' + (display.bounds.x) + '</b>x<b>' + (display.bounds.y) + '</b>' +
                  ' - <b>' + (display.bounds.width) + '</b>x<b>' + (display.bounds.height) + '</b>' +
-		 '</span></li>';
+                 '</span></li>';
           }
           return ('<ul>' + t + '</ul>');
         };
+
+        $('screen').observe('mousedown', function(event){ // event: MouseEvent
+          talkAt(footer, event.clientX, event.clientY);
+        });
+
+        $('screen').observe('touchstart', function(event){  // event: TouchEvent
+          var l = event.changedTouches; // l: TouchList
+          for( var i = l.length - 1; i >= 0; i-- )
+          { 
+            talkAt(footer, l[i].pageX, l[i].pageY); // l[i]: Touch
+          }
+          event.preventDefault();
+        });
+
+        display_data.innerHTML = displaysText();
+        local_hostname.innerHTML = getHostName();
+        window.setInterval(function() { clock_time.innerHTML = Date(); }, 500);	
+
+        window.nodeRequire = require;delete window.require;delete window.exports;delete window.module;
+      })();
+    </script>
+
+    <script type="text/javascript">
+      document.addEventListener("DOMContentLoaded", function() { // (function(){
+        var b = document.body, indicator = $('indicator'), mouse,
+          colors = $w('#0f0 #f00 #00f #f0f #ff0 #0ff #8f8 #f88 #88f #f8f #0f0 #f00 #00f #f0f #ff0 #0ff #8f8 #f88 #88f #f8f'),
+          touchcounter = 0, transformactioncounter = 0, mousecounter = 0,
+          panspeed = $('panspeed'), panspeedDiv = panspeed.down('div'), inc = 0;
 
         //setInterval(function(){
         //  $('debug').innerHTML = ['|','/','-','\\'][inc%4];
@@ -394,27 +423,14 @@
         $('screen').observe('touchstart', start);
         $('screen').observe('touchmove', move);
         $('screen').observe('touchend', end);
-        
+
         $('screen').observe('transformactionstart', transformactionStart);
         $('screen').observe('transformactionupdate', transformactionUpdate);
         $('screen').observe('transformactionend', transformactionEnd);
-        
+
         $('screen').observe('mousedown', mouseDown);
         $('screen').observe('mouseup', mouseUp);
         $('screen').observe('mousemove', mouseMove);
-
-        $('screen').observe('mousedown', function(event){ // event: MouseEvent
-          talkAt(footer, event.clientX, event.clientY);	  
-        });
-
-        $('screen').observe('touchstart', function(event){  // event: TouchEvent
-          var l = event.changedTouches; // l: TouchList
-          for( var i = l.length - 1; i >= 0; i-- )
-          { 
-            talkAt(footer, l[i].pageX, l[i].pageY); // l[i]: Touch
-          }
-          event.preventDefault();
-        });
 
         indicator.hide();
         panspeed.hide();
@@ -423,10 +439,6 @@
         $('mouse').addClassName('inactive');
         mouse.innerHTML = '<span>mouse</span>';
         b.insert(mouse);
-
-        display_data.innerHTML = displaysText();
-        window.setInterval(function() { clock_time.innerHTML = Date(); }, 500);	
-	// window.nodeRequire = require;delete window.require;delete window.exports;delete window.module;
       })();
     </script>
   </body>
