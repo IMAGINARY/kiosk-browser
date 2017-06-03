@@ -37,10 +37,16 @@ PULSE_COOKIE="${PULSE_COOKIE:-$HOME/.config/pulse/cookie11}"
     SOUND_OPTS="-v ${PWD}/.asoundrc:/root/.asoundrc:ro --privileged=true"
   fi
 
-  exec docker run -e DISPLAY --rm -it -a stdin -a stdout -a stderr --ipc=host --net=host \
+  exec docker run \
+  --rm -it -a stdin -a stdout -a stderr --ipc=host --net=host \
+  -e DISPLAY -e LANG -e LANGUAGE -e LC_ALL -e LC_TIME \
+  -e LC_CTYPE -e LC_NUMERIC -e LC_COLLATE -e LC_MONETARY \
+  -e LC_MESSAGES -e LC_PAPER -e LC_NAME -e LC_ADDRESS \
+  -e LC_TELEPHONE -e LC_MEASUREMENT -e LC_IDENTIFICATION \
   ${SOUND_OPTS} \
   -v /tmp/:/tmp/:rw \
   -v /dev/shm:/dev/shm \
+  -v /etc/localtime:/etc/localtime:ro \
   hilbert/kiosk \
   /sbin/my_init --skip-startup-files --skip-runit -- /usr/local/bin/run.sh $ARGS
 fi
