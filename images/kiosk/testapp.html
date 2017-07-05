@@ -185,6 +185,7 @@
         var clock_time = document.getElementById('local_datetime');
         var local_hostname = document.getElementById('local_hostname');
         var display_data = document.getElementById('display_data');
+        var network_data = document.getElementById('network_data');
 
         function getHostName(){ return (require('os').hostname()); }
 
@@ -212,28 +213,6 @@
           return (false);
         };
 
-  require('network').get_interfaces_list(function(err, list) 
-  { if (err) throw err;
-
-  /* list should be as follows: [{name: 'eth0', type: 'Wired',
-    ip_address: '10.0.1.3', mac_address: '56:e5:f9:e4:38:1d',
-    netmask: '255.255.255.0', gateway_ip: '10.0.1.1' // only on OS X and Linux
-   }, { ... }, { ... }] 
-   */
-
-  var arrayLength = list.length; 
-  var t = '';
-  for (var i = 0; arrayLength > i; i++) 
-  { var f = list[i];
-    t +=  '<li><span style="float:left;"><b>' + f.type.toUpperCase() + '</b> interface <b>' + f.name + '</b></span><span style="float:right;">' +
-         'mac: <b>' + f.mac_address.toUpperCase() + '</b>, ' +
-          'ip: <b>' + f.ip_address.toUpperCase() + '</b>, ' + 
-     'netmask: <b>' + f.netmask + '</b>, ' + 
-     'gateway: <b>' + f.gateway_ip + '</b></span></li>';
-  };
-  t = '<ul>' + t + '</ul>';
-  var d = document.getElementById('network_data'); if(d) d.innerHTML = t;
-  });
 
         function displaysText(){ 
           var displays = require('electron').screen.getAllDisplays(); var ndisplays = displays.length;
@@ -265,6 +244,60 @@
           return ('<ul>' + t + '</ul>');
         };
 
+//  require('network').get_interfaces_list(function(err, _list)   { if (err) throw err;
+  function networkText() {
+     var list=require('os').networkInterfaces();
+     console.log(list);
+
+  /* list should be as follows: [{name: 'eth0', type: 'Wired',
+    ip_address: '10.0.1.3', mac_address: '56:e5:f9:e4:38:1d',
+    netmask: '255.255.255.0', gateway_ip: '10.0.1.1' // only on OS X and Linux
+   }, { ... }, { ... }] 
+   */
+var t = '';
+
+//  var arrayLength = list.length;      console.log(arrayLength);
+
+  for (var i in list)
+  { 
+console.log(i);
+    var L = list[i]; console.log(L);
+    var l = L.length; console.log(l);
+    for (var j = 0; l > j; j++) 
+{ var f = L[j]; console.log(f);
+  if (!f.internal)
+    t +=  '<li><span id="interface_' + i + '"><b>' + f.family + '</b> interface <b>' + i + '</b>  ' +
+         'mac: <b>' + f.mac.toUpperCase() + '</b>, ' +
+     'address: <b>' + f.address.toUpperCase() + '</b>, ' + 
+     'netmask: <b>' + f.netmask + '</b>' + 
+     '</span></li>'; //     'scopeid: <b>' + f.scopeid + '</b>' + 
+
+
+/*
+address
+family
+internal
+mac
+netmask
+scopeid
+*/
+
+/*
+    t +=  '<li><span style="float:left;"><b>' + f.type.toUpperCase() + '</b> interface <b>' + f.name + '</b></span><span style="float:right;">' +
+         'mac: <b>' + f.mac_address.toUpperCase() + '</b>, ' +
+          'ip: <b>' + f.ip_address.toUpperCase() + '</b>, ' + 
+     'netmask: <b>' + f.netmask + '</b>, ' + 
+     'gateway: <b>' + f.gateway_ip + '</b></span></li>';
+*/
+};
+
+  };
+  t = '<ul>' + t + '</ul>';
+
+  return(t);
+//  var d = document.getElementById('network_data'); if(d) d.innerHTML = t; });
+ };
+
         $('screen').observe('mousedown', function(event){ // event: MouseEvent
           talkAt(footer, event.clientX, event.clientY);
         });
@@ -278,14 +311,15 @@
           event.preventDefault();
         });
 
-        display_data.innerHTML = displaysText();
+
+        window.setInterval(function() { clock_time.innerHTML = Date(); }, 500);
+        window.setInterval(function() { network_data.innerHTML = networkText(); }, 3000);
         local_hostname.innerHTML = getHostName();
-        window.setInterval(function() { clock_time.innerHTML = Date(); }, 500);	
+        window.setInterval(function() { display_data.innerHTML = displaysText(); }, 3000);
 
-        window.nodeRequire = require;delete window.require;delete window.exports;delete window.module;
-      })();
+//        window.nodeRequire = require;delete window.require;delete window.exports;delete window.module;
+      });
     </script>
-
     <script type="text/javascript">
       document.addEventListener("DOMContentLoaded", function() { // (function(){
         var b = document.body, indicator = $('indicator'), mouse,
@@ -439,7 +473,7 @@
         $('mouse').addClassName('inactive');
         mouse.innerHTML = '<span>mouse</span>';
         b.insert(mouse);
-      })();
+      });
     </script>
   </body>
 </html>

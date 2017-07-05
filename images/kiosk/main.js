@@ -50,7 +50,7 @@ var VERBOSE_LEVEL = args.verbose;
 function WARN()  { VERBOSE_LEVEL >= 0 && console.log.apply(console, arguments); }
 function INFO()  { VERBOSE_LEVEL >= 1 && console.log.apply(console, arguments); }
 function DEBUG() { VERBOSE_LEVEL >= 2 && console.log.apply(console, arguments); }
-
+function TRACE(a) { VERBOSE_LEVEL >= 2 && console.trace(a); }
 DEBUG(process.argv); // [1..]; // ????
 
 DEBUG('Help: ' + (args.help) );
