@@ -165,7 +165,8 @@
             <li>HOSTNAME: <b><span id="local_hostname"></span></b></li>
             <li>DATETIME: <b><span id="local_datetime"></span></b></li>
             <li>DISPLAYS: <span id="display_data"></span></li>
-            <li>NETWORK INTERFACES: <span id="network_data"></span></li>
+            <li>ACTIVE  NETWORK INTERFACES: <span id="active_network_data"></span></li>
+            <li>PASSIVE NETWORK INTERFACES: <span id="passive_network_data"></span></li>
           </ul>
           <hr/>
           <b style="background:#eee;color:#111">SOUND TEST:</b><table width="100%" align="center"><tr><th><i>left</i></th><th><i>center</i></th><th><i>right</i></th></tr></table>
@@ -185,7 +186,8 @@
         var clock_time = document.getElementById('local_datetime');
         var local_hostname = document.getElementById('local_hostname');
         var display_data = document.getElementById('display_data');
-        var network_data = document.getElementById('network_data');
+        var network_data = document.getElementById('active_network_data');
+        var passive_network_data = document.getElementById('passive_network_data');
 
         function getHostName(){ return (require('os').hostname()); }
 
@@ -233,7 +235,7 @@
             t += '<li><span style="float:left;"><b>0x' + (display.id.toString(16).toUpperCase()) + '</b>' +
                  ', rotation: <b>' + (display.rotation) + '</b>&deg; &#x21bb;' +
                  ', touch support: <b>' + (display.touchSupport.toUpperCase()) + '</b>' +
-                 '</span><span style="float:right;">' +
+                 '</span>, <span>' + //  style="float:right;"
                  'scale factor: <b>' + (display.scaleFactor) + '</b>' +
                  ', size: <b>' + (display.size.width) + '</b>x<b>' + (display.size.height) + '</b>' +
                  ', work area size: <b>' + (display.workAreaSize.width) + '</b>x<b>' + (display.workAreaSize.height) + '</b>' +
@@ -244,59 +246,67 @@
           return ('<ul>' + t + '</ul>');
         };
 
+        function NetworkTextPassive()
+        { 
+//          var list = require('os').networkInterfaces(); // Active (!) interfaces!
+            var EOL = require('os').EOL;
+            var cmd  = "egrep . /sys/class/net/*/address";
+            require('child_process').exec(cmd, function(err, stdout) {
+              var t = '';
+              var raw = stdout.toString().trim();
+              if (err) { passive_network_data.innerHTML = ''; console.log('Error: [' + err + '] from command ['+cmd+']. Output: ['+ raw +'].'); } else
+              {
+                var list = raw.split(EOL); // if (list.length === 0 || list === ['']) {  return (); }
+                var len = list.length; var s, id, d, mac;
+                for (var i = 0; len > i; i++) { 
+                  s = list[i].split("/address:");
+                  id = s[0].split('/')[4];
+                  mac = s[1].toUpperCase();
+//                  if (mac != '' ) mac = '<span style="float:right;"> mac: <b>' + mac + '</b></span>';
+                  if (mac != '' ) mac = ' <span>(mac: <b>' + mac + '</b>)</span>'; //  style="float:right;"
+//                  d = ;
+                  if( !id.startsWith("docker") && id != 'lo' && id != 'lo0' )
+                    if( !document.getElementById('interface_' + id) ) // { console.log(d); d.innerHTML += '<li>' + mac  + '</li>'; } else
+                    { t += '<li><span id="passive_interface_' + id + '">Interface <b>' + id + '</b>' +  mac + '</span></li>'; }
+                }
+                if (t != '') { t = '<ul>' + t + '</ul>'; } else { passive_network_data.innerHTML = ''; console.log('Warning: No network interface found...'); }
+              };
+              if (passive_network_data.innerHTML != t) passive_network_data.innerHTML = t;
+            });
+//          for (var i in list){var d = document.getElementById('interface_' + i); if(d) t += '<li>Interface: ' +i+'</li>'; };
+//          return (t); 
+        };
+
 //  require('network').get_interfaces_list(function(err, _list)   { if (err) throw err;
   function networkText() {
-     var list=require('os').networkInterfaces();
-     console.log(list);
-
-  /* list should be as follows: [{name: 'eth0', type: 'Wired',
-    ip_address: '10.0.1.3', mac_address: '56:e5:f9:e4:38:1d',
-    netmask: '255.255.255.0', gateway_ip: '10.0.1.1' // only on OS X and Linux
-   }, { ... }, { ... }] 
-   */
-var t = '';
-
-//  var arrayLength = list.length;      console.log(arrayLength);
-
-  for (var i in list)
-  { 
-console.log(i);
-    var L = list[i]; console.log(L);
-    var l = L.length; console.log(l);
-    for (var j = 0; l > j; j++) 
-{ var f = L[j]; console.log(f);
-  if (!f.internal)
-    t +=  '<li><span id="interface_' + i + '"><b>' + f.family + '</b> interface <b>' + i + '</b>  ' +
-         'mac: <b>' + f.mac.toUpperCase() + '</b>, ' +
-     'address: <b>' + f.address.toUpperCase() + '</b>, ' + 
-     'netmask: <b>' + f.netmask + '</b>' + 
-     '</span></li>'; //     'scopeid: <b>' + f.scopeid + '</b>' + 
-
-
-/*
-address
-family
-internal
-mac
-netmask
-scopeid
-*/
-
-/*
-    t +=  '<li><span style="float:left;"><b>' + f.type.toUpperCase() + '</b> interface <b>' + f.name + '</b></span><span style="float:right;">' +
-         'mac: <b>' + f.mac_address.toUpperCase() + '</b>, ' +
-          'ip: <b>' + f.ip_address.toUpperCase() + '</b>, ' + 
-     'netmask: <b>' + f.netmask + '</b>, ' + 
-     'gateway: <b>' + f.gateway_ip + '</b></span></li>';
-*/
-};
-
-  };
-  t = '<ul>' + t + '</ul>';
-
-  return(t);
-//  var d = document.getElementById('network_data'); if(d) d.innerHTML = t; });
- };
+    var t = ''; var mac, tt, L, len;
+    var list=require('os').networkInterfaces(); // Active (!) interfaces!
+    //     console.log(list);
+    for (var i in list)
+    { //console.log(i);
+      if( !i.startsWith("docker") && i != 'lo' && i != 'lo0' ) 
+      {
+        L = list[i]; len = L.length; mac = ''; tt = '';
+        for (var j = 0; len > j; j++)  // address family internal mac netmask // scopeid?
+        { var f = L[j]; // console.log(f);
+//        if (!f.internal)
+//        {
+          tt +=  '<li><span style="float:left;">family: <b>' + f.family + '</b>'+
+              '</span>, ' + // <span style="float:right;">' +
+              'address: <b>' + f.address.toUpperCase() + '</b>, ' + 
+              'netmask: <b>' + f.netmask + '</b>' +  //              '</span>' +
+              '</span></li>';
+          mac = f.mac.toUpperCase();
+//        };
+        };
+        if (mac != '' ) mac = ' <span>(mac: <b>' + mac + '</b>)</span>'; //  style="float:right;"
+//        if (mac != '' ) mac = '<span>mac: <b>' + mac + '</b></span>'; //  style="float:right;"
+        t +=  '<li><span id="interface_' + i + '">Interface <b>' + i + '</b>' + mac + ':<ul>' + tt + '</ul></span></li>';
+      };
+    };
+    if (t != '')    t = '<ul>' + t + '</ul>';
+    return(t); //  var d = document.getElementById('network_data'); if(d) d.innerHTML = t; });
+   };
 
         $('screen').observe('mousedown', function(event){ // event: MouseEvent
           talkAt(footer, event.clientX, event.clientY);
@@ -313,7 +323,8 @@ scopeid
 
 
         window.setInterval(function() { clock_time.innerHTML = Date(); }, 500);
-        window.setInterval(function() { network_data.innerHTML = networkText(); }, 3000);
+        window.setInterval(function() { network_data.innerHTML = networkText(); NetworkTextPassive(); }, 4000);
+
         local_hostname.innerHTML = getHostName();
         window.setInterval(function() { display_data.innerHTML = displaysText(); }, 3000);
 
