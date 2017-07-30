@@ -385,11 +385,13 @@ Object.keys(signals).forEach(function (signal) {
   });
 });
 
+function _min(a, b){ if(a <= b) return (a); else return (b); }
+function _max(a, b){ if(a >= b) return (a); else return (b); }
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.on('ready', function()
 {
-
     const webprefs = {
        javascript: true,
        images: true,
@@ -407,10 +409,23 @@ app.on('ready', function()
     };
 
    const {screen} = electron; // require('screen');
-   const size = screen.getPrimaryDisplay().workAreaSize;
+   const size = screen.getPrimaryDisplay().bounds;
+
+   // NOTE: span all enabled displays:
+   var _x = size.x; var _y = size.y; var _r = _x + size.width; var _b = _y + size.height;
+   const displays = screen.getAllDisplays(); var _d;
+   for(var d in displays)
+   {  _d = displays[d].bounds;
+
+     _x = _min(_x, _d.x);
+     _y = _min(_y, _d.y);
+     _r = _max(_r, _d.x + _d.width);
+     _b = _max(_b, _d.y + _d.height);
+   };
+   DEBUG('MAX SCREEN: (' + _x + ' , ' + _y + ') - (' + _r + ' , ' + _b + ')!');
 
     const options = { show: false
-    , x: 0, y: 0, width: size.width, height: size.height
+    , x: _x, y: _y, width: _r - _x, height: _b - _y
     , frame: !args.transparent
     , titleBarStyle: 'hidden-inset'
     , fullscreenable: true
