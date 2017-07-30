@@ -211,11 +211,28 @@ const BrowserWindow = electron.BrowserWindow
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-var mainWindow = null;
+let mainWindow = null;
 
 // Quit when all windows are closed.
-app.on('window-all-closed', function() { DEBUG('window-all-closed!'); app.quit(); }); // also on MAC OS X?
-// if (process.platform != 'darwin') // ?
+function Finish(msg)
+{
+  DEBUG('Finish(' + msg + ')...'); 
+  if(mainWindow)
+  { 
+    DEBUG('['+msg+'] Closing the main window...'); 
+    mainWindow.hide(); 
+    mainWindow.close(); 
+    mainWindow = null; 
+  };
+  setTimeout(() => { process.exit(0); }, 5000);
+}
+
+app.on('window-all-closed', function() { Finish('app::window-all-closed'); app.quit(); }); // also on MAC OS X?
+
+// if (process.platform != 'darwin') // 
+
+app.on('before-quit', function() { Finish('app::before-quit'); });
+app.on('will-quit', function() { Finish('app::will-quit'); });
 
 var {Menu} = electron; //require('menu'); // var MenuItem = require('menu-item');
 
@@ -232,7 +249,8 @@ if(!args.menu)
 var menu = Menu.getApplicationMenu();
 if( !menu ) // ???
 {
-  var template = 
+
+var template = 
 [
   {
     label: 'Edit',
@@ -373,10 +391,9 @@ var signals = {
 };
 
 function shutdown(signal, value) {
-  server.close(function () {
-    console.log('Kiosk stopped due to [' + signal + '] signal');
-    process.exit(128 + value);
-  });
+  DEBUG('shutdown(signal: ' + signal + ', value: ' + value + ')...'); //  DEBUG('Kiosk stopped due to [' + signal + '] signal');
+//    app.quit();
+  process.exit(128 + value);
 }
 
 Object.keys(signals).forEach(function (signal) {
@@ -457,8 +474,7 @@ app.on('ready', function()
      // Dereference the window object, usually you would store windows
      // in an array if your app supports multi windows, this is the time
      // when you should delete the corresponding element.
-     DEBUG("closing main window...");
-     mainWindow = null;
+     Finish('mainWindow::closed');
      app.quit();
    });
 
@@ -481,6 +497,7 @@ app.on('ready', function()
    mainWindow.once('ready-to-show', () => {
      if(args.fullscreen){ mainWindow.maximize(); };
      mainWindow.show();
+     mainWindow.focus();
    });
 
    mainWindow.webContents.on('did-finish-load', () => {
