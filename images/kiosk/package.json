@@ -65,6 +65,7 @@
       "!hooks",
       "!Makefile",
       "!*.sh",
+      "!*~",
       "!*Dockerfile"
     ],
     "extraResources": [
