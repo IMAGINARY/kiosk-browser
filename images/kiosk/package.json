@@ -1,7 +1,7 @@
 {
   "name": "kiosk-browser",
   "productName": "kiosk-browser",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "description": "Hardend Kiosk Web Browser",
   "homepage": "https://github.com/hilbert/hilbert-docker-images/tree/devel/images/kiosk",
   "repository": {
@@ -22,9 +22,9 @@
   "author": "IMAGINARY gGmbH <info@imaginary.org>",
   "license": "Apache-2.0",
   "devDependencies": {
-    "electron": "^1.6.2",
+    "electron": "^1.7.5",
     "electron-builder": "^10.8.1",
-    "electron-rebuild": "^1.4.0"
+    "electron-rebuild": "^1.6.0"
   },
   "dependencies": {
     "electron-settings": "^2.2.4",
