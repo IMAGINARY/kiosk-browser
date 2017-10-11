@@ -1,7 +1,7 @@
 {
   "name": "kiosk-browser",
   "productName": "kiosk-browser",
-  "version": "0.9.4",
+  "version": "0.9.5",
   "description": "Hardend Kiosk Web Browser",
   "homepage": "https://github.com/hilbert/hilbert-docker-images/tree/devel/images/kiosk",
   "repository": {

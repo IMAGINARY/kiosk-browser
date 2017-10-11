@@ -2,6 +2,7 @@
     "fullscreen": false,
     "kiosk": false,
     "devTools": false,
+    "remoteDebuggingPort": 8315,
     "cursor": false,
     "menu": false,
     "zoom": 1.0,

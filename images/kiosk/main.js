@@ -24,12 +24,15 @@ function getLinuxIcon() {
 
 const yargs = require('yargs'); // https://www.npmjs.com/package/yargs
 
+//   if(args.dev){ mainWindow.openDevTools(); } // --remote-debugging-port=8315 .port
+
 // TODO: mouse cursor? language?
 const options = yargs.wrap(yargs.terminalWidth())
 .alias('h', 'help').boolean('h').describe('h', 'Print this usage message.')
 .alias('V', 'version').boolean('V').describe('V', 'Print the version.')
 .alias('v', 'verbose').count('v').describe('v', 'Increase Verbosity').default('v', settings.getSync("verbose"))
 .alias('d', 'dev').boolean('d').describe('d', 'Run in development mode.').default('d', settings.getSync("devTools"))
+.alias('p', 'port').number('p').describe('p', 'Specify remote debugging port.').default('p', settings.getSync("remoteDebuggingPort"))
 .alias('c', 'cursor').boolean('c').describe('c', 'Toggle Mouse Cursor (TODO)').default('m', settings.getSync("cursor"))
 .alias('m', 'menu').boolean('m').describe('m', 'Toggle Main Menu').default('m', settings.getSync("menu"))
 .alias('k', 'kiosk').boolean('k').describe('k', 'Toggle Kiosk Mode').default('k', settings.getSync("kiosk"))
@@ -57,6 +60,7 @@ DEBUG('Help: ' + (args.help) );
 DEBUG('Version: ' + (args.version) );
 DEBUG('Verbose: ' + (args.verbose) );
 DEBUG('Dev: ' + (args.dev) );
+DEBUG('RemoteDebuggingPort: ' + (args.port) );
 DEBUG('Cursor: ' + (args.cursor) );
 
 DEBUG('Menu: ' + (args.menu) );
@@ -185,9 +189,14 @@ app.commandLine.appendSwitch('force-device-scale-factor', '1');
 //    , 'force-device-scale-factor', '--force-device-scale-factor',
 app.commandLine.appendSwitch('force-device-scale-factor', '1');
 
+if(args.dev){ app.commandLine.appendSwitch('remote-debugging-port', args.port); }
+
 // sw();
 app.commandLine.appendSwitch('flag-switches-begin');
 sw();
+
+if(args.dev){ app.commandLine.appendSwitch('remote-debugging-port', args.port); }
+
 app.commandLine.appendSwitch('flag-switches-end');
 
 
@@ -349,7 +358,7 @@ var template =
       },
       {
 	label: 'Index',
- 	click: function(item, focusedWindow) {
+	click: function(item, focusedWindow) {
 //      console.log(focusedWindow);
           if (focusedWindow) {
             focusedWindow.loadURL(`file://${ __dirname}/index.html`);
@@ -508,7 +517,7 @@ app.on('ready', function()
    mainWindow.setFullScreen(args.fullscreen);
 
    // Open the DevTools?
-   if(args.dev){ mainWindow.openDevTools(); }
+   if(args.dev){ mainWindow.openDevTools(); } // --remote-debugging-port=8315
 
    // and load some URL?!
    mainWindow.loadURL(`${url}`);
