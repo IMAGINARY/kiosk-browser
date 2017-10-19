@@ -2,7 +2,7 @@ mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 COPYFILES   := 
 include ../Makefile.inc
 
-CMD=hb_wrapper.sh launch.sh testapp.sh
+CMD=hb_wrapper.sh launch.sh browser.sh -i
 ARGS=
 APP_ID=browser_app
 
@@ -19,6 +19,7 @@ OPTS=/sbin/my_init --skip-startup-files --skip-runit
 #! 
 build: build_full
 
+# -e KIOSK_BROWSER="/opt/kiosk-browser.0.9.0/kiosk-browser"
 check: $(TS)
 	### [ -z "${DISPLAY}" ] && exit 1
 	###: xhost + || exit 1

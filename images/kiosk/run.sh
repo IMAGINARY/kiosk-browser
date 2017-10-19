@@ -5,6 +5,9 @@
 SELFDIR=`dirname "$0"`
 SELFDIR=`cd "$SELFDIR" && pwd`
 
+#SELFDIR="$(readlink -f "$0")"
+#SELFDIR="$(dirname "${SELFDIR}")"
+
 D="$SELFDIR/node_modules/.bin/electron"
 
 if [ ! -x "${D}" ]; then
@@ -19,6 +22,14 @@ ARGS="$@"
 if [[ -n "${ELECTRON}" && -r "${SELFDIR}/main.js" && -r "${SELFDIR}/package.json" ]]; then
   echo "Running: '${ELECTRON} ${SELFDIR} $ARGS'"
   exec "${ELECTRON}" "${SELFDIR}" $ARGS
+fi
+
+
+if [[ -n "${KIOSK_BROWSER}" ]]; then 
+  if [[ -x "${KIOSK_BROWSER}" ]]; then
+    echo "Note: trying to use '${KIOSK_BROWSER}'"
+    exec "${KIOSK_BROWSER}" "--" $ARGS
+  fi
 fi
 
 if [[ -x "/opt/kiosk-browser/kiosk-browser" ]]; then
