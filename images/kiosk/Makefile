@@ -13,13 +13,14 @@ APP_ID=browser_app
 
 
 # --privileged
-RUNTERM=--rm -it -a stdin -a stdout -a stderr --ipc=host --net=host 
+RUNTERM=--rm -it -a stdin -a stdout -a stderr --ipc=host --net=host
+# -e KIOSK_BROWSER="/opt/kiosk-browser.0.9.0/kiosk-browser"
+
 OPTS=/sbin/my_init --skip-startup-files --skip-runit
 
 #! 
 build: build_full
 
-# -e KIOSK_BROWSER="/opt/kiosk-browser.0.9.0/kiosk-browser"
 check: $(TS)
 	### [ -z "${DISPLAY}" ] && exit 1
 	###: xhost + || exit 1

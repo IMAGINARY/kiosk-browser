@@ -111,9 +111,14 @@ app.commandLine.appendSwitch('ignore-gpu-blacklist');
 // app.commandLine.appendSwitch('show-fps-counter');
 // app.commandLine.appendSwitch('ash-touch-hud');
 
-app.commandLine.appendSwitch('touch-events');
-app.commandLine.appendSwitch('touch-events-enabled');
-app.commandLine.appendSwitch('touch-events', 'enabled');
+//app.commandLine.appendSwitch('touch-events');
+//app.commandLine.appendSwitch('touch-events-enabled');
+//app.commandLine.appendSwitch('touch-events', 'enabled');
+
+app.commandLine.appendSwitch('disable-touch-events');
+app.commandLine.appendSwitch('touch-events-disabled');
+app.commandLine.appendSwitch('touch-events', 'disabled');
+
 
 /// app.commandLine.appendSwitch('ignore-gpu-blacklist');
 /// app.commandLine.appendSwitch('enable-gpu');
@@ -153,11 +158,13 @@ app.commandLine.appendSwitch('allow-file-access-from-files');
 //    'disable-threaded-scrolling',
 //    'javascript-harmony',
 //    'disable-pinch',
-[
-    'enable_hidpi', 'enable-hidpi',
-    '--high-dpi-support=1', '--high-dpi-support', 'high-dpi-support',
-    '--force-device-scale-factor=1'
-].forEach(app.commandLine.appendSwitch);
+[   'enable_hidpi', 
+    'enable-hidpi', 
+    '--high-dpi-support', 
+     'high-dpi-support', 
+    'disable-background-timer-throttling'
+].forEach(app.commandLine.appendSwitch); //     '--high-dpi-support=1',     '--force-device-scale-factor=1'
+
 app.commandLine.appendSwitch('force-device-scale-factor', '1');
 //    '--force-device-scale-factor', 'force-device-scale-factor'
 
@@ -179,15 +186,18 @@ app.commandLine.appendSwitch('force-device-scale-factor', '1');
 /// 'enable-pinch',  // ?
 [
     'enable_hidpi', 'enable-hidpi',
-    '--high-dpi-support=1', '--high-dpi-support', 'high-dpi-support',
-    '--force-device-scale-factor=1',
+    '--high-dpi-support', 
+    'high-dpi-support',
     'enable-transparent-visuals', '--enable-transparent-visuals',
     'disable-pinch',
     'allow-file-access-from-files'
 ].forEach(app.commandLine.appendSwitch);
 // --disable-gpu
 //    , 'force-device-scale-factor', '--force-device-scale-factor',
+//    '--force-device-scale-factor=1',
 app.commandLine.appendSwitch('force-device-scale-factor', '1');
+app.commandLine.appendSwitch('high-dpi-support', '1'); //    '--high-dpi-support=1', 
+
 
 if(args.dev){ app.commandLine.appendSwitch('remote-debugging-port', args.port); }
 

@@ -158,6 +158,16 @@
     <div id="f7" class="touch"></div>
     <div id="f8" class="touch"></div>
     <div id="f9" class="touch"></div>
+    <div id="f10" class="touch"></div>
+    <div id="f11" class="touch"></div>
+    <div id="f12" class="touch"></div>
+    <div id="f13" class="touch"></div>
+    <div id="f14" class="touch"></div>
+    <div id="f15" class="touch"></div>
+    <div id="f16" class="touch"></div>
+    <div id="f17" class="touch"></div>
+    <div id="f18" class="touch"></div>
+    <div id="f19" class="touch"></div>
 
     <div id="footer"><br/>
           <b style="background:#eee;color:#111">LOCAL INFO:</b>
@@ -383,7 +393,7 @@
         function renderInfoForTouches(touches){
           var info = '';
 
-          for( var i = 9; i >= 0; i-- ){ touchfingers[i].addClassName('off'); }
+          for( var i = 19; i >= 0; i-- ){ touchfingers[i].addClassName('off'); }
 
           $A(touches).each(function(touch,index){
             info += infoForTouch(touch,index);
