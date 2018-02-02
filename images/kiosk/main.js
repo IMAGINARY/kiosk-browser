@@ -42,6 +42,7 @@ const options = yargs.wrap(yargs.terminalWidth())
 .alias('z', 'zoom').number('z').describe('z', 'Set Zoom Factor').default('z', settings.getSync("zoom"))
 .alias('l', 'url').string('l').describe('l', 'URL to load').default('l', 'file://' + __dirname + '/' + 'index.html')
 .alias('t', 'transparent').boolean('t').describe('t', 'Transparent Browser Window').default('t', settings.getSync("transparent"))
+.string('preload').describe('preload', 'preload a JavaScript file')
 .usage('Kiosk Web Browser\n    Usage: $0 [options] [args]' );
 
 // settings.getSync("default_html")
@@ -70,6 +71,7 @@ DEBUG('Kiosk Mode: ' + (args.kiosk));
 DEBUG('Zoom Factor: ' + (args.zoom));
 DEBUG('Node Integration: ' + (args.integration));
 DEBUG('URL: ' + (args.url) );
+DEBUG('Preload: ' + (args.preload));
 
 if(args.help){ options.showHelp(); process.exit(0); };
 
@@ -443,6 +445,9 @@ app.on('ready', function()
        zoomFactor: args.zoom, 'zoom-factor': args.zoom,
        nodeIntegration: args.integration, 'node-integration': args.integration
     };
+    
+    if(args.preload)
+        webprefs.preload = path.resolve(args.preload);
 
    const {screen} = electron; // require('screen');
    const size = screen.getPrimaryDisplay().bounds;
