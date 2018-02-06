@@ -133,7 +133,6 @@
         display: none;
       }
     </style>
-    <script src="hilbert-heartbeat.js"></script>
   </head>   
   <body id="body">
     <div id="panspeed"><div></div></div>
@@ -163,14 +162,6 @@
     </div>
     <script type="text/javascript">
       document.addEventListener("DOMContentLoaded", function() { // (function(){
-        var heartbeat = new Heartbeat({
-                  url: Heartbeat.getPassedUrl('http://127.0.0.1:8888'),
-                  appId: Heartbeat.getPassedAppId('kiosk_browser_testapp'),
-                  interval: 10000,
-                  sendInitCommand: false,
-                  sendDoneCommand: false,
-        });
-
         var footer = $('footer'); // var footer = document.getElementById('footer'); 
         var clock_time = document.getElementById('local_datetime');
         var local_hostname = document.getElementById('local_hostname');
