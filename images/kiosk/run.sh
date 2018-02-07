@@ -11,6 +11,7 @@ SELFDIR=`cd "$SELFDIR" && pwd`
 D="$SELFDIR/node_modules/.bin/electron"
 
 if [ ! -x "${D}" ]; then
+  echo "Warning: no local electron at [$D]!"
   D=""
 fi
 
