@@ -41,7 +41,7 @@ const options = yargs.wrap(yargs.terminalWidth())
 .boolean('testapp').describe('testapp', 'Testing application').default('testapp', settings.getSync("testapp"))
 .boolean('localhost').describe('localhost', 'Restrict to LocalHost').default('localhost', settings.getSync("localhost"))
 .alias('z', 'zoom').number('z').describe('z', 'Set Zoom Factor').default('z', settings.getSync("zoom"))
-.alias('l', 'url').string('l').describe('l', 'URL to load').default('l', 'file://' + __dirname + '/' + 'index.html')
+.alias('l', 'url').string('l').describe('l', 'URL to load').default('l', 'file://' + __dirname + '/' + settings.getSync("index_url"))
 .alias('t', 'transparent').boolean('t').describe('t', 'Transparent Browser Window').default('t', settings.getSync("transparent"))
 .string('preload').describe('preload', 'preload a JavaScript file')
 .usage('Kiosk Web Browser\n    Usage: $0 [options] [args]' );
@@ -61,6 +61,7 @@ DEBUG(process.argv); // [1..]; // ????
 DEBUG('Help: ' + (args.help) );
 DEBUG('Version: ' + (args.version) );
 DEBUG('Verbose: ' + (args.verbose) );
+DEBUG('Dirname: ' + (__dirname) );
 DEBUG('Dev: ' + (args.dev) );
 DEBUG('RemoteDebuggingPort: ' + (args.port) );
 DEBUG('Cursor: ' + (args.cursor) );
@@ -81,7 +82,7 @@ const app = electron.app;
 
 if(args.version){ console.log(app.getVersion()); process.exit(0); };
 
-const url = args.testapp ? 'file://' + __dirname + '/' + 'testapp.html' : args.url;
+const url = args.testapp ? 'file://' + __dirname + '/' + settings.getSync("testapp_url") : args.url;
 
 // http://peter.sh/experiments/chromium-command-line-switches/
 // https://xwartz.gitbooks.io/electron-gitbook/content/en/api/chrome-command-line-switches.html
@@ -377,7 +378,7 @@ var template =
 	click: function(item, focusedWindow) {
 //      console.log(focusedWindow);
           if (focusedWindow) {
-            focusedWindow.loadURL(`file://${ __dirname}/index.html`);
+            focusedWindow.loadURL(`file://${ __dirname}/` + settings.getSync("index_url"));
           }
         }
       },

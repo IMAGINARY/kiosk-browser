@@ -1,7 +1,10 @@
 {
     "fullscreen": false,
     "kiosk": false,
+    "index_url": "index.html",
     "localhost": false,
+    "testapp": false,
+    "testapp_url": "testapp.html",
     "devTools": false,
     "remoteDebuggingPort": 8315,
     "cursor": false,
