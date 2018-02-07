@@ -39,6 +39,7 @@ const options = yargs.wrap(yargs.terminalWidth())
 .alias('f', 'fullscreen').boolean('f').describe('f', 'Toggle Fullscreen Mode').default('f', settings.getSync("fullscreen"))
 .alias('i', 'integration').boolean('i').describe('i', 'node Integration').default('i', settings.getSync("integration"))
 .boolean('testapp').describe('testapp', 'Testing application').default('testapp', settings.getSync("testapp"))
+.boolean('localhost').describe('localhost', 'Restrict to LocalHost').default('localhost', settings.getSync("localhost"))
 .alias('z', 'zoom').number('z').describe('z', 'Set Zoom Factor').default('z', settings.getSync("zoom"))
 .alias('l', 'url').string('l').describe('l', 'URL to load').default('l', 'file://' + __dirname + '/' + 'index.html')
 .alias('t', 'transparent').boolean('t').describe('t', 'Transparent Browser Window').default('t', settings.getSync("transparent"))
@@ -83,6 +84,8 @@ if(args.version){ console.log(app.getVersion()); process.exit(0); };
 const url = args.testapp ? 'file://' + __dirname + '/' + 'testapp.html' : args.url;
 
 // http://peter.sh/experiments/chromium-command-line-switches/
+// https://xwartz.gitbooks.io/electron-gitbook/content/en/api/chrome-command-line-switches.html
+
 
 // --enable-pinch --flag-switches-begin 
 //--enable-experimental-canvas-features --enable-gpu-rasterization --javascript-harmony --enable-touch-editing --enable-webgl-draft-extensions --enable-experimental-extension-apis --ignore-gpu-blacklist --show-fps-counter --ash-touch-hud --touch-events=enabled
@@ -203,19 +206,20 @@ app.commandLine.appendSwitch('high-dpi-support', '1'); //    '--high-dpi-support
 
 if(args.dev){ app.commandLine.appendSwitch('remote-debugging-port', args.port); }
 
-// sw();
-app.commandLine.appendSwitch('flag-switches-begin');
+if(args.localhost){ app.commandLine.appendSwitch('host-rules', 'MAP * 127.0.0.1'); }
+
 sw();
 
-if(args.dev){ app.commandLine.appendSwitch('remote-debugging-port', args.port); }
+app.commandLine.appendSwitch('flag-switches-begin');
+
+// if(args.dev){ app.commandLine.appendSwitch('remote-debugging-port', args.port); }
+// if(args.kiosk){ app.commandLine.appendSwitch('host-rules', 'MAP * 127.0.0.1'); }
+
+sw();
 
 app.commandLine.appendSwitch('flag-switches-end');
 
 
-
-
-// app.commandLine.appendSwitch('remote-debugging-port', '8315');
-// app.commandLine.appendSwitch('host-rules', 'MAP * 127.0.0.1');
 
 // var crashReporter = require('crash-reporter');
 // crashReporter.start(); // Report crashes to our server: productName: 'Kiosk', companyName: 'IMAGINARY'???
