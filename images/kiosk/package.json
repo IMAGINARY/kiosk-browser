@@ -1,15 +1,15 @@
 {
   "name": "kiosk-browser",
   "productName": "kiosk-browser",
-  "version": "0.9.7",
+  "version": "0.9.8",
   "description": "Hardend Kiosk Web Browser",
-  "homepage": "https://github.com/hilbert/hilbert-docker-images/tree/devel/images/kiosk",
+  "homepage": "https://github.com/IMAGINARY/kiosk-browser",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hilbert/hilbert-docker-images.git"
+    "url": "git+https://github.com/IMAGINARY/kiosk-browser.git"
   },
   "bugs": {
-    "url": "https://github.com/hilbert/hilbert-docker-images/issues",
+    "url": "https://github.com/IMAGINARY/kiosk-browser/issues",
     "email": "info@imaginary.org"
   },
   "main": "main.js",
