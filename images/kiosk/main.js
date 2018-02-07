@@ -44,7 +44,10 @@ const options = yargs.wrap(yargs.terminalWidth())
 .alias('l', 'url').string('l').describe('l', 'URL to load').default('l', 'file://' + __dirname + '/' + settings.getSync("index_url"))
 .alias('t', 'transparent').boolean('t').describe('t', 'Transparent Browser Window').default('t', settings.getSync("transparent"))
 .string('preload').describe('preload', 'preload a JavaScript file')
-.usage('Kiosk Web Browser\n    Usage: $0 [options] [args]' );
+.usage('Kiosk Web Browser\n    Usage: $0 [options] [url]' )
+.strict();
+/*.fail(function (msg, err, yargs) { f (err) throw err // preserve stack
+    console.error('You broke it!'); console.error(msg); console.error('You should be doing', yargs.help()); process.exit(1); })*/
 
 // settings.getSync("default_html")
 
@@ -72,8 +75,10 @@ DEBUG('Testing?: ' + (args.testapp));
 DEBUG('Kiosk Mode: ' + (args.kiosk));
 DEBUG('Zoom Factor: ' + (args.zoom));
 DEBUG('Node Integration: ' + (args.integration));
-DEBUG('URL: ' + (args.url) );
+DEBUG('--url: ' + (args.url) );
 DEBUG('Preload: ' + (args.preload));
+
+DEBUG('Further Args: [' + (args._) + '], #: [' + args._.length + ']');
 
 if(args.help){ options.showHelp(); process.exit(0); };
 
@@ -82,10 +87,13 @@ const app = electron.app;
 
 if(args.version){ console.log(app.getVersion()); process.exit(0); };
 
-const url = args.testapp ? 'file://' + __dirname + '/' + settings.getSync("testapp_url") : args.url;
 
-// http://peter.sh/experiments/chromium-command-line-switches/
-// https://xwartz.gitbooks.io/electron-gitbook/content/en/api/chrome-command-line-switches.html
+var url = (args._.length > 0)? args._[0] : args.url;
+url = args.testapp ? 'file://' + __dirname + '/' + settings.getSync("testapp_url") : url;
+
+if((!args.testapp) && (args._.length > 1)){ WARN('Multiple arguments were given: [' + (args._) + ']!'); process.exit(1); }
+
+DEBUG('Resulting URL to load: [' + (url) + ']');
 
 
 // --enable-pinch --flag-switches-begin 
@@ -94,10 +102,14 @@ const url = args.testapp ? 'file://' + __dirname + '/' + settings.getSync("testa
 
 function sw() 
 {
+  // https://github.com/atom/electron/issues/1277
+  // https://bugs.launchpad.net/ubuntu/+source/chromium-browser/+bug/1463598
+  // https://code.google.com/p/chromium/issues/detail?id=121183
+  // http://peter.sh/experiments/chromium-command-line-switches/
+  // https://xwartz.gitbooks.io/electron-gitbook/content/en/api/chrome-command-line-switches.html
 
-app.commandLine.appendSwitch('--js-flags="--max_old_space_size=4096"');
-
-app.commandLine.appendSwitch('disable-threaded-scrolling');
+  app.commandLine.appendSwitch('--js-flags="--max_old_space_size=4096"');
+  app.commandLine.appendSwitch('disable-threaded-scrolling');
 
 // app.commandLine.appendSwitch('enable-apps-show-on-first-paint');
 // app.commandLine.appendSwitch('enable-embedded-extension-options');
@@ -121,9 +133,11 @@ app.commandLine.appendSwitch('ignore-gpu-blacklist');
 //app.commandLine.appendSwitch('touch-events-enabled');
 //app.commandLine.appendSwitch('touch-events', 'enabled');
 
+app.commandLine.appendSwitch('disabled');
 app.commandLine.appendSwitch('disable-touch-events');
 app.commandLine.appendSwitch('touch-events-disabled');
-app.commandLine.appendSwitch('touch-events', 'disabled');
+app.commandLine.appendSwitch('touch-events', 'disabled'); // --touch-events=disabled 
+app.commandLine.appendSwitch('disable-features', 'PassiveDocumentEventListeners,PassiveEventListenersDueToFling'); // --disable-features=PassiveDocumentEventListeners,PassiveEventListenersDueToFling
 
 
 /// app.commandLine.appendSwitch('ignore-gpu-blacklist');
@@ -158,67 +172,38 @@ app.commandLine.appendSwitch('disable-web-security');
 // app.commandLine.appendSwitch('ash-enable-touch-view-testing');
 
 /// app.commandLine.appendSwitch('auto');
-app.commandLine.appendSwitch('allow-file-access-from-files');
 
 //    '--js-flags="--max_old_space_size=4096"',
 //    'disable-threaded-scrolling',
 //    'javascript-harmony',
 //    'disable-pinch',
-[   'enable_hidpi', 
+
+  [
+    'disable-pinch',
+    'allow-file-access-from-files',
+    'enable_hidpi', 
     'enable-hidpi', 
-    '--high-dpi-support', 
-     'high-dpi-support', 
-    'disable-background-timer-throttling'
-].forEach(app.commandLine.appendSwitch); //     '--high-dpi-support=1',     '--force-device-scale-factor=1'
+    'disable-background-timer-throttling',
+    'enable-transparent-visuals',
+    'incognito'
+  ].forEach(app.commandLine.appendSwitch); 
 
-app.commandLine.appendSwitch('force-device-scale-factor', '1');
-//    '--force-device-scale-factor', 'force-device-scale-factor'
+  app.commandLine.appendSwitch('high-dpi-support', '1');
+  app.commandLine.appendSwitch('force-device-scale-factor', '1');
+  app.commandLine.appendSwitch('set-base-background-color', '0x00000000');
 
-[
-    'enable-transparent-visuals', '--enable-transparent-visuals',
-].forEach(app.commandLine.appendSwitch);
-
+  /// 'enable-pinch',  // ?
+  // --disable-gpu
 
 
 }
 
-//https://github.com/atom/electron/issues/1277
-//https://bugs.launchpad.net/ubuntu/+source/chromium-browser/+bug/1463598
-//https://code.google.com/p/chromium/issues/detail?id=121183
-
-
 
 // Append Chromium command line switches
-/// 'enable-pinch',  // ?
-[
-    'enable_hidpi', 'enable-hidpi',
-    '--high-dpi-support', 
-    'high-dpi-support',
-    'enable-transparent-visuals', '--enable-transparent-visuals',
-    'disable-pinch',
-    'allow-file-access-from-files'
-].forEach(app.commandLine.appendSwitch);
-// --disable-gpu
-//    , 'force-device-scale-factor', '--force-device-scale-factor',
-//    '--force-device-scale-factor=1',
-app.commandLine.appendSwitch('force-device-scale-factor', '1');
-app.commandLine.appendSwitch('high-dpi-support', '1'); //    '--high-dpi-support=1', 
-
-
 if(args.dev){ app.commandLine.appendSwitch('remote-debugging-port', args.port); }
-
 if(args.localhost){ app.commandLine.appendSwitch('host-rules', 'MAP * 127.0.0.1'); }
 
-sw();
-
-app.commandLine.appendSwitch('flag-switches-begin');
-
-// if(args.dev){ app.commandLine.appendSwitch('remote-debugging-port', args.port); }
-// if(args.kiosk){ app.commandLine.appendSwitch('host-rules', 'MAP * 127.0.0.1'); }
-
-sw();
-
-app.commandLine.appendSwitch('flag-switches-end');
+sw(); app.commandLine.appendSwitch('flag-switches-begin'); sw(); app.commandLine.appendSwitch('flag-switches-end');
 
 
 
