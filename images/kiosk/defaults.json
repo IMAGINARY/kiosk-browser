@@ -1,6 +1,7 @@
 {
     "fullscreen": false,
     "kiosk": false,
+    "localhost": false,
     "devTools": false,
     "remoteDebuggingPort": 8315,
     "cursor": false,
