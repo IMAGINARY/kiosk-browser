@@ -60,6 +60,16 @@
       "icon": "build/icon.ico"
     },
     "files": [
+      "main.js",
+      "defaults.json",
+      "index.html",
+      "testapp.html",
+      "prototype.min.js",
+      "arrow.png",
+      "Center.mp3",
+      "Left.mp3",
+      "Right.mp3",
+      "!yarn-error.log",
       "!.gitignore",
       "!yarn.lock",
       "!hooks",
@@ -81,7 +91,6 @@
     "short-option-groups": true,
     "camel-case-expansion": true,
     "dot-notation": true,
-    "parse-numbers": true,
-    "boolean-negation": true
+    "parse-numbers": true
   }
 }
