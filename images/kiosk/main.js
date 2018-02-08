@@ -8,6 +8,14 @@ global.shellStartTime = Date.now();
 
 const electron = require('electron');
 
+// Module to control application life.
+const app = electron.app;
+
+// This method will be called when Electron has finished
+// initialization and is ready to create browser windows.
+app.on('ready', function()
+{
+    
 const path = require('path');
 const settings = require('electron-settings');
 
@@ -80,9 +88,6 @@ DEBUG('Preload: ' + (args.preload));
 DEBUG('Further Args: [' + (args._) + '], #: [' + args._.length + ']');
 
 if(args.help){ options.showHelp(); process.exit(0); };
-
-// Module to control application life.
-const app = electron.app;
 
 if(args.version){ console.log(app.getVersion()); process.exit(0); };
 
@@ -415,9 +420,6 @@ Object.keys(signals).forEach(function (signal) {
 function _min(a, b){ if(a <= b) return (a); else return (b); }
 function _max(a, b){ if(a >= b) return (a); else return (b); }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-app.on('ready', function()
 {
     const webprefs = {
        javascript: true,
@@ -540,5 +542,7 @@ app.on('ready', function()
 //  `);
 
 
+
+}
 
 });
