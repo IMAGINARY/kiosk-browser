@@ -22,18 +22,18 @@
   "author": "IMAGINARY gGmbH <info@imaginary.org>",
   "license": "Apache-2.0",
   "devDependencies": {
-    "electron": "1.7.5",
-    "electron-builder": "^10.8.1",
+    "electron": "^1.7.5",
+    "electron-builder": "^19.56.0",
     "electron-rebuild": "^1.6.0"
   },
   "dependencies": {
-    "electron-settings": "^2.2.4",
-    "network": "^0.3.2",
+    "electron-settings": "^3.1.4",
+    "network": "^0.4.0",
     "os": "^0.1.1",
-    "yargs": "^6.6.1-candidate.4"
+    "yargs": "^11.0.0"
   },
   "scripts": {
-    "postinstall": "electron-rebuild",
+    "postinstall": "electron-builder install-app-deps",
     "start": "electron .",
     "rebuild": "electron-rebuild",
     "pack": "electron-rebuild && CSC_IDENTITY_AUTO_DISCOVERY=false build --linux --x64 --dir",
@@ -43,19 +43,15 @@
     "appId": "org.imaginary.kiosk",
     "npmRebuild": false,
     "linux": {
-      "icon": "build/48x48.png",
+      "icon": "build/256x256.png",
       "executableName": "kiosk-browser",
       "target": [
-        "deb",
-        "rpm",
-        "AppImage"
+        "deb"
       ],
       "category": "Internet",
       "packageCategory": "Internet"
     },
     "deb": {},
-    "rpm": {},
-    "appimage": {},
     "win": {
       "icon": "build/icon.ico"
     },
@@ -83,7 +79,7 @@
       {
         "from": "build",
         "to": ".",
-        "filter": "**/48x48.png"
+        "filter": "**/256x256.png"
       }
     ]
   },
