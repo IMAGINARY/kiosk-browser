@@ -77,6 +77,7 @@ const options = yargs.wrap(yargs.terminalWidth())
 .alias('l', 'url').string('l').describe('l', 'URL to load').default('l', 'file://' + __dirname + '/' + settings.getWithDefault("index_url"))
 .alias('t', 'transparent').boolean('t').describe('t', 'Transparent Browser Window').default('t', settings.getWithDefault("transparent"))
 .string('preload').describe('preload', 'preload a JavaScript file')
+.string('chromeOpts').describe('chromeOpts', 'Supply options for internal Chrome browser')
 .usage('Kiosk Web Browser\n    Usage: $0 [options] [url]' )
 .strict();
 /*.fail(function (msg, err, yargs) { f (err) throw err // preserve stack
@@ -85,6 +86,9 @@ const options = yargs.wrap(yargs.terminalWidth())
 // settings.getWithDefault("default_html")
 
 const args = options.argv;
+const additionalChromeOpts = require('shell-quote')
+  .parse(args.chromeOpts)
+  .filter(o => typeof o === "string");
 
 var VERBOSE_LEVEL = args.verbose;
 
@@ -110,6 +114,7 @@ DEBUG('Zoom Factor: ' + (args.zoom));
 DEBUG('Node Integration: ' + (args.integration));
 DEBUG('--url: ' + (args.url) );
 DEBUG('Preload: ' + (args.preload));
+DEBUG('Chrome options: ' + (JSON.stringify(additionalChromeOpts)));
 
 DEBUG('Further Args: [' + (args._) + '], #: [' + args._.length + ']');
 
@@ -236,6 +241,7 @@ if(args.localhost){ app.commandLine.appendSwitch('host-rules', 'MAP * 127.0.0.1'
 sw(); app.commandLine.appendSwitch('flag-switches-begin'); sw(); app.commandLine.appendSwitch('flag-switches-end');
 
 
+additionalChromeOpts.forEach(app.commandLine.appendSwitch);
 
 // var crashReporter = require('crash-reporter');
 // crashReporter.start(); // Report crashes to our server: productName: 'Kiosk', companyName: 'IMAGINARY'???
