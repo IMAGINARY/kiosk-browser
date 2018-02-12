@@ -77,7 +77,7 @@ const options = yargs.wrap(yargs.terminalWidth())
 .alias('l', 'url').string('l').describe('l', 'URL to load').default('l', 'file://' + __dirname + '/' + settings.getWithDefault("index_url"))
 .alias('t', 'transparent').boolean('t').describe('t', 'Transparent Browser Window').default('t', settings.getWithDefault("transparent"))
 .string('preload').describe('preload', 'preload a JavaScript file')
-.string('chromeOpts').describe('chromeOpts', 'Supply options for internal Chrome browser')
+.string('chromeOpts').describe('chromeOpts', 'Append options to internal Chrome browser options')
 .usage('Kiosk Web Browser\n    Usage: $0 [options] [url]' )
 .strict();
 /*.fail(function (msg, err, yargs) { f (err) throw err // preserve stack
@@ -114,7 +114,7 @@ DEBUG('Zoom Factor: ' + (args.zoom));
 DEBUG('Node Integration: ' + (args.integration));
 DEBUG('--url: ' + (args.url) );
 DEBUG('Preload: ' + (args.preload));
-DEBUG('Chrome options: ' + (JSON.stringify(additionalChromeOpts)));
+DEBUG('Additional Chrome options: ' + (JSON.stringify(additionalChromeOpts)));
 
 DEBUG('Further Args: [' + (args._) + '], #: [' + args._.length + ']');
 
