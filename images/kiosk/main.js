@@ -86,9 +86,12 @@ const options = yargs.wrap(yargs.terminalWidth())
 // settings.getWithDefault("default_html")
 
 const args = options.argv;
-const additionalChromeOpts = require('shell-quote')
-  .parse(args.chromeOpts)
-  .filter(o => typeof o === "string");
+function parseChromeOpts(optionString) {
+  return require('shell-quote')
+    .parse(optionString)
+    .filter(o => typeof o === "string");
+}
+const additionalChromeOpts = args.chromeOpts ? parseChromeOpts(args.chromeOpts) : [];
 
 var VERBOSE_LEVEL = args.verbose;
 
