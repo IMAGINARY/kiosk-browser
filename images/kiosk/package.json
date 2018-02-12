@@ -46,12 +46,16 @@
       "icon": "build/256x256.png",
       "executableName": "kiosk-browser",
       "target": [
-        "deb"
+        "deb",
+        "rpm",
+        "AppImage"
       ],
-      "category": "Internet",
-      "packageCategory": "Internet"
+      "category": "Network",
+      "packageCategory": "web"
     },
     "deb": {},
+    "rpm": {},
+    "appImage": {},
     "win": {
       "icon": "build/icon.ico"
     },
