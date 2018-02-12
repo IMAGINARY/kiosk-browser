@@ -78,6 +78,7 @@ const options = yargs.wrap(yargs.terminalWidth())
 .alias('t', 'transparent').boolean('t').describe('t', 'Transparent Browser Window').default('t', settings.getWithDefault("transparent"))
 .string('preload').describe('preload', 'preload a JavaScript file')
 .string('chromeOpts').describe('chromeOpts', 'Append options to internal Chrome browser options')
+.string('replaceChromeOpts').describe('replaceChromeOpts', 'Replace internal Chrome browser options')
 .usage('Kiosk Web Browser\n    Usage: $0 [options] [url]' )
 .strict();
 /*.fail(function (msg, err, yargs) { f (err) throw err // preserve stack
@@ -92,6 +93,7 @@ function parseChromeOpts(optionString) {
     .filter(o => typeof o === "string");
 }
 const additionalChromeOpts = args.chromeOpts ? parseChromeOpts(args.chromeOpts) : [];
+const replaceChromeOpts = args.replaceChromeOpts ? parseChromeOpts(args.replaceChromeOpts) : [];
 
 var VERBOSE_LEVEL = args.verbose;
 
@@ -118,6 +120,7 @@ DEBUG('Node Integration: ' + (args.integration));
 DEBUG('--url: ' + (args.url) );
 DEBUG('Preload: ' + (args.preload));
 DEBUG('Additional Chrome options: ' + (JSON.stringify(additionalChromeOpts)));
+DEBUG('Replace Chrome options: ' + (JSON.stringify(replaceChromeOpts)));
 
 DEBUG('Further Args: [' + (args._) + '], #: [' + args._.length + ']');
 
@@ -236,13 +239,15 @@ app.commandLine.appendSwitch('disable-web-security');
 
 }
 
+if(args.replaceChromeOpts) {
+  replaceChromeOpts.forEach(app.commandLine.appendSwitch);
+} else {
+  // Append Chromium command line switches
+  if(args.dev){ app.commandLine.appendSwitch('remote-debugging-port', args.port); }
+  if(args.localhost){ app.commandLine.appendSwitch('host-rules', 'MAP * 127.0.0.1'); }
 
-// Append Chromium command line switches
-if(args.dev){ app.commandLine.appendSwitch('remote-debugging-port', args.port); }
-if(args.localhost){ app.commandLine.appendSwitch('host-rules', 'MAP * 127.0.0.1'); }
-
-sw(); app.commandLine.appendSwitch('flag-switches-begin'); sw(); app.commandLine.appendSwitch('flag-switches-end');
-
+  sw(); app.commandLine.appendSwitch('flag-switches-begin'); sw(); app.commandLine.appendSwitch('flag-switches-end');
+}
 
 additionalChromeOpts.forEach(app.commandLine.appendSwitch);
 
