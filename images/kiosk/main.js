@@ -8,11 +8,45 @@ global.shellStartTime = Date.now();
 
 const electron = require('electron');
 
+// Module to control application life.
+const app = electron.app;
+
+// This method will be called when Electron has finished
+// initialization and is ready to create browser windows.
+app.on('ready', function()
+{
+    
 const path = require('path');
 const settings = require('electron-settings');
 
-settings.setAll(require("./defaults.json"));
-// settings.applyDefaultsSync({ prettify: true });
+// write defautl settings to Settings only file if it is empty
+const defaultSettings = require("./defaults.json");
+if(Object.keys(settings.getAll()).length==0)
+    settings.setAll(defaultSettings,{ prettify: true });
+
+// like get() function, but with automatic fallback to defaults
+settings.getWithDefault = function(keyPath) {
+    if(this.has(keyPath)) {
+        // return value from the Settings
+        return this.get(keyPath);
+    } else {
+        // return value from the defaults
+        const obj = defaultSettings;
+        const keys = keyPath.split(/\./);
+
+        for(let i = 0, len = keys.length; i < len; i++) {
+            const key = keys[i];
+
+            if(Object.prototype.hasOwnProperty.call(obj, key)) {
+                obj = obj[key];
+            } else {
+                return undefined;
+            }
+        }
+
+        return obj;
+    }
+}
 
 function getLinuxIcon() {
     if(process.mainModule.filename.indexOf('app.asar') === -1)
@@ -29,26 +63,26 @@ const yargs = require('yargs'); // https://www.npmjs.com/package/yargs
 const options = yargs.wrap(yargs.terminalWidth())
 .alias('h', 'help').boolean('h').describe('h', 'Print this usage message.')
 .alias('V', 'version').boolean('V').describe('V', 'Print the version.')
-.alias('v', 'verbose').count('v').describe('v', 'Increase Verbosity').default('v', settings.get("verbose"))
-.alias('d', 'dev').boolean('d').describe('d', 'Run in development mode.').default('d', settings.get("devTools"))
-.alias('p', 'port').number('p').describe('p', 'Specify remote debugging port.').default('p', settings.get("remoteDebuggingPort"))
-.alias('c', 'cursor').boolean('c').describe('c', 'Toggle Mouse Cursor (TODO)').default('m', settings.get("cursor"))
-.alias('m', 'menu').boolean('m').describe('m', 'Toggle Main Menu').default('m', settings.get("menu"))
-.alias('k', 'kiosk').boolean('k').describe('k', 'Toggle Kiosk Mode').default('k', settings.get("kiosk"))
-.alias('f', 'fullscreen').boolean('f').describe('f', 'Toggle Fullscreen Mode').default('f', settings.get("fullscreen"))
-.alias('i', 'integration').boolean('i').describe('i', 'node Integration').default('i', settings.get("integration"))
-.boolean('testapp').describe('testapp', 'Testing application').default('testapp', settings.get("testapp"))
-.boolean('localhost').describe('localhost', 'Restrict to LocalHost').default('localhost', settings.get("localhost"))
-.alias('z', 'zoom').number('z').describe('z', 'Set Zoom Factor').default('z', settings.get("zoom"))
-.alias('l', 'url').string('l').describe('l', 'URL to load').default('l', 'file://' + __dirname + '/' + settings.get("index_url"))
-.alias('t', 'transparent').boolean('t').describe('t', 'Transparent Browser Window').default('t', settings.get("transparent"))
+.alias('v', 'verbose').count('v').describe('v', 'Increase Verbosity').default('v', settings.getWithDefault("verbose"))
+.alias('d', 'dev').boolean('d').describe('d', 'Run in development mode.').default('d', settings.getWithDefault("devTools"))
+.alias('p', 'port').number('p').describe('p', 'Specify remote debugging port.').default('p', settings.getWithDefault("remoteDebuggingPort"))
+.alias('c', 'cursor').boolean('c').describe('c', 'Toggle Mouse Cursor (TODO)').default('m', settings.getWithDefault("cursor"))
+.alias('m', 'menu').boolean('m').describe('m', 'Toggle Main Menu').default('m', settings.getWithDefault("menu"))
+.alias('k', 'kiosk').boolean('k').describe('k', 'Toggle Kiosk Mode').default('k', settings.getWithDefault("kiosk"))
+.alias('f', 'fullscreen').boolean('f').describe('f', 'Toggle Fullscreen Mode').default('f', settings.getWithDefault("fullscreen"))
+.alias('i', 'integration').boolean('i').describe('i', 'node Integration').default('i', settings.getWithDefault("integration"))
+.boolean('testapp').describe('testapp', 'Testing application').default('testapp', settings.getWithDefault("testapp"))
+.boolean('localhost').describe('localhost', 'Restrict to LocalHost').default('localhost', settings.getWithDefault("localhost"))
+.alias('z', 'zoom').number('z').describe('z', 'Set Zoom Factor').default('z', settings.getWithDefault("zoom"))
+.alias('l', 'url').string('l').describe('l', 'URL to load').default('l', 'file://' + __dirname + '/' + settings.getWithDefault("index_url"))
+.alias('t', 'transparent').boolean('t').describe('t', 'Transparent Browser Window').default('t', settings.getWithDefault("transparent"))
 .string('preload').describe('preload', 'preload a JavaScript file')
 .usage('Kiosk Web Browser\n    Usage: $0 [options] [url]' )
 .strict();
 /*.fail(function (msg, err, yargs) { f (err) throw err // preserve stack
     console.error('You broke it!'); console.error(msg); console.error('You should be doing', yargs.help()); process.exit(1); })*/
 
-// settings.get("default_html")
+// settings.getWithDefault("default_html")
 
 const args = options.argv;
 
@@ -81,14 +115,11 @@ DEBUG('Further Args: [' + (args._) + '], #: [' + args._.length + ']');
 
 if(args.help){ options.showHelp(); process.exit(0); };
 
-// Module to control application life.
-const app = electron.app;
-
 if(args.version){ console.log(app.getVersion()); process.exit(0); };
 
 
 var url = (args._.length > 0)? args._[0] : args.url;
-url = args.testapp ? 'file://' + __dirname + '/' + settings.get("testapp_url") : url;
+url = args.testapp ? 'file://' + __dirname + '/' + settings.getWithDefault("testapp_url") : url;
 
 if((!args.testapp) && (args._.length > 1)){ WARN('Multiple arguments were given: [' + (args._) + ']!'); process.exit(1); }
 
@@ -362,7 +393,7 @@ var template =
         click: function(item, focusedWindow) {
 //      console.log(focusedWindow);
           if (focusedWindow) {
-            focusedWindow.loadURL(`file://${ __dirname}/` + settings.get("index_url"));
+            focusedWindow.loadURL(`file://${ __dirname}/` + settings.getWithDefault("index_url"));
           }
         }
       },
@@ -415,9 +446,6 @@ Object.keys(signals).forEach(function (signal) {
 function _min(a, b){ if(a <= b) return (a); else return (b); }
 function _max(a, b){ if(a >= b) return (a); else return (b); }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-app.on('ready', function()
 {
     const webprefs = {
        javascript: true,
@@ -540,5 +568,7 @@ app.on('ready', function()
 //  `);
 
 
+
+}
 
 });
