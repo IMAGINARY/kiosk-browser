@@ -89,7 +89,7 @@
   },
   "yargs": {
     "short-option-groups": true,
-    "camel-case-expansion": true,
+    "camel-case-expansion": false,
     "dot-notation": true,
     "parse-numbers": true
   }
