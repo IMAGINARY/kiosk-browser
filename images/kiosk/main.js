@@ -80,13 +80,26 @@ const options = yargs.wrap(yargs.terminalWidth())
 .string('chromeOpts').describe('chromeOpts', 'Append options to internal Chrome browser options')
 .string('replaceChromeOpts').describe('replaceChromeOpts', 'Replace internal Chrome browser options')
 .usage('Kiosk Web Browser\n    Usage: $0 [options] [url]' )
+.fail((msg,err,yargs) => {
+    yargs.showHelp();
+    console.error(msg);
+    if(err) throw(err);
+})
+.help(false) // automatic exit after help doesn't work after app.onReady
+.version(false) // automatic exit after version doesn't work after app.onReady
 .strict();
 /*.fail(function (msg, err, yargs) { f (err) throw err // preserve stack
     console.error('You broke it!'); console.error(msg); console.error('You should be doing', yargs.help()); process.exit(1); })*/
 
 // settings.getWithDefault("default_html")
 
-const args = options.argv;
+var args;
+try {
+    args = options.argv;
+} catch(err) {
+    app.exit(1);
+    return;
+}
 function parseChromeOpts(optionString) {
   return require('shell-quote')
     .parse(optionString)
@@ -124,15 +137,15 @@ DEBUG('Replace Chrome options: ' + (JSON.stringify(replaceChromeOpts)));
 
 DEBUG('Further Args: [' + (args._) + '], #: [' + args._.length + ']');
 
-if(args.help){ options.showHelp(); process.exit(0); };
+if(args.help){ options.showHelp(); process.exit(0); return; };
 
-if(args.version){ console.log(app.getVersion()); process.exit(0); };
+if(args.version){ console.log(app.getVersion()); process.exit(0); return; };
 
 
 var url = (args._.length > 0)? args._[0] : args.url;
 url = args.testapp ? 'file://' + __dirname + '/' + settings.getWithDefault("testapp_url") : url;
 
-if((!args.testapp) && (args._.length > 1)){ WARN('Multiple arguments were given: [' + (args._) + ']!'); process.exit(1); }
+if((!args.testapp) && (args._.length > 1)){ WARN('Multiple arguments were given: [' + (args._) + ']!'); process.exit(1); return; }
 
 DEBUG('Resulting URL to load: [' + (url) + ']');
 
