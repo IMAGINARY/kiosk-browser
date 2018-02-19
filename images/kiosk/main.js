@@ -279,20 +279,12 @@ var {Menu} = electron; //require('menu'); // var MenuItem = require('menu-item')
 
 if(!args.menu) 
 {
-
   menu = Menu.buildFromTemplate([]);
   Menu.setApplicationMenu(menu);
-
 } else 
 {
-// Menu.setApplicationMenu(null);
-
-var menu = Menu.getApplicationMenu();
-if( !menu ) // ???
-{
-
-var template = 
-[
+ var template = 
+ [
   {
     label: 'Edit',
     submenu: [
@@ -381,7 +373,7 @@ var template =
       },
       {
         label: 'GoBack',
-     	click: function(item, focusedWindow) {
+        click: function(item, focusedWindow) {
 //      console.log(focusedWindow);
           if (focusedWindow) { // .webContents.canGoBack()
             focusedWindow.webContents.goBack();
@@ -418,12 +410,17 @@ var template =
         accelerator: 'CmdOrCtrl+Q',
         role: 'quit'
   },
-];
+ ];
+  var menu = Menu.getApplicationMenu();
 
-  menu = Menu.buildFromTemplate(template);
-//  menu = Menu.buildFromTemplate([]);
+  if( menu ) {
+    Menu.buildFromTemplate(template).items.forEach((val, index) => {
+      // console.log(`${index}: ${val}`);
+      menu.append(val);
+    });
+  } else { menu = Menu.buildFromTemplate(template); }
+
   Menu.setApplicationMenu(menu);
-};
 };
 
 var signals = {
