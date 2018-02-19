@@ -30,7 +30,6 @@
     "electron-settings": "^3.1.4",
     "network": "^0.4.0",
     "os": "^0.1.1",
-    "shell-quote": "^1.6.1",
     "yargs": "^11.0.0"
   },
   "scripts": {
