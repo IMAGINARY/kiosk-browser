@@ -1,7 +1,5 @@
 #!/bin/bash
 
-ARG="$@"
-
 SELFDIR=`dirname "$0"`
 SELFDIR=`cd "$SELFDIR" && pwd`
 # ARG="$ARG"
@@ -19,6 +17,6 @@ SELFDIR=`cd "$SELFDIR" && pwd`
 
 # cd '/opt/kiosk-browser/'
 
-exec "$SELFDIR/browser.sh" --fullscreen --kiosk --localhost $ARG
+exec "$SELFDIR/browser.sh" --fullscreen --kiosk --localhost "$@"
 
 ## pkill -9 dbus-launch
