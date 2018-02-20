@@ -97,7 +97,7 @@ const options = yargs.wrap(yargs.terminalWidth())
 .fail((msg,err,yargs) => {
     yargs.showHelp();
     console.error(msg);
-    if(err) throw(err);
+    throw( err ? err : new Error("CLI option parsing failed") );
 })
 .help(false) // automatic exit after help doesn't work after app.onReady
 .version(false) // automatic exit after version doesn't work after app.onReady
