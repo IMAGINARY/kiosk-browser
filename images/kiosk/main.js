@@ -77,14 +77,43 @@ const options = yargs.wrap(yargs.terminalWidth())
 .alias('l', 'url').string('l').describe('l', 'URL to load').default('l', 'file://' + __dirname + '/' + settings.getWithDefault("index_url"))
 .alias('t', 'transparent').boolean('t').describe('t', 'Transparent Browser Window').default('t', settings.getWithDefault("transparent"))
 .string('preload').describe('preload', 'preload a JavaScript file')
+.string('append-chrome-switch').coerce('append-chrome-switch',function(xs){
+    function processSwitch(s) {
+        if(s.length==0)
+            throw new Error("Empty Chrome CLI switch");
+        
+        if(!s.startsWith('--'))
+            throw new Error("Chrome CLI switch must start with '--'");
+            
+        var parts = s.substr(2).split("=",2);
+        return parts.length == 1 ? { key: parts[0] } : { key: parts[0], value: parts[1] };
+    };
+    xs = typeof xs == 'string' ? [xs] : xs;
+    return xs.map(processSwitch);
+}).describe('append-chrome-switch', 'Append switch to internal Chrome browser switches')
+.string('append-chrome-argument').coerce('append-chrome-argument', xs=>typeof xs == 'string' ? [xs] : xs ).describe('append-chrome-argument', 'Append positional argument to internal Chrome browser argument')
+.boolean('use-minimal-chrome-cli').describe('use-minimal-chrome-cli', 'Don\'t append anything to the internal Chrome command line by default')
 .usage('Kiosk Web Browser\n    Usage: $0 [options] [url]' )
+.fail((msg,err,yargs) => {
+    yargs.showHelp();
+    console.error(msg);
+    throw( err ? err : new Error("CLI option parsing failed") );
+})
+.help(false) // automatic exit after help doesn't work after app.onReady
+.version(false) // automatic exit after version doesn't work after app.onReady
 .strict();
 /*.fail(function (msg, err, yargs) { f (err) throw err // preserve stack
     console.error('You broke it!'); console.error(msg); console.error('You should be doing', yargs.help()); process.exit(1); })*/
 
 // settings.getWithDefault("default_html")
 
-const args = options.argv;
+var args;
+try {
+    args = options.argv;
+} catch(err) {
+    app.exit(1);
+    return;
+}
 
 var VERBOSE_LEVEL = args.verbose;
 
@@ -110,18 +139,21 @@ DEBUG('Zoom Factor: ' + (args.zoom));
 DEBUG('Node Integration: ' + (args.integration));
 DEBUG('--url: ' + (args.url) );
 DEBUG('Preload: ' + (args.preload));
+DEBUG('Minimal Chrome CLI: ' + (args["use-minimal-chrome-cli"]));
+DEBUG('Chrome options to append: ' + JSON.stringify(args["append-chrome-switch"]));
+DEBUG('Chrome arguments to append: ' + JSON.stringify(args["append-chrome-argument"]));
 
 DEBUG('Further Args: [' + (args._) + '], #: [' + args._.length + ']');
 
-if(args.help){ options.showHelp(); process.exit(0); };
+if(args.help){ options.showHelp(); process.exit(0); return; };
 
-if(args.version){ console.log(app.getVersion()); process.exit(0); };
+if(args.version){ console.log(app.getVersion()); process.exit(0); return; };
 
 
 var url = (args._.length > 0)? args._[0] : args.url;
 url = args.testapp ? 'file://' + __dirname + '/' + settings.getWithDefault("testapp_url") : url;
 
-if((!args.testapp) && (args._.length > 1)){ WARN('Multiple arguments were given: [' + (args._) + ']!'); process.exit(1); }
+if((!args.testapp) && (args._.length > 1)){ WARN('Multiple arguments were given: [' + (args._) + ']!'); process.exit(1); return; }
 
 DEBUG('Resulting URL to load: [' + (url) + ']');
 
@@ -233,8 +265,15 @@ app.commandLine.appendSwitch('disable-web-security');
 if(args.dev){ app.commandLine.appendSwitch('remote-debugging-port', args.port); }
 if(args.localhost){ app.commandLine.appendSwitch('host-rules', 'MAP * 127.0.0.1'); }
 
-sw(); app.commandLine.appendSwitch('flag-switches-begin'); sw(); app.commandLine.appendSwitch('flag-switches-end');
+if(!args["use-minimal-chrome-cli"]) {
+    sw(); app.commandLine.appendSwitch('flag-switches-begin'); sw(); app.commandLine.appendSwitch('flag-switches-end');
+}
 
+if(args["append-chrome-switch"])
+    args["append-chrome-switch"].forEach(s => s.hasOwnProperty("value") ? app.commandLine.appendSwitch(s.key,s.value) : app.commandLine.appendSwitch(s.key));
+
+if(args["append-chrome-argument"])
+    args["append-chrome-argument"].forEach(a => app.commandLine.appendArgument(a));
 
 
 // var crashReporter = require('crash-reporter');
