@@ -139,6 +139,7 @@ DEBUG('Kiosk Mode: ' + (args.kiosk));
 DEBUG('Zoom Factor: ' + (args.zoom));
 DEBUG('Node Integration: ' + (args.integration));
 DEBUG('--url: ' + (args.url) );
+DEBUG('Retry: ' + (args.retry));
 DEBUG('Preload: ' + (args.preload));
 DEBUG('Minimal Chrome CLI: ' + (args["use-minimal-chrome-cli"]));
 DEBUG('Chrome options to append: ' + JSON.stringify(args["append-chrome-switch"]));
