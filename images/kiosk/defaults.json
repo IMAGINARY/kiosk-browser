@@ -1,5 +1,6 @@
 {
     "retryTimeout": 15,
+    "alwaysOnTop": false,
     "fullscreen": false,
     "kiosk": false,
     "index_url": "index.html",

@@ -69,6 +69,7 @@ const options = yargs.wrap(yargs.terminalWidth())
 .alias('c', 'cursor').boolean('c').describe('c', 'Toggle Mouse Cursor (TODO)').default('m', settings.getWithDefault("cursor"))
 .alias('m', 'menu').boolean('m').describe('m', 'Toggle Main Menu').default('m', settings.getWithDefault("menu"))
 .alias('k', 'kiosk').boolean('k').describe('k', 'Toggle Kiosk Mode').default('k', settings.getWithDefault("kiosk"))
+.alias('T', 'always-on-top').boolean('T').describe('T', 'Toggle Always On Top').default('T', settings.getWithDefault("alwaysOnTop"))
 .alias('f', 'fullscreen').boolean('f').describe('f', 'Toggle Fullscreen Mode').default('f', settings.getWithDefault("fullscreen"))
 .alias('i', 'integration').boolean('i').describe('i', 'node Integration').default('i', settings.getWithDefault("integration"))
 .boolean('testapp').describe('testapp', 'Testing application').default('testapp', settings.getWithDefault("testapp"))
@@ -136,6 +137,7 @@ DEBUG('Menu: ' + (args.menu) );
 DEBUG('Fullscreen Mode: ' + (args.fullscreen));
 DEBUG('Testing?: ' + (args.testapp));
 DEBUG('Kiosk Mode: ' + (args.kiosk));
+DEBUG('Always On Top: ' + (args["always-on-top"]));
 DEBUG('Zoom Factor: ' + (args.zoom));
 DEBUG('Node Integration: ' + (args.integration));
 DEBUG('--url: ' + (args.url) );
@@ -530,7 +532,7 @@ function _max(a, b){ if(a >= b) return (a); else return (b); }
     , kiosk: args.kiosk
     , resizable: !args.transparent
     , transparent: args.transparent
-    //, alwaysOnTop: true, 'always-on-top': true
+    , alwaysOnTop: args["always-on-top"], 'always-on-top': args["always-on-top"]
     , webPreferences: webprefs, 'web-preferences': webprefs
     , acceptFirstMouse: true, 'accept-first-mouse': true
     };
