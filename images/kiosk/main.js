@@ -31,7 +31,7 @@ settings.getWithDefault = function(keyPath) {
         return this.get(keyPath);
     } else {
         // return value from the defaults
-        const obj = defaultSettings;
+        var obj = defaultSettings;
         const keys = keyPath.split(/\./);
 
         for(let i = 0, len = keys.length; i < len; i++) {
