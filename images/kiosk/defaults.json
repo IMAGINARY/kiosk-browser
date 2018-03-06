@@ -1,4 +1,5 @@
 {
+    "retryTimeout": 15,
     "fullscreen": false,
     "kiosk": false,
     "index_url": "index.html",

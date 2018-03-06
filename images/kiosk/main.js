@@ -76,6 +76,7 @@ const options = yargs.wrap(yargs.terminalWidth())
 .alias('z', 'zoom').number('z').describe('z', 'Set Zoom Factor').default('z', settings.getWithDefault("zoom"))
 .alias('l', 'url').string('l').describe('l', 'URL to load').default('l', 'file://' + __dirname + '/' + settings.getWithDefault("index_url"))
 .alias('t', 'transparent').boolean('t').describe('t', 'Transparent Browser Window').default('t', settings.getWithDefault("transparent"))
+.number('retry').describe('retry', 'Retry after given number of seconds if loading the page failed (0 to disable)').default('retry',settings.getWithDefault('retryTimeout'))
 .string('preload').describe('preload', 'preload a JavaScript file')
 .string('append-chrome-switch').coerce('append-chrome-switch',function(xs){
     function processSwitch(s) {
@@ -528,7 +529,7 @@ function _max(a, b){ if(a >= b) return (a); else return (b); }
     , kiosk: args.kiosk
     , resizable: !args.transparent
     , transparent: args.transparent
-    , alwaysOnTop: true, 'always-on-top': true
+    //, alwaysOnTop: true, 'always-on-top': true
     , webPreferences: webprefs, 'web-preferences': webprefs
     , acceptFirstMouse: true, 'accept-first-mouse': true
     };
@@ -581,6 +582,40 @@ function _max(a, b){ if(a >= b) return (a); else return (b); }
     mainWindow.webContents.setZoomFactor(args.zoom);
     mainWindow.setFullScreen(args.fullscreen);
    });
+
+    { // retry loading the page if it failed
+        var retryTimeout = setTimeout(()=>{},0); // dummy, but valid Timeout object
+        var errorMsgDiv = "";
+        mainWindow.webContents.on('did-fail-load', ( event, errorCode, errorDescription, validatedURL, isMainFrame ) => {
+            clearTimeout(retryTimeout);
+            WARN(`Loading ${validatedURL} failed with Error ${errorCode}: ${errorDescription}`);
+            errorMsgDiv  = `<div style="position:absolute;top:0px;left:0px;width: 100%;color: white;background-color: black;">`;
+            errorMsgDiv += `Error ${errorCode}: ${errorDescription}<br />`;
+            errorMsgDiv += `URL: ${validatedURL}<br />`;
+            if(args.retry>0)
+            {
+                
+                errorMsgDiv += `Reloading in ${args.retry}s`;
+                retryTimeout = setTimeout(()=>{
+                        INFO("Reloading ...");
+                        mainWindow.webContents.reload();
+                    },
+                    args.retry*1000
+                );
+                retryTimeout.unref(); // do not prevent the process from exiting
+            }
+            errorMsgDiv += `</div>`;
+        });
+        mainWindow.webContents.on('will-navigate',()=>clearTimeout(retryTimeout));
+        mainWindow.webContents.on('did-navigate',()=>clearTimeout(retryTimeout));
+        mainWindow.webContents.on('dom-ready',()=>{
+            if(errorMsgDiv != "")
+            {
+                mainWindow.webContents.executeJavaScript(`document.body.innerHTML += '${errorMsgDiv}';`);
+                errorMsgDiv = "";
+            }
+        });
+    }
 
    mainWindow.setFullScreen(args.fullscreen);
 
