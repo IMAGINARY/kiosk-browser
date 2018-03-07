@@ -1,14 +1,12 @@
 #!/bin/bash
 
-ARG="$@"
-
 SELFDIR=`dirname "$0"`
 SELFDIR=`cd "$SELFDIR" && pwd`
 # ARG="$ARG"
 
-if [[ -n "${ARG}" ]]; then 
-  ARG="-l ${ARG}"
-fi
+#if [[ -n "${ARG}" ]]; then 
+#  ARG="-l ${ARG}"
+#fi
 
 # exec firefox -no-remote -P kiosk $1
 #export NODE_PATH="/opt/node_modules"
@@ -19,6 +17,6 @@ fi
 
 # cd '/opt/kiosk-browser/'
 
-exec "$SELFDIR/browser.sh" --set-base-background-color=0x00000000 $ARG
+exec "$SELFDIR/browser.sh" --fullscreen --kiosk --localhost "$@"
 
 ## pkill -9 dbus-launch

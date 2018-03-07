@@ -133,7 +133,6 @@
         display: none;
       }
     </style>
-    <script src="hilbert-heartbeat.js"></script>
   </head>   
   <body id="body">
     <div id="panspeed"><div></div></div>
@@ -148,27 +147,6 @@
     <div id="screen" style="cursor:none;position:absolute;top:0;left:0;width:2048px;height:20480px;background:rgba(255,255,255,0);z-index:1000"></div>    
     <div id="debug"></div>
     
-    <div id="f0" class="touch"></div>
-    <div id="f1" class="touch"></div>
-    <div id="f2" class="touch"></div>
-    <div id="f3" class="touch"></div>
-    <div id="f4" class="touch"></div>
-    <div id="f5" class="touch"></div>
-    <div id="f6" class="touch"></div>
-    <div id="f7" class="touch"></div>
-    <div id="f8" class="touch"></div>
-    <div id="f9" class="touch"></div>
-    <div id="f10" class="touch"></div>
-    <div id="f11" class="touch"></div>
-    <div id="f12" class="touch"></div>
-    <div id="f13" class="touch"></div>
-    <div id="f14" class="touch"></div>
-    <div id="f15" class="touch"></div>
-    <div id="f16" class="touch"></div>
-    <div id="f17" class="touch"></div>
-    <div id="f18" class="touch"></div>
-    <div id="f19" class="touch"></div>
-
     <div id="footer"><br/>
           <b style="background:#eee;color:#111">LOCAL INFO:</b>
           <ul style="list-style: square;">
@@ -184,14 +162,6 @@
     </div>
     <script type="text/javascript">
       document.addEventListener("DOMContentLoaded", function() { // (function(){
-        var heartbeat = new Heartbeat({
-                  url: Heartbeat.getPassedUrl('http://127.0.0.1:8888'),
-                  appId: Heartbeat.getPassedAppId('kiosk_browser_testapp'),
-                  interval: 10000,
-                  sendInitCommand: false,
-                  sendDoneCommand: false,
-        });
-
         var footer = $('footer'); // var footer = document.getElementById('footer'); 
         var clock_time = document.getElementById('local_datetime');
         var local_hostname = document.getElementById('local_hostname');
@@ -348,6 +318,8 @@
           touchcounter = 0, transformactioncounter = 0, mousecounter = 0,
           panspeed = $('panspeed'), panspeedDiv = panspeed.down('div'), inc = 0;
 
+        for( var i = 0; 50 >= i; i++ ){ var e = new Element('div', { className: 'touch' }); e.setAttribute("id", "f" + (i)); b.insert(e); }
+
         //setInterval(function(){
         //  $('debug').innerHTML = ['|','/','-','\\'][inc%4];
         //},10);
@@ -393,7 +365,7 @@
         function renderInfoForTouches(touches){
           var info = '';
 
-          for( var i = 19; i >= 0; i-- ){ touchfingers[i].addClassName('off'); }
+          for( var i = touchfingers.length-1; i >= 0; i-- ){ touchfingers[i].addClassName('off'); }
 
           $A(touches).each(function(touch,index){
             info += infoForTouch(touch,index);

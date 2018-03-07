@@ -11,30 +11,31 @@ SELFDIR=`cd "$SELFDIR" && pwd`
 D="$SELFDIR/node_modules/.bin/electron"
 
 if [ ! -x "${D}" ]; then
+  echo "Warning: no local electron at [$D]!"
   D=""
 fi
 
 ELECTRON="${ELECTRON:-$D}"
-ARGS="$@"
 
+echo "Args: [$@]"
 # cd "$SELFDIR"
 
 if [[ -n "${ELECTRON}" && -r "${SELFDIR}/main.js" && -r "${SELFDIR}/package.json" ]]; then
-  echo "Running: '${ELECTRON} ${SELFDIR} $ARGS'"
-  exec "${ELECTRON}" "${SELFDIR}" $ARGS
+  echo "Running: [${ELECTRON} ${SELFDIR} $@]"
+  exec "${ELECTRON}" "${SELFDIR}" "$@"
 fi
 
 
 if [[ -n "${KIOSK_BROWSER}" ]]; then 
   if [[ -x "${KIOSK_BROWSER}" ]]; then
     echo "Note: trying to use '${KIOSK_BROWSER}'"
-    exec "${KIOSK_BROWSER}" "--" $ARGS
+    exec "${KIOSK_BROWSER}" "--" "$@"
   fi
 fi
 
 if [[ -x "/opt/kiosk-browser/kiosk-browser" ]]; then
   echo "Note: falling back to '/opt/kiosk-browser/kiosk-browser'..."
-  exec "/opt/kiosk-browser/kiosk-browser" "--" $ARGS
+  exec "/opt/kiosk-browser/kiosk-browser" "--" "$@"
 fi
 
 if hash docker 2>/dev/null; then
@@ -84,7 +85,7 @@ if hash docker 2>/dev/null; then
   -v /etc/localtime:/etc/localtime:ro \
   "${KIOSK_IMAGE}" \
   /sbin/my_init --skip-startup-files --skip-runit -- \
-    /usr/local/bin/run.sh $ARGS
+    /usr/local/bin/run.sh "$@"
 #    launch.sh 
 # /bin/bash
 

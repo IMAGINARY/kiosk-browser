@@ -8,12 +8,45 @@ global.shellStartTime = Date.now();
 
 const electron = require('electron');
 
+// Module to control application life.
+const app = electron.app;
+
+// This method will be called when Electron has finished
+// initialization and is ready to create browser windows.
+app.on('ready', function()
+{
+    
 const path = require('path');
 const settings = require('electron-settings');
-settings.defaults(require("./defaults.json"));
-settings.applyDefaultsSync({
-    prettify: true
-});
+
+// write defautl settings to Settings only file if it is empty
+const defaultSettings = require("./defaults.json");
+if(Object.keys(settings.getAll()).length==0)
+    settings.setAll(defaultSettings,{ prettify: true });
+
+// like get() function, but with automatic fallback to defaults
+settings.getWithDefault = function(keyPath) {
+    if(this.has(keyPath)) {
+        // return value from the Settings
+        return this.get(keyPath);
+    } else {
+        // return value from the defaults
+        var obj = defaultSettings;
+        const keys = keyPath.split(/\./);
+
+        for(let i = 0, len = keys.length; i < len; i++) {
+            const key = keys[i];
+
+            if(Object.prototype.hasOwnProperty.call(obj, key)) {
+                obj = obj[key];
+            } else {
+                return undefined;
+            }
+        }
+
+        return obj;
+    }
+}
 
 function getLinuxIcon() {
     if(process.mainModule.filename.indexOf('app.asar') === -1)
@@ -30,23 +63,59 @@ const yargs = require('yargs'); // https://www.npmjs.com/package/yargs
 const options = yargs.wrap(yargs.terminalWidth())
 .alias('h', 'help').boolean('h').describe('h', 'Print this usage message.')
 .alias('V', 'version').boolean('V').describe('V', 'Print the version.')
-.alias('v', 'verbose').count('v').describe('v', 'Increase Verbosity').default('v', settings.getSync("verbose"))
-.alias('d', 'dev').boolean('d').describe('d', 'Run in development mode.').default('d', settings.getSync("devTools"))
-.alias('p', 'port').number('p').describe('p', 'Specify remote debugging port.').default('p', settings.getSync("remoteDebuggingPort"))
-.alias('c', 'cursor').boolean('c').describe('c', 'Toggle Mouse Cursor (TODO)').default('m', settings.getSync("cursor"))
-.alias('m', 'menu').boolean('m').describe('m', 'Toggle Main Menu').default('m', settings.getSync("menu"))
-.alias('k', 'kiosk').boolean('k').describe('k', 'Toggle Kiosk Mode').default('k', settings.getSync("kiosk"))
-.alias('f', 'fullscreen').boolean('f').describe('f', 'Toggle Fullscreen Mode').default('f', settings.getSync("fullscreen"))
-.alias('i', 'integration').boolean('i').describe('i', 'node Integration').default('i', settings.getSync("integration"))
-.boolean('testapp').describe('testapp', 'Testing application').default('testapp', settings.getSync("testapp"))
-.alias('z', 'zoom').number('z').describe('z', 'Set Zoom Factor').default('z', settings.getSync("zoom"))
-.alias('l', 'url').string('l').describe('l', 'URL to load').default('l', 'file://' + __dirname + '/' + 'index.html')
-.alias('t', 'transparent').boolean('t').describe('t', 'Transparent Browser Window').default('t', settings.getSync("transparent"))
-.usage('Kiosk Web Browser\n    Usage: $0 [options] [args]' );
+.alias('v', 'verbose').count('v').describe('v', 'Increase Verbosity').default('v', settings.getWithDefault("verbose"))
+.alias('d', 'dev').boolean('d').describe('d', 'Run in development mode.').default('d', settings.getWithDefault("devTools"))
+.alias('p', 'port').number('p').describe('p', 'Specify remote debugging port.').default('p', settings.getWithDefault("remoteDebuggingPort"))
+.alias('c', 'cursor').boolean('c').describe('c', 'Toggle Mouse Cursor (TODO)').default('m', settings.getWithDefault("cursor"))
+.alias('m', 'menu').boolean('m').describe('m', 'Toggle Main Menu').default('m', settings.getWithDefault("menu"))
+.alias('k', 'kiosk').boolean('k').describe('k', 'Toggle Kiosk Mode').default('k', settings.getWithDefault("kiosk"))
+.alias('T', 'always-on-top').boolean('T').describe('T', 'Toggle Always On Top').default('T', settings.getWithDefault("alwaysOnTop"))
+.alias('f', 'fullscreen').boolean('f').describe('f', 'Toggle Fullscreen Mode').default('f', settings.getWithDefault("fullscreen"))
+.alias('i', 'integration').boolean('i').describe('i', 'node Integration').default('i', settings.getWithDefault("integration"))
+.boolean('testapp').describe('testapp', 'Testing application').default('testapp', settings.getWithDefault("testapp"))
+.boolean('localhost').describe('localhost', 'Restrict to LocalHost').default('localhost', settings.getWithDefault("localhost"))
+.alias('z', 'zoom').number('z').describe('z', 'Set Zoom Factor').default('z', settings.getWithDefault("zoom"))
+.alias('l', 'url').string('l').describe('l', 'URL to load').default('l', 'file://' + __dirname + '/' + settings.getWithDefault("index_url"))
+.alias('t', 'transparent').boolean('t').describe('t', 'Transparent Browser Window').default('t', settings.getWithDefault("transparent"))
+.number('retry').describe('retry', 'Retry after given number of seconds if loading the page failed (0 to disable)').default('retry',settings.getWithDefault('retryTimeout'))
+.string('preload').describe('preload', 'preload a JavaScript file')
+.string('append-chrome-switch').coerce('append-chrome-switch',function(xs){
+    function processSwitch(s) {
+        if(s.length==0)
+            throw new Error("Empty Chrome CLI switch");
+        
+        if(!s.startsWith('--'))
+            throw new Error("Chrome CLI switch must start with '--'");
+            
+        var parts = s.substr(2).split("=",2);
+        return parts.length == 1 ? { key: parts[0] } : { key: parts[0], value: parts[1] };
+    };
+    xs = typeof xs == 'string' ? [xs] : xs;
+    return xs.map(processSwitch);
+}).describe('append-chrome-switch', 'Append switch to internal Chrome browser switches')
+.string('append-chrome-argument').coerce('append-chrome-argument', xs=>typeof xs == 'string' ? [xs] : xs ).describe('append-chrome-argument', 'Append positional argument to internal Chrome browser argument')
+.boolean('use-minimal-chrome-cli').describe('use-minimal-chrome-cli', 'Don\'t append anything to the internal Chrome command line by default')
+.usage('Kiosk Web Browser\n    Usage: $0 [options] [url]' )
+.fail((msg,err,yargs) => {
+    yargs.showHelp();
+    console.error(msg);
+    throw( err ? err : new Error("CLI option parsing failed") );
+})
+.help(false) // automatic exit after help doesn't work after app.onReady
+.version(false) // automatic exit after version doesn't work after app.onReady
+.strict();
+/*.fail(function (msg, err, yargs) { f (err) throw err // preserve stack
+    console.error('You broke it!'); console.error(msg); console.error('You should be doing', yargs.help()); process.exit(1); })*/
 
-// settings.getSync("default_html")
+// settings.getWithDefault("default_html")
 
-const args = options.argv;
+var args;
+try {
+    args = options.argv;
+} catch(err) {
+    app.exit(1);
+    return;
+}
 
 var VERBOSE_LEVEL = args.verbose;
 
@@ -59,6 +128,7 @@ DEBUG(process.argv); // [1..]; // ????
 DEBUG('Help: ' + (args.help) );
 DEBUG('Version: ' + (args.version) );
 DEBUG('Verbose: ' + (args.verbose) );
+DEBUG('Dirname: ' + (__dirname) );
 DEBUG('Dev: ' + (args.dev) );
 DEBUG('RemoteDebuggingPort: ' + (args.port) );
 DEBUG('Cursor: ' + (args.cursor) );
@@ -67,20 +137,30 @@ DEBUG('Menu: ' + (args.menu) );
 DEBUG('Fullscreen Mode: ' + (args.fullscreen));
 DEBUG('Testing?: ' + (args.testapp));
 DEBUG('Kiosk Mode: ' + (args.kiosk));
+DEBUG('Always On Top: ' + (args["always-on-top"]));
 DEBUG('Zoom Factor: ' + (args.zoom));
 DEBUG('Node Integration: ' + (args.integration));
-DEBUG('URL: ' + (args.url) );
+DEBUG('--url: ' + (args.url) );
+DEBUG('Retry: ' + (args.retry));
+DEBUG('Preload: ' + (args.preload));
+DEBUG('Minimal Chrome CLI: ' + (args["use-minimal-chrome-cli"]));
+DEBUG('Chrome options to append: ' + JSON.stringify(args["append-chrome-switch"]));
+DEBUG('Chrome arguments to append: ' + JSON.stringify(args["append-chrome-argument"]));
 
-if(args.help){ options.showHelp(); process.exit(0); };
+DEBUG('Further Args: [' + (args._) + '], #: [' + args._.length + ']');
 
-// Module to control application life.
-const app = electron.app;
+if(args.help){ options.showHelp(); process.exit(0); return; };
 
-if(args.version){ console.log(app.getVersion()); process.exit(0); };
+if(args.version){ console.log(app.getVersion()); process.exit(0); return; };
 
-const url = args.testapp ? 'file://' + __dirname + '/' + 'testapp.html' : args.url;
 
-// http://peter.sh/experiments/chromium-command-line-switches/
+var url = (args._.length > 0)? args._[0] : args.url;
+url = args.testapp ? 'file://' + __dirname + '/' + settings.getWithDefault("testapp_url") : url;
+
+if((!args.testapp) && (args._.length > 1)){ WARN('Multiple arguments were given: [' + (args._) + ']!'); process.exit(1); return; }
+
+DEBUG('Resulting URL to load: [' + (url) + ']');
+
 
 // --enable-pinch --flag-switches-begin 
 //--enable-experimental-canvas-features --enable-gpu-rasterization --javascript-harmony --enable-touch-editing --enable-webgl-draft-extensions --enable-experimental-extension-apis --ignore-gpu-blacklist --show-fps-counter --ash-touch-hud --touch-events=enabled
@@ -88,10 +168,14 @@ const url = args.testapp ? 'file://' + __dirname + '/' + 'testapp.html' : args.u
 
 function sw() 
 {
+  // https://github.com/atom/electron/issues/1277
+  // https://bugs.launchpad.net/ubuntu/+source/chromium-browser/+bug/1463598
+  // https://code.google.com/p/chromium/issues/detail?id=121183
+  // http://peter.sh/experiments/chromium-command-line-switches/
+  // https://xwartz.gitbooks.io/electron-gitbook/content/en/api/chrome-command-line-switches.html
 
-app.commandLine.appendSwitch('--js-flags="--max_old_space_size=4096"');
-
-app.commandLine.appendSwitch('disable-threaded-scrolling');
+  app.commandLine.appendSwitch('--js-flags="--max_old_space_size=4096"');
+  app.commandLine.appendSwitch('disable-threaded-scrolling');
 
 // app.commandLine.appendSwitch('enable-apps-show-on-first-paint');
 // app.commandLine.appendSwitch('enable-embedded-extension-options');
@@ -115,9 +199,11 @@ app.commandLine.appendSwitch('ignore-gpu-blacklist');
 //app.commandLine.appendSwitch('touch-events-enabled');
 //app.commandLine.appendSwitch('touch-events', 'enabled');
 
+app.commandLine.appendSwitch('disabled');
 app.commandLine.appendSwitch('disable-touch-events');
 app.commandLine.appendSwitch('touch-events-disabled');
-app.commandLine.appendSwitch('touch-events', 'disabled');
+app.commandLine.appendSwitch('touch-events', 'disabled'); // --touch-events=disabled 
+app.commandLine.appendSwitch('disable-features', 'PassiveDocumentEventListeners,PassiveEventListenersDueToFling'); // --disable-features=PassiveDocumentEventListeners,PassiveEventListenersDueToFling
 
 
 /// app.commandLine.appendSwitch('ignore-gpu-blacklist');
@@ -152,68 +238,47 @@ app.commandLine.appendSwitch('disable-web-security');
 // app.commandLine.appendSwitch('ash-enable-touch-view-testing');
 
 /// app.commandLine.appendSwitch('auto');
-app.commandLine.appendSwitch('allow-file-access-from-files');
 
 //    '--js-flags="--max_old_space_size=4096"',
 //    'disable-threaded-scrolling',
 //    'javascript-harmony',
 //    'disable-pinch',
-[   'enable_hidpi', 
+
+  [
+    'disable-pinch',
+    'allow-file-access-from-files',
+    'enable_hidpi', 
     'enable-hidpi', 
-    '--high-dpi-support', 
-     'high-dpi-support', 
-    'disable-background-timer-throttling'
-].forEach(app.commandLine.appendSwitch); //     '--high-dpi-support=1',     '--force-device-scale-factor=1'
+    'disable-background-timer-throttling',
+    'enable-transparent-visuals',
+    'incognito'
+  ].forEach(app.commandLine.appendSwitch); 
 
-app.commandLine.appendSwitch('force-device-scale-factor', '1');
-//    '--force-device-scale-factor', 'force-device-scale-factor'
+  app.commandLine.appendSwitch('high-dpi-support', '1');
+  app.commandLine.appendSwitch('force-device-scale-factor', '1');
+  app.commandLine.appendSwitch('set-base-background-color', '0x00000000');
 
-[
-    'enable-transparent-visuals', '--enable-transparent-visuals',
-].forEach(app.commandLine.appendSwitch);
-
+  /// 'enable-pinch',  // ?
+  // --disable-gpu
 
 
 }
 
-//https://github.com/atom/electron/issues/1277
-//https://bugs.launchpad.net/ubuntu/+source/chromium-browser/+bug/1463598
-//https://code.google.com/p/chromium/issues/detail?id=121183
-
-
 
 // Append Chromium command line switches
-/// 'enable-pinch',  // ?
-[
-    'enable_hidpi', 'enable-hidpi',
-    '--high-dpi-support', 
-    'high-dpi-support',
-    'enable-transparent-visuals', '--enable-transparent-visuals',
-    'disable-pinch',
-    'allow-file-access-from-files'
-].forEach(app.commandLine.appendSwitch);
-// --disable-gpu
-//    , 'force-device-scale-factor', '--force-device-scale-factor',
-//    '--force-device-scale-factor=1',
-app.commandLine.appendSwitch('force-device-scale-factor', '1');
-app.commandLine.appendSwitch('high-dpi-support', '1'); //    '--high-dpi-support=1', 
-
-
 if(args.dev){ app.commandLine.appendSwitch('remote-debugging-port', args.port); }
+if(args.localhost){ app.commandLine.appendSwitch('host-rules', 'MAP * 127.0.0.1'); }
 
-// sw();
-app.commandLine.appendSwitch('flag-switches-begin');
-sw();
+if(!args["use-minimal-chrome-cli"]) {
+    sw(); app.commandLine.appendSwitch('flag-switches-begin'); sw(); app.commandLine.appendSwitch('flag-switches-end');
+}
 
-if(args.dev){ app.commandLine.appendSwitch('remote-debugging-port', args.port); }
+if(args["append-chrome-switch"])
+    args["append-chrome-switch"].forEach(s => s.hasOwnProperty("value") ? app.commandLine.appendSwitch(s.key,s.value) : app.commandLine.appendSwitch(s.key));
 
-app.commandLine.appendSwitch('flag-switches-end');
+if(args["append-chrome-argument"])
+    args["append-chrome-argument"].forEach(a => app.commandLine.appendArgument(a));
 
-
-
-
-// app.commandLine.appendSwitch('remote-debugging-port', '8315');
-// app.commandLine.appendSwitch('host-rules', 'MAP * 127.0.0.1');
 
 // var crashReporter = require('crash-reporter');
 // crashReporter.start(); // Report crashes to our server: productName: 'Kiosk', companyName: 'IMAGINARY'???
@@ -257,20 +322,12 @@ var {Menu} = electron; //require('menu'); // var MenuItem = require('menu-item')
 
 if(!args.menu) 
 {
-
   menu = Menu.buildFromTemplate([]);
   Menu.setApplicationMenu(menu);
-
 } else 
 {
-// Menu.setApplicationMenu(null);
-
-var menu = Menu.getApplicationMenu();
-if( !menu ) // ???
-{
-
-var template = 
-[
+ var template = 
+ [
   {
     label: 'Edit',
     submenu: [
@@ -359,7 +416,7 @@ var template =
       },
       {
         label: 'GoBack',
-     	click: function(item, focusedWindow) {
+        click: function(item, focusedWindow) {
 //      console.log(focusedWindow);
           if (focusedWindow) { // .webContents.canGoBack()
             focusedWindow.webContents.goBack();
@@ -367,11 +424,11 @@ var template =
         }
       },
       {
-	label: 'Index',
-	click: function(item, focusedWindow) {
+        label: 'Index',
+        click: function(item, focusedWindow) {
 //      console.log(focusedWindow);
           if (focusedWindow) {
-            focusedWindow.loadURL(`file://${ __dirname}/index.html`);
+            focusedWindow.loadURL(`file://${ __dirname}/` + settings.getWithDefault("index_url"));
           }
         }
       },
@@ -385,7 +442,7 @@ var template =
         }
       },
     ]
-  }, 
+  },
   {
         label: 'Close',
         accelerator: 'CmdOrCtrl+W',
@@ -396,12 +453,17 @@ var template =
         accelerator: 'CmdOrCtrl+Q',
         role: 'quit'
   },
-];
+ ];
+  var menu = Menu.getApplicationMenu();
 
-  menu = Menu.buildFromTemplate(template);
-//  menu = Menu.buildFromTemplate([]);
+  if( menu ) {
+    Menu.buildFromTemplate(template).items.forEach((val, index) => {
+      // console.log(`${index}: ${val}`);
+      menu.append(val);
+    });
+  } else { menu = Menu.buildFromTemplate(template); }
+
   Menu.setApplicationMenu(menu);
-};
 };
 
 var signals = {
@@ -424,9 +486,6 @@ Object.keys(signals).forEach(function (signal) {
 function _min(a, b){ if(a <= b) return (a); else return (b); }
 function _max(a, b){ if(a >= b) return (a); else return (b); }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-app.on('ready', function()
 {
     const webprefs = {
        javascript: true,
@@ -443,6 +502,9 @@ app.on('ready', function()
        zoomFactor: args.zoom, 'zoom-factor': args.zoom,
        nodeIntegration: args.integration, 'node-integration': args.integration
     };
+    
+    if(args.preload)
+        webprefs.preload = path.resolve(args.preload);
 
    const {screen} = electron; // require('screen');
    const size = screen.getPrimaryDisplay().bounds;
@@ -470,7 +532,7 @@ app.on('ready', function()
     , kiosk: args.kiosk
     , resizable: !args.transparent
     , transparent: args.transparent
-    , alwaysOnTop: true, 'always-on-top': true
+    , alwaysOnTop: args["always-on-top"], 'always-on-top': args["always-on-top"]
     , webPreferences: webprefs, 'web-preferences': webprefs
     , acceptFirstMouse: true, 'accept-first-mouse': true
     };
@@ -524,6 +586,40 @@ app.on('ready', function()
     mainWindow.setFullScreen(args.fullscreen);
    });
 
+    { // retry loading the page if it failed
+        var retryTimeout = setTimeout(()=>{},0); // dummy, but valid Timeout object
+        var errorMsgDiv = "";
+        mainWindow.webContents.on('did-fail-load', ( event, errorCode, errorDescription, validatedURL, isMainFrame ) => {
+            clearTimeout(retryTimeout);
+            WARN(`Loading ${validatedURL} failed with Error ${errorCode}: ${errorDescription}`);
+            errorMsgDiv  = `<div style="position:absolute;top:0px;left:0px;width: 100%;color: white;background-color: black;">`;
+            errorMsgDiv += `Error ${errorCode}: ${errorDescription}<br />`;
+            errorMsgDiv += `URL: ${validatedURL}<br />`;
+            if(args.retry>0)
+            {
+                
+                errorMsgDiv += `Reloading in ${args.retry}s`;
+                retryTimeout = setTimeout(()=>{
+                        INFO("Reloading ...");
+                        mainWindow.webContents.reload();
+                    },
+                    args.retry*1000
+                );
+                retryTimeout.unref(); // do not prevent the process from exiting
+            }
+            errorMsgDiv += `</div>`;
+        });
+        mainWindow.webContents.on('will-navigate',()=>clearTimeout(retryTimeout));
+        mainWindow.webContents.on('did-navigate',()=>clearTimeout(retryTimeout));
+        mainWindow.webContents.on('dom-ready',()=>{
+            if(errorMsgDiv != "")
+            {
+                mainWindow.webContents.executeJavaScript(`document.body.innerHTML += '${errorMsgDiv}';`);
+                errorMsgDiv = "";
+            }
+        });
+    }
+
    mainWindow.setFullScreen(args.fullscreen);
 
    // Open the DevTools?
@@ -546,5 +642,7 @@ app.on('ready', function()
 //  `);
 
 
+
+}
 
 });

@@ -1,15 +1,15 @@
 {
   "name": "kiosk-browser",
   "productName": "kiosk-browser",
-  "version": "0.9.7",
+  "version": "0.9.8",
   "description": "Hardend Kiosk Web Browser",
-  "homepage": "https://github.com/hilbert/hilbert-docker-images/tree/devel/images/kiosk",
+  "homepage": "https://github.com/IMAGINARY/kiosk-browser",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hilbert/hilbert-docker-images.git"
+    "url": "git+https://github.com/IMAGINARY/kiosk-browser.git"
   },
   "bugs": {
-    "url": "https://github.com/hilbert/hilbert-docker-images/issues",
+    "url": "https://github.com/IMAGINARY/kiosk-browser/issues",
     "email": "info@imaginary.org"
   },
   "main": "main.js",
@@ -22,18 +22,18 @@
   "author": "IMAGINARY gGmbH <info@imaginary.org>",
   "license": "Apache-2.0",
   "devDependencies": {
-    "electron": "1.7.5",
-    "electron-builder": "^10.8.1",
+    "electron": "1.7.12",
+    "electron-builder": "^19.56.0",
     "electron-rebuild": "^1.6.0"
   },
   "dependencies": {
-    "electron-settings": "^2.2.4",
-    "network": "^0.3.2",
+    "electron-settings": "^3.1.4",
+    "network": "^0.4.0",
     "os": "^0.1.1",
-    "yargs": "^6.6.1-candidate.4"
+    "yargs": "^11.0.0"
   },
   "scripts": {
-    "postinstall": "electron-rebuild",
+    "postinstall": "electron-builder install-app-deps",
     "start": "electron .",
     "rebuild": "electron-rebuild",
     "pack": "electron-rebuild && CSC_IDENTITY_AUTO_DISCOVERY=false build --linux --x64 --dir",
@@ -43,23 +43,33 @@
     "appId": "org.imaginary.kiosk",
     "npmRebuild": false,
     "linux": {
-      "icon": "build/48x48.png",
+      "icon": "build/256x256.png",
       "executableName": "kiosk-browser",
       "target": [
         "deb",
         "rpm",
         "AppImage"
       ],
-      "category": "Internet",
-      "packageCategory": "Internet"
+      "category": "Network",
+      "packageCategory": "web"
     },
     "deb": {},
     "rpm": {},
-    "appimage": {},
+    "appImage": {},
     "win": {
       "icon": "build/icon.ico"
     },
     "files": [
+      "main.js",
+      "defaults.json",
+      "index.html",
+      "testapp.html",
+      "prototype.min.js",
+      "arrow.png",
+      "Center.mp3",
+      "Left.mp3",
+      "Right.mp3",
+      "!yarn-error.log",
       "!.gitignore",
       "!yarn.lock",
       "!hooks",
@@ -73,15 +83,14 @@
       {
         "from": "build",
         "to": ".",
-        "filter": "**/48x48.png"
+        "filter": "**/256x256.png"
       }
     ]
   },
   "yargs": {
     "short-option-groups": true,
-    "camel-case-expansion": true,
+    "camel-case-expansion": false,
     "dot-notation": true,
-    "parse-numbers": true,
-    "boolean-negation": true
+    "parse-numbers": true
   }
 }

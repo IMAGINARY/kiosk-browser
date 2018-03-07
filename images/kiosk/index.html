@@ -23,25 +23,16 @@
 </SCRIPT>
   </head>
   <body> 
-    <script src="hilbert-heartbeat.js"></script>
-    <script>
-               var heartbeat = new Heartbeat({
-                  url: Heartbeat.getPassedUrl('http://127.0.0.1:8888'),
-                  appId: Heartbeat.getPassedAppId('kiosk_browser_index'),
-                  interval: 10000,
-                  sendInitCommand: false,
-                  sendDoneCommand: false,
-              }); 
-    </script>
-
     <h2>Kiosk Browser Software Versions: </h2>  
     <!-- All of the Node.js APIs are available in this renderer process. -->
-    We are using Node.js <script>document.write(process.versions.node)</script>,
-    Chromium <script>document.write(process.versions.chrome)</script>,
-    and Electron <script>document.write(process.versions.electron)</script>. 
+    We are using 
+     Node.JS<script>document.write(' (<tt>' + process.versions.node + '</tt>)')</script>,
+    Chromium<script>document.write(' (<tt>' + process.versions.chrome + '</tt>)')</script>,
+    Electron<script>document.write(' (<tt>' + process.versions.electron + '</tt>)')</script> and
+          V8<script>document.write(' (<tt>' + process.versions.v8 + '</tt>)')</script>. 
 
     <h2>Navigator Language(s):</h2>
-    
+
     Current <tt>navigator.language</tt> is "<script>document.write(navigator.language);</script>",
     current <tt>navigator.languages</tt> is "<script>window.document.write(navigator.languages); </script>".
 
