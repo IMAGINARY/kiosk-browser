@@ -483,6 +483,8 @@ Object.keys(signals).forEach(function (signal) {
   });
 });
 
+process.on('SIGUSR1', () => mainWindow.webContents.toggleDevTools() );
+
 function _min(a, b){ if(a <= b) return (a); else return (b); }
 function _max(a, b){ if(a >= b) return (a); else return (b); }
 
