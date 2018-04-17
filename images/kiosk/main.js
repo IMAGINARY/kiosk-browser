@@ -606,7 +606,7 @@ function _max(a, b){ if(a >= b) return (a); else return (b); }
         errorMsgDiv += `</div>`;
 
         mainWindow.webContents.once('dom-ready',()=>{
-            mainWindow.webContents.executeJavaScript(`document.body.innerHTML += '${errorMsgDiv}';`);
+            mainWindow.webContents.executeJavaScript(`document.body.innerHTML += ${JSON.stringify(errorMsgDiv)};`);
             if(args.retry>0) {
                 mainWindow.webContents.executeJavaScript(`setTimeout(()=>window.location.reload(),${args.retry*1000});`);
             }
