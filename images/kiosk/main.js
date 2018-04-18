@@ -590,7 +590,7 @@ function _max(a, b){ if(a >= b) return (a); else return (b); }
 
     // retry loading the page if it failed
     mainWindow.webContents.on('did-fail-load', ( event, errorCode, errorDescription, validatedURL, isMainFrame ) => {
-        if( errorCode == -3 )
+        if( errorCode == -3 || errorCode == 0 )
             return;
 
         WARN(`Loading ${validatedURL} failed with Error ${errorCode}: ${errorDescription}`);
