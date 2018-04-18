@@ -483,6 +483,8 @@ Object.keys(signals).forEach(function (signal) {
   });
 });
 
+process.on('SIGUSR1', () => mainWindow.webContents.toggleDevTools() );
+
 function _min(a, b){ if(a <= b) return (a); else return (b); }
 function _max(a, b){ if(a >= b) return (a); else return (b); }
 
@@ -586,39 +588,30 @@ function _max(a, b){ if(a >= b) return (a); else return (b); }
     mainWindow.setFullScreen(args.fullscreen);
    });
 
-    { // retry loading the page if it failed
-        var retryTimeout = setTimeout(()=>{},0); // dummy, but valid Timeout object
-        var errorMsgDiv = "";
-        mainWindow.webContents.on('did-fail-load', ( event, errorCode, errorDescription, validatedURL, isMainFrame ) => {
-            clearTimeout(retryTimeout);
-            WARN(`Loading ${validatedURL} failed with Error ${errorCode}: ${errorDescription}`);
-            errorMsgDiv  = `<div style="position:absolute;top:0px;left:0px;width: 100%;color: white;background-color: black;">`;
-            errorMsgDiv += `Error ${errorCode}: ${errorDescription}<br />`;
-            errorMsgDiv += `URL: ${validatedURL}<br />`;
-            if(args.retry>0)
-            {
-                
-                errorMsgDiv += `Reloading in ${args.retry}s`;
-                retryTimeout = setTimeout(()=>{
-                        INFO("Reloading ...");
-                        mainWindow.webContents.reload();
-                    },
-                    args.retry*1000
-                );
-                retryTimeout.unref(); // do not prevent the process from exiting
-            }
-            errorMsgDiv += `</div>`;
-        });
-        mainWindow.webContents.on('will-navigate',()=>clearTimeout(retryTimeout));
-        mainWindow.webContents.on('did-navigate',()=>clearTimeout(retryTimeout));
-        mainWindow.webContents.on('dom-ready',()=>{
-            if(errorMsgDiv != "")
-            {
-                mainWindow.webContents.executeJavaScript(`document.body.innerHTML += '${errorMsgDiv}';`);
-                errorMsgDiv = "";
+    // retry loading the page if it failed
+    mainWindow.webContents.on('did-fail-load', ( event, errorCode, errorDescription, validatedURL, isMainFrame ) => {
+        if( errorCode == -3 || errorCode == 0 )
+            return;
+
+        WARN(`Loading ${validatedURL} failed with Error ${errorCode}: ${errorDescription}`);
+        var errorMsgDiv  = `
+            <div style="position:absolute;top:0px;left:0px;width: 100%;color: white;background-color: black;">
+                Error ${errorCode}: ${errorDescription}<br />
+                URL: ${validatedURL}<br />
+        `;
+
+        if(args.retry>0)
+            errorMsgDiv += `Reloading in ${args.retry}s`;
+            
+        errorMsgDiv += `</div>`;
+
+        mainWindow.webContents.once('dom-ready',()=>{
+            mainWindow.webContents.executeJavaScript(`document.body.innerHTML += ${JSON.stringify(errorMsgDiv)};`);
+            if(args.retry>0) {
+                mainWindow.webContents.executeJavaScript(`setTimeout(()=>window.location.reload(),${args.retry*1000});`);
             }
         });
-    }
+    });
 
    mainWindow.setFullScreen(args.fullscreen);
 

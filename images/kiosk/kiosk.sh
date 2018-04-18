@@ -17,6 +17,6 @@ SELFDIR=`cd "$SELFDIR" && pwd`
 
 # cd '/opt/kiosk-browser/'
 
-exec "$SELFDIR/browser.sh" --fullscreen --kiosk --localhost "$@"
+exec "$SELFDIR/browser.sh" --fullscreen --kiosk --localhost --always-on-top "$@"
 
 ## pkill -9 dbus-launch
