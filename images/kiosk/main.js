@@ -551,6 +551,10 @@ function _max(a, b){ if(a >= b) return (a); else return (b); }
 
    if((!args.menu) || args.kiosk) { mainWindow.setMenu(null); }
 
+   if(args.fullscreen) {
+       mainWindow.setMinimumSize(_r - _x,_b - _y);
+       mainWindow.setContentSize(_r - _x,_b - _y);
+   }
 
    // Emitted when the window is closed.
    mainWindow.on('closed', function() {
