@@ -132,9 +132,26 @@
       .off {
         display: none;
       }
+.vsync-demo-box {
+  z-index: -1;
+  position: absolute;
+  background-color:white;
+  animation-duration: 1s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-fill-mode: forwards;
+  animation-name: expandBox;
+}
+@keyframes expandBox {
+    0%   {top: 0%; left: 0%; width:100%; height: 0%;}
+    50%  {top: 0%; left: 0%; width:100%; height: 100%;}
+    100% {top: 0%; left: 100%; width:0%; height: 100%;}
+}
     </style>
-  </head>   
+  </head>
   <body id="body">
+<!-- class="vsync-demo-box" -->
+    <div id="vsyncDemoBox"></div>
     <div id="panspeed"><div></div></div>
     <div id="events">
       <div id="mouse"></div>
@@ -153,16 +170,22 @@
             <li>HOSTNAME: <b><span id="local_hostname"></span></b></li>
             <li>DATETIME: <b><span id="local_datetime"></span></b></li>
             <li>DISPLAYS: <span id="display_data"></span></li>
+<!--            <li>VSYNC TEST:  <input onclick="vsyncTestStart();" value="Start" type="button"> <input onclick="vsyncTestStop();" value="Stop" type="button"></li>
+-->
             <li>ACTIVE  NETWORK INTERFACES: <span id="active_network_data"></span></li>
             <li>PASSIVE NETWORK INTERFACES: <span id="passive_network_data"></span></li>
           </ul>
           <hr/>
-          <b style="background:#eee;color:#111">SOUND TEST:</b><table width="100%" align="center"><tr><th><i>left</i></th><th><i>center</i></th><th><i>right</i></th></tr></table>
-          <br/><hr/>
+          <div id="soundtest">
+          <b style="background:#eee;color:#111">SOUND/VSYNC TEST:</b><table width="100%" align="center"><tr><th><i>left + vsync stop</i></th><th><i>center + vsync start</i></th><th><i>right + vsync stop</i></th></tr></table>
+          <br/></div>
+          <hr/>
     </div>
     <script type="text/javascript">
       document.addEventListener("DOMContentLoaded", function() { // (function(){
         var footer = $('footer'); // var footer = document.getElementById('footer'); 
+        var soundtest = $('soundtest');
+        var vsyncDemoBox = $('vsyncDemoBox');
         var clock_time = document.getElementById('local_datetime');
         var local_hostname = document.getElementById('local_hostname');
         var display_data = document.getElementById('display_data');
@@ -176,9 +199,16 @@
 
         function restartAudio(P){ P.pause(); P.currentTime = 0; P.play(); };
 
+        function vsyncTestStart(){ vsyncDemoBox.classList.add('vsync-demo-box');
+// document.querySelector('#vsyncDemoBox').classList.add('vsync-demo-box'); 
+}
+        function vsyncTestStop(){ vsyncDemoBox.classList.remove('vsync-demo-box'); 
+// document.querySelector('#vsyncDemoBox').classList.remove('vsync-demo-box'); 
+}
+
         function talkAt(d, X, Y) // d: HTMLDivElement
         { 
-          if(!d) d = document.getElementById('footer'); 
+          if(!d) d = document.getElementById('soundtest'); 
           if(!d) return; 
 
           d = d.getBoundingClientRect(); // console.log("Footer at " + (d.left) +"x" + (d.top) + "::" + (d.width) +"x" + (d.height));
@@ -186,9 +216,9 @@
           var dx = (X - d.left), dy = (Y - d.top), ww = d.width; // console.log("Delta " + (dx) +"x" + (dy));
           if( (dx >= 0) && (dy >= 0) && (ww > dx) && (d.height > dy)) // inside footer? 
           { 
-            if( ww > 3*dx ){ restartAudio(L); } else 
-            { 
-              if( 3*dx > 2*ww ){ restartAudio(R); } else { restartAudio(C); }; 
+            if( ww > 3*dx ){ restartAudio(L); vsyncTestStop(); } else 
+            {
+              if( 3*dx > 2*ww ){ restartAudio(R); vsyncTestStop(); } else { restartAudio(C); vsyncTestStart(); }; 
             };
             return (true); 
           };
@@ -289,7 +319,7 @@
    };
 
         $('screen').observe('mousedown', function(event){ // event: MouseEvent
-          talkAt(footer, event.clientX, event.clientY);
+          talkAt(soundtest, event.clientX, event.clientY);
         });
 
         $('screen').observe('touchstart', function(event){  // event: TouchEvent
