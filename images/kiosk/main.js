@@ -11,14 +11,15 @@ const electron = require('electron');
 // Module to control application life.
 const app = electron.app;
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-app.on('ready', function()
-{
-    
 const path = require('path');
+const fsExtra = require('fs-extra');
 const settings = require('electron-settings');
+const settingsPath = app.getPath('userData');
 
+// ensure that the directory for the settings actually exists
+// otherwise, electron-settings may fail if used before the 'ready' event
+fsExtra.ensureDirSync(settingsPath);
+console.log(settingsPath);
 // write defautl settings to Settings only file if it is empty
 const defaultSettings = require("./defaults.json");
 if(Object.keys(settings.getAll()).length==0)
@@ -289,6 +290,12 @@ process.on('uncaughtException', function(error) { // '='? '{}'?
    WARN('uncaughtException! :(');
    WARN(error);
 });
+
+
+// This method will be called when Electron has finished
+// initialization and is ready to create browser windows.
+app.on('ready', function()
+{
 
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
