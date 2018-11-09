@@ -8,7 +8,7 @@
     "testapp": false,
     "testapp_url": "testapp.html",
     "devTools": false,
-    "remoteDebuggingPort": 8315,
+    "remoteDebuggingPort": 9222,
     "cursor": false,
     "menu": false,
     "zoom": 1.0,
