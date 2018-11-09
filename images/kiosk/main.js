@@ -66,7 +66,19 @@ const options = yargs.wrap(yargs.terminalWidth())
 .alias('V', 'version').boolean('V').describe('V', 'Print the version.')
 .alias('v', 'verbose').count('v').describe('v', 'Increase Verbosity').default('v', settings.getWithDefault("verbose"))
 .alias('d', 'dev').boolean('d').describe('d', 'Run in development mode.').default('d', settings.getWithDefault("devTools"))
-.alias('p', 'port').number('p').describe('p', 'Specify remote debugging port.').default('p', settings.getWithDefault("remoteDebuggingPort"))
+.alias('p', 'port').number('p').describe('p', 'Specify remote debugging port.').coerce('p', p => {
+    console.log("port: " + p);
+    if(p === undefined) {
+        return settings.getWithDefault("remoteDebuggingPort");
+    } else {
+        const pInt = Number.parseInt(p);
+        if( /[0-9]+/.test(p) && pInt >= 0 && pInt <= 65535) {
+            return pInt;
+        } else {
+            throw new Error(`Invalid remote debugging port: ${p}`);
+        }
+    }
+} )
 .alias('c', 'cursor').boolean('c').describe('c', 'Toggle Mouse Cursor (TODO)').default('m', settings.getWithDefault("cursor"))
 .alias('m', 'menu').boolean('m').describe('m', 'Toggle Main Menu').default('m', settings.getWithDefault("menu"))
 .alias('k', 'kiosk').boolean('k').describe('k', 'Toggle Kiosk Mode').default('k', settings.getWithDefault("kiosk"))
@@ -267,7 +279,7 @@ app.commandLine.appendSwitch('disable-web-security');
 
 
 // Append Chromium command line switches
-if(args.dev){ app.commandLine.appendSwitch('remote-debugging-port', args.port); }
+if(args.port){ app.commandLine.appendSwitch('remote-debugging-port', args.port ); }
 if(args.localhost){ app.commandLine.appendSwitch('host-rules', 'MAP * 127.0.0.1'); }
 
 if(!args["use-minimal-chrome-cli"]) {
