@@ -89,6 +89,7 @@ const options = yargs.wrap(yargs.terminalWidth())
 .boolean('localhost').describe('localhost', 'Restrict to LocalHost').default('localhost', settings.getWithDefault("localhost"))
 .alias('z', 'zoom').number('z').describe('z', 'Set Zoom Factor').default('z', settings.getWithDefault("zoom"))
 .alias('l', 'url').string('l').describe('l', 'URL to load').default('l', 'file://' + __dirname + '/' + settings.getWithDefault("index_url"))
+.alias('s','serve').string('s').describe('s','Open url relative to this path served via built-in HTTP server').default('s', settings.getWithDefault("serve"))
 .alias('t', 'transparent').boolean('t').describe('t', 'Transparent Browser Window').default('t', settings.getWithDefault("transparent"))
 .number('retry').describe('retry', 'Retry after given number of seconds if loading the page failed (0 to disable)').default('retry',settings.getWithDefault('retryTimeout'))
 .string('preload').describe('preload', 'preload a JavaScript file')
@@ -153,6 +154,7 @@ DEBUG('Kiosk Mode: ' + (args.kiosk));
 DEBUG('Always On Top: ' + (args["always-on-top"]));
 DEBUG('Zoom Factor: ' + (args.zoom));
 DEBUG('Node Integration: ' + (args.integration));
+DEBUG('Serve files: ' + (args.serve));
 DEBUG('--url: ' + (args.url) );
 DEBUG('Retry: ' + (args.retry));
 DEBUG('Preload: ' + (args.preload));
@@ -172,8 +174,38 @@ url = args.testapp ? 'file://' + __dirname + '/' + settings.getWithDefault("test
 
 if((!args.testapp) && (args._.length > 1)){ WARN('Multiple arguments were given: [' + (args._) + ']!'); process.exit(1); return; }
 
-DEBUG('Resulting URL to load: [' + (url) + ']');
+let server;
+const urlPrefixPromise = typeof args.serve === "undefined" ? Promise.resolve("") : require('portfinder').getPortPromise()
+    .then(port => {
+        // `port` is guaranteed to be a free port in this scope.
+        // -> start HTTP server on that port
+        const finalhandler = require('finalhandler');
+        const http = require('http');
+        const serveStatic = require('serve-static');
 
+        // Serve up folder provided via CLI option
+        const serve = serveStatic(path.resolve(args.serve), {'index': ['index.html', 'index.htm']});
+
+        // Create server
+        server = http.createServer(function onRequest(req, res) {
+            serve(req, res, finalhandler(req, res))
+        });
+
+        // Do something about errors
+        server.on('error', err => { throw err; } );
+
+        const host = 'localhost';
+        const urlPrefix = `http://${host}:${port}/`;
+
+        // Listen
+        server.listen(port,host);
+
+        DEBUG( `Serving ${args.serve} at ${urlPrefix}`);
+
+        return urlPrefix;
+    });
+
+urlPrefixPromise.then( urlPrefix => DEBUG(`Resulting URL to load: ${urlPrefix}${url}`));
 
 // --enable-pinch --flag-switches-begin 
 //--enable-experimental-canvas-features --enable-gpu-rasterization --javascript-harmony --enable-touch-editing --enable-webgl-draft-extensions --enable-experimental-extension-apis --ignore-gpu-blacklist --show-fps-counter --ash-touch-hud --touch-events=enabled
@@ -292,6 +324,9 @@ if(args["append-chrome-switch"])
 if(args["append-chrome-argument"])
     args["append-chrome-argument"].forEach(a => app.commandLine.appendArgument(a));
 
+
+// delay all execution until server has been started
+urlPrefixPromise.then( urlPrefix => {
 
 // var crashReporter = require('crash-reporter');
 // crashReporter.start(); // Report crashes to our server: productName: 'Kiosk', companyName: 'IMAGINARY'???
@@ -642,7 +677,9 @@ function _max(a, b){ if(a >= b) return (a); else return (b); }
    if(args.dev){ mainWindow.openDevTools(); } // --remote-debugging-port=8315
 
    // and load some URL?!
-   mainWindow.loadURL(`${url}`);
+   const fullUrl = `${urlPrefix}${url}`;
+   DEBUG( `Loading ${fullUrl}`);
+   mainWindow.loadURL(fullUrl);
 
 //  mainWindow.webContents.setZoomFactor(args.zoom);
 
@@ -660,5 +697,7 @@ function _max(a, b){ if(a >= b) return (a); else return (b); }
 
 
 }
+
+});
 
 });
