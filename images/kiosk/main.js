@@ -67,7 +67,6 @@ const options = yargs.wrap(yargs.terminalWidth())
 .alias('v', 'verbose').count('v').describe('v', 'Increase Verbosity').default('v', settings.getWithDefault("verbose"))
 .alias('d', 'dev').boolean('d').describe('d', 'Run in development mode.').default('d', settings.getWithDefault("devTools"))
 .alias('p', 'port').number('p').describe('p', 'Specify remote debugging port.').coerce('p', p => {
-    console.log("port: " + p);
     if(p === undefined) {
         return settings.getWithDefault("remoteDebuggingPort");
     } else {
