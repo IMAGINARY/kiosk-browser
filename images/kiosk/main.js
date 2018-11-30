@@ -85,10 +85,9 @@ const options = yargs.wrap(yargs.terminalWidth())
 .alias('T', 'always-on-top').boolean('T').describe('T', 'Toggle Always On Top').default('T', settings.getWithDefault("alwaysOnTop"))
 .alias('f', 'fullscreen').boolean('f').describe('f', 'Toggle Fullscreen Mode').default('f', settings.getWithDefault("fullscreen"))
 .alias('i', 'integration').boolean('i').describe('i', 'node Integration').default('i', settings.getWithDefault("integration"))
-.boolean('testapp').describe('testapp', 'Testing application').default('testapp', settings.getWithDefault("testapp"))
 .boolean('localhost').describe('localhost', 'Restrict to LocalHost').default('localhost', settings.getWithDefault("localhost"))
 .alias('z', 'zoom').number('z').describe('z', 'Set Zoom Factor').default('z', settings.getWithDefault("zoom"))
-.alias('l', 'url').string('l').describe('l', 'URL to load').default('l', 'file://' + __dirname + '/' + settings.getWithDefault("index_url"))
+.alias('l', 'url').string('l').requiresArg('l').describe('l', 'URL to load')
 .alias('s','serve').string('s').nargs('s',1).describe('s','Open url relative to this path served via built-in HTTP server').coerce('s',path => {
     const nsdError = new Error(`No such directory: ${path}`);
     try {
@@ -184,14 +183,8 @@ if(args.help){ options.showHelp(); process.exit(0); return; };
 
 if(args.version){ console.log(app.getVersion()); process.exit(0); return; };
 
-
-var url = (args._.length > 0)? args._[0] : args.url;
-url = args.testapp ? 'file://' + __dirname + '/' + settings.getWithDefault("testapp_url") : url;
-
-if((!args.testapp) && (args._.length > 1)){ WARN('Multiple arguments were given: [' + (args._) + ']!'); process.exit(1); return; }
-
 let server;
-const htmlPath = typeof args.serve === "undefined" ? typeof settings.getWithDefault("serve") === "undefined" : args.serve;
+const htmlPath = args.serve ? typeof settings.getWithDefault("serve") === "undefined" : args.serve;
 const urlPrefixPromise = typeof htmlPath === "undefined" ? Promise.resolve("") : require('portfinder').getPortPromise()
     .then(port => {
         // `port` is guaranteed to be a free port in this scope.
@@ -221,8 +214,6 @@ const urlPrefixPromise = typeof htmlPath === "undefined" ? Promise.resolve("") :
 
         return urlPrefix;
     });
-
-urlPrefixPromise.then( urlPrefix => DEBUG(`Resulting URL to load: ${urlPrefix}${url}`));
 
 // --enable-pinch --flag-switches-begin 
 //--enable-experimental-canvas-features --enable-gpu-rasterization --javascript-harmony --enable-touch-editing --enable-webgl-draft-extensions --enable-experimental-extension-apis --ignore-gpu-blacklist --show-fps-counter --ash-touch-hud --touch-events=enabled
@@ -360,6 +351,22 @@ process.on('uncaughtException', function(error) { // '='? '{}'?
 // initialization and is ready to create browser windows.
 app.on('ready', function()
 {
+
+electron.protocol.registerFileProtocol('kiosk', (request, callback) => {
+    const url = request.url.substr(8);
+    switch(url) {
+        case 'home':
+            callback(path.normalize(`${__dirname}/index.html`));
+            break;
+        case 'testapp':
+            callback(path.normalize(`${__dirname}/testapp.html`));
+            break;
+        default:
+            throw new Error(`Unknown kiosk:// url: ${request.url}`);
+    }
+}, (error) => {
+    if (error) throw error;
+})
 
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
@@ -694,7 +701,13 @@ function _max(a, b){ if(a >= b) return (a); else return (b); }
    if(args.dev){ mainWindow.openDevTools(); } // --remote-debugging-port=8315
 
    // and load some URL?!
-   const fullUrl = `${urlPrefix}${url}`;
+   const parseUrl = require('url').parse;
+   const partialUrl = (args._.length > 0)? args._[0] : (args.url ? args.url : (args.serve ? 'index.html' : settings.getWithDefault('home')));
+   const fullUrl = parseUrl(partialUrl).protocol === null ? ( args.serve ? urlPrefix + partialUrl : `file://${path.resolve(partialUrl)}`) : partialUrl;
+
+   DEBUG(`urlPrefix: ${urlPrefix}`);
+   DEBUG(`partialUrl: ${partialUrl}`);
+
    DEBUG( `Loading ${fullUrl}`);
    mainWindow.loadURL(fullUrl);
 

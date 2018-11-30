@@ -1,12 +1,10 @@
 {
+    "home": "kiosk://home",
     "retryTimeout": 15,
     "alwaysOnTop": false,
     "fullscreen": false,
     "kiosk": false,
-    "index_url": "index.html",
     "localhost": false,
-    "testapp": false,
-    "testapp_url": "testapp.html",
     "devTools": false,
     "remoteDebuggingPort": 9222,
     "cursor": false,
