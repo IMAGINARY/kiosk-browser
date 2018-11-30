@@ -84,10 +84,26 @@ const options = yargs.wrap(yargs.terminalWidth())
 .alias('T', 'always-on-top').boolean('T').describe('T', 'Toggle Always On Top').default('T', settings.getWithDefault("alwaysOnTop"))
 .alias('f', 'fullscreen').boolean('f').describe('f', 'Toggle Fullscreen Mode').default('f', settings.getWithDefault("fullscreen"))
 .alias('i', 'integration').boolean('i').describe('i', 'node Integration').default('i', settings.getWithDefault("integration"))
-.boolean('testapp').describe('testapp', 'Testing application').default('testapp', settings.getWithDefault("testapp"))
 .boolean('localhost').describe('localhost', 'Restrict to LocalHost').default('localhost', settings.getWithDefault("localhost"))
 .alias('z', 'zoom').number('z').describe('z', 'Set Zoom Factor').default('z', settings.getWithDefault("zoom"))
-.alias('l', 'url').string('l').describe('l', 'URL to load').default('l', 'file://' + __dirname + '/' + settings.getWithDefault("index_url"))
+.alias('l', 'url').string('l').requiresArg('l').describe('l', 'URL to load')
+.alias('s','serve').string('s').nargs('s',1).describe('s','Open url relative to this path served via built-in HTTP server').coerce('s',path => {
+    const nsdError = new Error(`No such directory: ${path}`);
+    try {
+        if (fsExtra.lstatSync(path).isDirectory())
+            return path;
+        else
+            throw nsdError;
+    } catch (err) {
+        // handle lstat error
+        if (err.code == 'ENOENT') {
+            //no such file or directory
+            throw nsdError;
+        } else {
+            throw err;
+        }
+    }
+})
 .alias('t', 'transparent').boolean('t').describe('t', 'Transparent Browser Window').default('t', settings.getWithDefault("transparent"))
 .number('retry').describe('retry', 'Retry after given number of seconds if loading the page failed (0 to disable)').default('retry',settings.getWithDefault('retryTimeout'))
 .string('preload').describe('preload', 'preload a JavaScript file')
@@ -158,6 +174,7 @@ DEBUG('Kiosk Mode: ' + (args.kiosk));
 DEBUG('Always On Top: ' + (args["always-on-top"]));
 DEBUG('Zoom Factor: ' + (args.zoom));
 DEBUG('Node Integration: ' + (args.integration));
+DEBUG('Serve files: ' + (args.serve));
 DEBUG('--url: ' + (args.url) );
 DEBUG('Retry: ' + (args.retry));
 DEBUG('Preload: ' + (args.preload));
@@ -171,14 +188,37 @@ if(args.help){ options.showHelp(); process.exit(0); return; };
 
 if(args.version){ console.log(app.getVersion()); process.exit(0); return; };
 
+let server;
+const htmlPath = args.serve ? typeof settings.getWithDefault("serve") === "undefined" : args.serve;
+const urlPrefixPromise = typeof htmlPath === "undefined" ? Promise.resolve("") : require('portfinder').getPortPromise()
+    .then(port => {
+        // `port` is guaranteed to be a free port in this scope.
+        // -> start HTTP server on that port
+        const finalhandler = require('finalhandler');
+        const http = require('http');
+        const serveStatic = require('serve-static');
 
-var url = (args._.length > 0)? args._[0] : args.url;
-url = args.testapp ? 'file://' + __dirname + '/' + settings.getWithDefault("testapp_url") : url;
+        // Serve up folder provided via CLI option
+        const serve = serveStatic(path.resolve(args.serve), {'index': ['index.html', 'index.htm']});
 
-if((!args.testapp) && (args._.length > 1)){ WARN('Multiple arguments were given: [' + (args._) + ']!'); process.exit(1); return; }
+        // Create server
+        server = http.createServer(function onRequest(req, res) {
+            serve(req, res, finalhandler(req, res))
+        });
 
-DEBUG('Resulting URL to load: [' + (url) + ']');
+        // Do something about errors
+        server.on('error', err => { throw err; } );
 
+        const host = 'localhost';
+        const urlPrefix = `http://${host}:${port}/`;
+
+        // Listen
+        server.listen(port,host);
+
+        DEBUG( `Serving ${args.serve} at ${urlPrefix}`);
+
+        return urlPrefix;
+    });
 
 // --enable-pinch --flag-switches-begin 
 //--enable-experimental-canvas-features --enable-gpu-rasterization --javascript-harmony --enable-touch-editing --enable-webgl-draft-extensions --enable-experimental-extension-apis --ignore-gpu-blacklist --show-fps-counter --ash-touch-hud --touch-events=enabled
@@ -298,6 +338,9 @@ if(args["append-chrome-argument"])
     args["append-chrome-argument"].forEach(a => app.commandLine.appendArgument(a));
 
 
+// delay all execution until server has been started
+urlPrefixPromise.then( urlPrefix => {
+
 // var crashReporter = require('crash-reporter');
 // crashReporter.start(); // Report crashes to our server: productName: 'Kiosk', companyName: 'IMAGINARY'???
 
@@ -313,7 +356,6 @@ process.on('uncaughtException', function(error) { // '='? '{}'?
 // initialization and is ready to create browser windows.
 app.on('ready', function()
 {
-
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
 
@@ -327,9 +369,9 @@ function Finish(msg)
   DEBUG('Finish(' + msg + ')...'); 
   if(mainWindow)
   { 
-    DEBUG('['+msg+'] Closing the main window...'); 
-    mainWindow.hide(); 
-    mainWindow.close(); 
+    DEBUG('['+msg+'] Closing the main window...');
+    try { mainWindow.hide(); } catch(err) {/* was already closed*/}
+    try { mainWindow.close(); } catch(err) {/* was already closed*/}
     mainWindow = null; 
   };
   setTimeout(() => { process.exit(0); }, 5000);
@@ -447,24 +489,24 @@ if(!args.menu)
           }
         }
       },
-      {
-        label: 'Index',
-        click: function(item, focusedWindow) {
-//      console.log(focusedWindow);
-          if (focusedWindow) {
-            focusedWindow.loadURL(`file://${ __dirname}/` + settings.getWithDefault("index_url"));
-          }
-        }
-      },
-      {
-        label: 'Learn More',
-        click: function(item, focusedWindow) {
-          if (focusedWindow) {
-           focusedWindow.loadURL(`https://github.com/hilbert/hilbert-docker-images/tree/devel/images/kiosk`);
-        // require('shell').openExternal('https://github.com/hilbert/hilbert-docker-images/tree/devel/images/kiosk') ;
-           }
-        }
-      },
+//      {
+//        label: 'Index',
+//        click: function(item, focusedWindow) {
+////      console.log(focusedWindow);
+//          if (focusedWindow) {
+//            focusedWindow.loadURL(`kiosk://home`);
+//          }
+//        }
+//      },
+//      {
+//        label: 'Learn More',
+//        click: function(item, focusedWindow) {
+//          if (focusedWindow) {
+//           focusedWindow.loadURL(`https://github.com/hilbert/hilbert-docker-images/`);
+//        // require('shell').openExternal('https://github.com/hilbert/hilbert-docker-images/tree/devel/images/kiosk') ;
+//           }
+//        }
+//      },
     ]
   },
   {
@@ -647,7 +689,31 @@ function _max(a, b){ if(a >= b) return (a); else return (b); }
    if(args.dev){ mainWindow.openDevTools(); } // --remote-debugging-port=8315
 
    // and load some URL?!
-   mainWindow.loadURL(`${url}`);
+   const partialUrl = (args._.length > 0)? args._[0] : (args.url ? args.url : (args.serve ? 'index.html' : settings.getWithDefault('home')));
+   const parseUrl = require('url').parse;
+   const parsedPartialUrl = parseUrl(partialUrl);
+   DEBUG(parsedPartialUrl);
+   if(parsedPartialUrl.protocol === "kiosk:" ) {
+       switch(parsedPartialUrl.hostname) {
+           case 'home':
+               mainWindow.loadURL('file://'+path.normalize(`${__dirname}/index.html`));
+               break;
+           case 'testapp':
+               mainWindow.loadURL('file://'+path.normalize(`${__dirname}/testapp.html`));
+               break;
+           default:
+               console.error(`Unknown kiosk:// url: ${partialUrl}`);
+               app.exit(-1);
+       }
+   } else {
+       const fullUrl = parsedPartialUrl.protocol === null ? ( args.serve ? urlPrefix + partialUrl : `file://${path.resolve(partialUrl)}`) : partialUrl;
+       DEBUG(`urlPrefix: ${urlPrefix}`);
+       DEBUG(`partialUrl: ${partialUrl}`);
+       DEBUG( `Loading ${fullUrl}`);
+       mainWindow.loadURL(fullUrl);
+   }
+
+
 
 //  mainWindow.webContents.setZoomFactor(args.zoom);
 
@@ -665,5 +731,7 @@ function _max(a, b){ if(a >= b) return (a); else return (b); }
 
 
 }
+
+});
 
 });
