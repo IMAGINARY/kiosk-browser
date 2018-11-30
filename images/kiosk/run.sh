@@ -29,13 +29,13 @@ fi
 if [[ -n "${KIOSK_BROWSER}" ]]; then 
   if [[ -x "${KIOSK_BROWSER}" ]]; then
     echo "Note: trying to use '${KIOSK_BROWSER}'"
-    exec "${KIOSK_BROWSER}" "--" "$@"
+    exec "${KIOSK_BROWSER}" "$@"
   fi
 fi
 
 if [[ -x "/opt/kiosk-browser/kiosk-browser" ]]; then
   echo "Note: falling back to '/opt/kiosk-browser/kiosk-browser'..."
-  exec "/opt/kiosk-browser/kiosk-browser" "--" "$@"
+  exec "/opt/kiosk-browser/kiosk-browser" "$@"
 fi
 
 if hash docker 2>/dev/null; then

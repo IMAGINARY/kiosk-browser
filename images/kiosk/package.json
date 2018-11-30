@@ -35,7 +35,7 @@
   },
   "scripts": {
     "postinstall": "electron-builder install-app-deps",
-    "start": "electron .",
+    "start": "ELECTRON_IS_DEV=1 electron .",
     "rebuild": "electron-rebuild",
     "pack": "electron-rebuild && CSC_IDENTITY_AUTO_DISCOVERY=false build --linux --x64 --dir",
     "dist": "electron-rebuild && CSC_IDENTITY_AUTO_DISCOVERY=false build --linux --x64"
