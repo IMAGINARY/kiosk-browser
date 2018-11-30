@@ -484,24 +484,24 @@ if(!args.menu)
           }
         }
       },
-      {
-        label: 'Index',
-        click: function(item, focusedWindow) {
-//      console.log(focusedWindow);
-          if (focusedWindow) {
-            focusedWindow.loadURL(`file://${ __dirname}/` + settings.getWithDefault("index_url"));
-          }
-        }
-      },
-      {
-        label: 'Learn More',
-        click: function(item, focusedWindow) {
-          if (focusedWindow) {
-           focusedWindow.loadURL(`https://github.com/hilbert/hilbert-docker-images/tree/devel/images/kiosk`);
-        // require('shell').openExternal('https://github.com/hilbert/hilbert-docker-images/tree/devel/images/kiosk') ;
-           }
-        }
-      },
+//      {
+//        label: 'Index',
+//        click: function(item, focusedWindow) {
+////      console.log(focusedWindow);
+//          if (focusedWindow) {
+//            focusedWindow.loadURL(`kiosk://home`);
+//          }
+//        }
+//      },
+//      {
+//        label: 'Learn More',
+//        click: function(item, focusedWindow) {
+//          if (focusedWindow) {
+//           focusedWindow.loadURL(`https://github.com/hilbert/hilbert-docker-images/`);
+//        // require('shell').openExternal('https://github.com/hilbert/hilbert-docker-images/tree/devel/images/kiosk') ;
+//           }
+//        }
+//      },
     ]
   },
   {
