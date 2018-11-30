@@ -89,7 +89,23 @@ const options = yargs.wrap(yargs.terminalWidth())
 .boolean('localhost').describe('localhost', 'Restrict to LocalHost').default('localhost', settings.getWithDefault("localhost"))
 .alias('z', 'zoom').number('z').describe('z', 'Set Zoom Factor').default('z', settings.getWithDefault("zoom"))
 .alias('l', 'url').string('l').describe('l', 'URL to load').default('l', 'file://' + __dirname + '/' + settings.getWithDefault("index_url"))
-.alias('s','serve').string('s').describe('s','Open url relative to this path served via built-in HTTP server').default('s', settings.getWithDefault("serve"))
+.alias('s','serve').string('s').nargs('s',1).describe('s','Open url relative to this path served via built-in HTTP server').coerce('s',path => {
+    const nsdError = new Error(`No such directory: ${path}`);
+    try {
+        if (fsExtra.lstatSync(path).isDirectory())
+            return path;
+        else
+            throw nsdError;
+    } catch (err) {
+        // handle lstat error
+        if (err.code == 'ENOENT') {
+            //no such file or directory
+            throw nsdError;
+        } else {
+            throw err;
+        }
+    }
+})
 .alias('t', 'transparent').boolean('t').describe('t', 'Transparent Browser Window').default('t', settings.getWithDefault("transparent"))
 .number('retry').describe('retry', 'Retry after given number of seconds if loading the page failed (0 to disable)').default('retry',settings.getWithDefault('retryTimeout'))
 .string('preload').describe('preload', 'preload a JavaScript file')
@@ -175,7 +191,8 @@ url = args.testapp ? 'file://' + __dirname + '/' + settings.getWithDefault("test
 if((!args.testapp) && (args._.length > 1)){ WARN('Multiple arguments were given: [' + (args._) + ']!'); process.exit(1); return; }
 
 let server;
-const urlPrefixPromise = typeof args.serve === "undefined" ? Promise.resolve("") : require('portfinder').getPortPromise()
+const htmlPath = typeof args.serve === "undefined" ? typeof settings.getWithDefault("serve") === "undefined" : args.serve;
+const urlPrefixPromise = typeof htmlPath === "undefined" ? Promise.resolve("") : require('portfinder').getPortPromise()
     .then(port => {
         // `port` is guaranteed to be a free port in this scope.
         // -> start HTTP server on that port
