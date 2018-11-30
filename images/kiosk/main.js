@@ -351,23 +351,6 @@ process.on('uncaughtException', function(error) { // '='? '{}'?
 // initialization and is ready to create browser windows.
 app.on('ready', function()
 {
-
-electron.protocol.registerFileProtocol('kiosk', (request, callback) => {
-    const url = request.url.substr(8);
-    switch(url) {
-        case 'home':
-            callback(path.normalize(`${__dirname}/index.html`));
-            break;
-        case 'testapp':
-            callback(path.normalize(`${__dirname}/testapp.html`));
-            break;
-        default:
-            throw new Error(`Unknown kiosk:// url: ${request.url}`);
-    }
-}, (error) => {
-    if (error) throw error;
-})
-
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
 
@@ -381,9 +364,9 @@ function Finish(msg)
   DEBUG('Finish(' + msg + ')...'); 
   if(mainWindow)
   { 
-    DEBUG('['+msg+'] Closing the main window...'); 
-    mainWindow.hide(); 
-    mainWindow.close(); 
+    DEBUG('['+msg+'] Closing the main window...');
+    try { mainWindow.hide(); } catch(err) {/* was already closed*/}
+    try { mainWindow.close(); } catch(err) {/* was already closed*/}
     mainWindow = null; 
   };
   setTimeout(() => { process.exit(0); }, 5000);
@@ -701,15 +684,31 @@ function _max(a, b){ if(a >= b) return (a); else return (b); }
    if(args.dev){ mainWindow.openDevTools(); } // --remote-debugging-port=8315
 
    // and load some URL?!
-   const parseUrl = require('url').parse;
    const partialUrl = (args._.length > 0)? args._[0] : (args.url ? args.url : (args.serve ? 'index.html' : settings.getWithDefault('home')));
-   const fullUrl = parseUrl(partialUrl).protocol === null ? ( args.serve ? urlPrefix + partialUrl : `file://${path.resolve(partialUrl)}`) : partialUrl;
+   const parseUrl = require('url').parse;
+   const parsedPartialUrl = parseUrl(partialUrl);
+   DEBUG(parsedPartialUrl);
+   if(parsedPartialUrl.protocol === "kiosk:" ) {
+       switch(parsedPartialUrl.hostname) {
+           case 'home':
+               mainWindow.loadURL('file://'+path.normalize(`${__dirname}/index.html`));
+               break;
+           case 'testapp':
+               mainWindow.loadURL('file://'+path.normalize(`${__dirname}/testapp.html`));
+               break;
+           default:
+               console.error(`Unknown kiosk:// url: ${partialUrl}`);
+               app.exit(-1);
+       }
+   } else {
+       const fullUrl = parsedPartialUrl.protocol === null ? ( args.serve ? urlPrefix + partialUrl : `file://${path.resolve(partialUrl)}`) : partialUrl;
+       DEBUG(`urlPrefix: ${urlPrefix}`);
+       DEBUG(`partialUrl: ${partialUrl}`);
+       DEBUG( `Loading ${fullUrl}`);
+       mainWindow.loadURL(fullUrl);
+   }
 
-   DEBUG(`urlPrefix: ${urlPrefix}`);
-   DEBUG(`partialUrl: ${partialUrl}`);
 
-   DEBUG( `Loading ${fullUrl}`);
-   mainWindow.loadURL(fullUrl);
 
 //  mainWindow.webContents.setZoomFactor(args.zoom);
 
