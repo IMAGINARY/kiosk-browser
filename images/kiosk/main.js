@@ -19,7 +19,7 @@ const settingsPath = app.getPath('userData');
 // ensure that the directory for the settings actually exists
 // otherwise, electron-settings may fail if used before the 'ready' event
 fsExtra.ensureDirSync(settingsPath);
-console.log(settingsPath);
+
 // write defautl settings to Settings only file if it is empty
 const defaultSettings = require("./defaults.json");
 if(Object.keys(settings.getAll()).length==0)
