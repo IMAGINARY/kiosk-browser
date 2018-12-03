@@ -23,7 +23,7 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "electron": "1.7.12",
-    "electron-builder": "^19.56.0",
+    "electron-builder": "^20.38.2",
     "electron-rebuild": "^1.8.2"
   },
   "dependencies": {
