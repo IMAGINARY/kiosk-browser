@@ -319,7 +319,7 @@ app.commandLine.appendSwitch('disable-web-security');
   /// 'enable-pinch',  // ?
   // --disable-gpu
 
-
+  app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
 }
 
 
