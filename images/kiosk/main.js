@@ -142,10 +142,7 @@ try {
 
     // running electron via npm/yarn adds an extra '.' cli argument after the exe path
     // and we need to strip that away.
-    // TODO: switch from custom workaround to app.isPackaged in Electron 3.x+
-    // TODO: remove ELECTRON_IS_DEV=1 in package.json once migrated to app.isPackaged
-    const isPackaged = () => 'ELECTRON_IS_DEV' in process.env ? !(process.env.ELECTRON_IS_DEV != 0) : true;
-    args = options.parse(process.argv.slice(isPackaged() ? 1 : 2 ));
+    args = options.parse(process.argv.slice(app.isPackaged ? 1 : 2 ));
 } catch(err) {
     app.exit(1);
     return;
