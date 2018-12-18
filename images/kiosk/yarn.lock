@@ -715,10 +715,10 @@ electron-settings@^3.1.4:
     clone "^2.1.1"
     jsonfile "^4.0.0"
 
-electron@4.0.0-beta.8:
-  version "4.0.0-beta.8"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-4.0.0-beta.8.tgz#df2f464d4e13479a3baa1e063af6c7362b9a2756"
-  integrity sha512-zo0Tf3t1uary5O9Skdlo37axs+vvh9CPC+MkvZnnX3MA/3kWIc+I6jN+AL4bHUdxsMVtjbY8KnusjnCjKSb0sg==
+electron@4.0.0-beta.11:
+  version "4.0.0-beta.11"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-4.0.0-beta.11.tgz#9a5cdf144639fc28cafa651124312585f2e136da"
+  integrity sha512-bn8bVvtur+KK1FlVEOJgXZ24Id3pgqUtQ8kgLhrgSEiIpTu/uNYdhcR+nLYEl4QekIMSLv198lOsx2suyzoyow==
   dependencies:
     "@types/node" "^8.0.24"
     electron-download "^4.1.0"
