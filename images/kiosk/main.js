@@ -688,4 +688,7 @@ function _max(a, b){ if(a >= b) return (a); else return (b); }
 
 });
 
+// Quit when all windows are closed.
+app.on('window-all-closed', () => app.quit());
+
 });
