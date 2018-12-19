@@ -63,7 +63,7 @@ const yargs = require('yargs'); // https://www.npmjs.com/package/yargs
 // TODO: mouse cursor? language?
 const options = yargs.wrap(yargs.terminalWidth())
 .alias('h', 'help').boolean('h').describe('h', 'Print this usage message.')
-.alias('V', 'version').boolean('V').describe('V', 'Print the version.')
+.alias('V', 'version').boolean('V').describe('V', 'Print the version. Combine with -v to get more details.')
 .alias('v', 'verbose').count('v').describe('v', 'Increase Verbosity').default('v', settings.getWithDefault("verbose"))
 .alias('d', 'dev').boolean('d').describe('d', 'Run in development mode.').default('d', settings.getWithDefault("devTools"))
 .alias('p', 'port').number('p').describe('p', 'Specify remote debugging port.').coerce('p', p => {
@@ -183,7 +183,18 @@ DEBUG('Further Args: [' + (args._) + '], #: [' + args._.length + ']');
 
 if(args.help){ options.showHelp(); app.quit(); return; };
 
-if(args.version){ console.log(app.getVersion()); app.quit(); return; };
+if(args.version){
+    if( VERBOSE_LEVEL == 0 ) {
+        console.log(`v${app.getVersion()}`);
+    } else {
+        console.log(`Kiosk browser: v${app.getVersion()}`);
+        console.log(`Electron: v${process.versions.electron}`);
+        console.log(`Node: v${process.versions.node}`);
+        console.log(`Chromium: v${process.versions.chrome}`);
+    }
+    app.quit();
+    return;
+};
 
 let server;
 const htmlPath = args.serve ? typeof settings.getWithDefault("serve") === "undefined" : args.serve;
