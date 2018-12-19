@@ -64,6 +64,11 @@
     "win": {
       "icon": "build/icon.ico"
     },
+    "mac": {
+      "target": [
+        "dmg"
+      ]
+    },
     "files": [
       "main.js",
       "defaults.json",
