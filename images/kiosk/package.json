@@ -41,8 +41,8 @@
     "postinstall": "electron-builder install-app-deps",
     "start": "ELECTRON_IS_DEV=1 electron .",
     "rebuild": "electron-rebuild",
-    "pack": "electron-rebuild && CSC_IDENTITY_AUTO_DISCOVERY=false build --linux --x64 --dir",
-    "dist": "electron-rebuild && CSC_IDENTITY_AUTO_DISCOVERY=false build --linux --x64"
+    "pack": "electron-rebuild && CSC_IDENTITY_AUTO_DISCOVERY=false build --x64 --dir",
+    "dist": "electron-rebuild && CSC_IDENTITY_AUTO_DISCOVERY=false build --x64"
   },
   "build": {
     "appId": "org.imaginary.kiosk",
