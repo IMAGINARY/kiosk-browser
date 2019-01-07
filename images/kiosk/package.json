@@ -1,7 +1,7 @@
 {
   "name": "kiosk-browser",
   "productName": "kiosk-browser",
-  "version": "0.10.0-beta.1",
+  "version": "0.10.0",
   "description": "Hardend Kiosk Web Browser",
   "homepage": "https://github.com/IMAGINARY/kiosk-browser",
   "repository": {
