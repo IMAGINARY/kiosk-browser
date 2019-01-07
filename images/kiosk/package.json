@@ -22,7 +22,7 @@
   "author": "IMAGINARY gGmbH <info@imaginary.org>",
   "license": "Apache-2.0",
   "devDependencies": {
-    "electron": "3.0.13",
+    "electron": "~3.0.13",
     "electron-builder": "^20.38.2",
     "electron-rebuild": "^1.8.2"
   },
