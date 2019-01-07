@@ -19,7 +19,7 @@ const settingsPath = app.getPath('userData');
 // ensure that the directory for the settings actually exists
 // otherwise, electron-settings may fail if used before the 'ready' event
 fsExtra.ensureDirSync(settingsPath);
-console.log(settingsPath);
+
 // write defautl settings to Settings only file if it is empty
 const defaultSettings = require("./defaults.json");
 if(Object.keys(settings.getAll()).length==0)
@@ -63,7 +63,7 @@ const yargs = require('yargs'); // https://www.npmjs.com/package/yargs
 // TODO: mouse cursor? language?
 const options = yargs.wrap(yargs.terminalWidth())
 .alias('h', 'help').boolean('h').describe('h', 'Print this usage message.')
-.alias('V', 'version').boolean('V').describe('V', 'Print the version.')
+.alias('V', 'version').boolean('V').describe('V', 'Print the version. Combine with -v to get more details.')
 .alias('v', 'verbose').count('v').describe('v', 'Increase Verbosity').default('v', settings.getWithDefault("verbose"))
 .alias('d', 'dev').boolean('d').describe('d', 'Run in development mode.').default('d', settings.getWithDefault("devTools"))
 .alias('p', 'port').number('p').describe('p', 'Specify remote debugging port.').coerce('p', p => {
@@ -142,10 +142,7 @@ try {
 
     // running electron via npm/yarn adds an extra '.' cli argument after the exe path
     // and we need to strip that away.
-    // TODO: switch from custom workaround to app.isPackaged in Electron 3.x+
-    // TODO: remove ELECTRON_IS_DEV=1 in package.json once migrated to app.isPackaged
-    const isPackaged = () => 'ELECTRON_IS_DEV' in process.env ? !(process.env.ELECTRON_IS_DEV != 0) : true;
-    args = options.parse(process.argv.slice(isPackaged() ? 1 : 2 ));
+    args = options.parse(process.argv.slice(app.isPackaged ? 1 : 2 ));
 } catch(err) {
     app.exit(1);
     return;
@@ -184,9 +181,20 @@ DEBUG('Chrome arguments to append: ' + JSON.stringify(args["append-chrome-argume
 
 DEBUG('Further Args: [' + (args._) + '], #: [' + args._.length + ']');
 
-if(args.help){ options.showHelp(); process.exit(0); return; };
+if(args.help){ options.showHelp(); app.quit(); return; };
 
-if(args.version){ console.log(app.getVersion()); process.exit(0); return; };
+if(args.version){
+    if( VERBOSE_LEVEL == 0 ) {
+        console.log(`v${app.getVersion()}`);
+    } else {
+        console.log(`Kiosk browser: v${app.getVersion()}`);
+        console.log(`Electron: v${process.versions.electron}`);
+        console.log(`Node: v${process.versions.node}`);
+        console.log(`Chromium: v${process.versions.chrome}`);
+    }
+    app.quit();
+    return;
+};
 
 let server;
 const htmlPath = args.serve ? typeof settings.getWithDefault("serve") === "undefined" : args.serve;
@@ -319,7 +327,7 @@ app.commandLine.appendSwitch('disable-web-security');
   /// 'enable-pinch',  // ?
   // --disable-gpu
 
-
+  app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
 }
 
 
@@ -337,20 +345,21 @@ if(args["append-chrome-switch"])
 if(args["append-chrome-argument"])
     args["append-chrome-argument"].forEach(a => app.commandLine.appendArgument(a));
 
-
-// delay all execution until server has been started
-urlPrefixPromise.then( urlPrefix => {
-
 // var crashReporter = require('crash-reporter');
 // crashReporter.start(); // Report crashes to our server: productName: 'Kiosk', companyName: 'IMAGINARY'???
 
-// var nslog = require('nslog');
-// console.log = nslog;
-process.on('uncaughtException', function(error) { // '='? '{}'?
-   WARN('uncaughtException! :(');
-   WARN(error);
-});
+function logAndExit(title,error) {
+    WARN(title);
+    WARN(error);
 
+    // unhandled exceptions should be considered fatal
+    app.exit(-1);
+}
+
+['uncaughtException','unhandledRejection'].forEach(e => process.on(e,error=>logAndExit(e,error)));
+
+// delay all execution until server has been started
+urlPrefixPromise.then( urlPrefix => {
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -362,27 +371,6 @@ const BrowserWindow = electron.BrowserWindow
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow = null;
-
-// Quit when all windows are closed.
-function Finish(msg)
-{
-  DEBUG('Finish(' + msg + ')...'); 
-  if(mainWindow)
-  { 
-    DEBUG('['+msg+'] Closing the main window...');
-    try { mainWindow.hide(); } catch(err) {/* was already closed*/}
-    try { mainWindow.close(); } catch(err) {/* was already closed*/}
-    mainWindow = null; 
-  };
-  setTimeout(() => { process.exit(0); }, 5000);
-}
-
-app.on('window-all-closed', function() { Finish('app::window-all-closed'); app.quit(); }); // also on MAC OS X?
-
-// if (process.platform != 'darwin') // 
-
-app.on('before-quit', function() { Finish('app::before-quit'); });
-app.on('will-quit', function() { Finish('app::will-quit'); });
 
 var {Menu} = electron; //require('menu'); // var MenuItem = require('menu-item');
 
@@ -532,23 +520,6 @@ if(!args.menu)
   Menu.setApplicationMenu(menu);
 };
 
-var signals = {
-  'SIGINT': 2,
-  'SIGTERM': 15
-};
-
-function shutdown(signal, value) {
-  DEBUG('shutdown(signal: ' + signal + ', value: ' + value + ')...'); //  DEBUG('Kiosk stopped due to [' + signal + '] signal');
-//    app.quit();
-  process.exit(128 + value);
-}
-
-Object.keys(signals).forEach(function (signal) {
-  process.on(signal, function () {
-    shutdown(signal, signals[signal]);
-  });
-});
-
 process.on('SIGUSR1', () => mainWindow.webContents.toggleDevTools() );
 
 function _min(a, b){ if(a <= b) return (a); else return (b); }
@@ -621,15 +592,6 @@ function _max(a, b){ if(a >= b) return (a); else return (b); }
        mainWindow.setMinimumSize(_r - _x,_b - _y);
        mainWindow.setContentSize(_r - _x,_b - _y);
    }
-
-   // Emitted when the window is closed.
-   mainWindow.on('closed', function() {
-     // Dereference the window object, usually you would store windows
-     // in an array if your app supports multi windows, this is the time
-     // when you should delete the corresponding element.
-     Finish('mainWindow::closed');
-     app.quit();
-   });
 
    mainWindow.webContents.on('new-window', function(event, _url) { event.preventDefault(); });
 
@@ -733,5 +695,8 @@ function _max(a, b){ if(a >= b) return (a); else return (b); }
 }
 
 });
+
+// Quit when all windows are closed.
+app.on('window-all-closed', () => app.quit());
 
 });

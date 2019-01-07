@@ -10,7 +10,7 @@
     "cursor": false,
     "menu": false,
     "zoom": 1.0,
-    "verbose": 1,
+    "verbose": 0,
     "testapp": false,
     "integration": false,
     "transparent": false
