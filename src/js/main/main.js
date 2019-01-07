@@ -21,7 +21,7 @@ const settingsPath = app.getPath('userData');
 fsExtra.ensureDirSync(settingsPath);
 
 // write defautl settings to Settings only file if it is empty
-const defaultSettings = require("./defaults.json");
+const defaultSettings = require(path.join(__dirname,"../../json/defaults.json"));
 if(Object.keys(settings.getAll()).length==0)
     settings.setAll(defaultSettings,{ prettify: true });
 
@@ -658,10 +658,10 @@ function _max(a, b){ if(a >= b) return (a); else return (b); }
    if(parsedPartialUrl.protocol === "kiosk:" ) {
        switch(parsedPartialUrl.hostname) {
            case 'home':
-               mainWindow.loadURL('file://'+path.normalize(`${__dirname}/index.html`));
+               mainWindow.loadURL('file://'+path.normalize(`${__dirname}/../../html/index.html`));
                break;
            case 'testapp':
-               mainWindow.loadURL('file://'+path.normalize(`${__dirname}/testapp.html`));
+               mainWindow.loadURL('file://'+path.normalize(`${__dirname}/../../html/testapp.html`));
                break;
            default:
                console.error(`Unknown kiosk:// url: ${partialUrl}`);

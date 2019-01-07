@@ -12,7 +12,7 @@
     "url": "https://github.com/IMAGINARY/kiosk-browser/issues",
     "email": "info@imaginary.org"
   },
-  "main": "main.js",
+  "main": "src/js/main/main.js",
   "keywords": [
     "kiosk",
     "web",
