@@ -120,8 +120,8 @@ const options = yargs.wrap(yargs.terminalWidth())
     };
     xs = typeof xs == 'string' ? [xs] : xs;
     return xs.map(processSwitch);
-}).describe('append-chrome-switch', 'Append switch to internal Chrome browser switches')
-.string('append-chrome-argument').coerce('append-chrome-argument', xs=>typeof xs == 'string' ? [xs] : xs ).describe('append-chrome-argument', 'Append positional argument to internal Chrome browser argument')
+}).describe('append-chrome-switch', 'Append switch to internal Chrome browser switches').default('append-chrome-switch',[])
+.string('append-chrome-argument').coerce('append-chrome-argument', xs=>typeof xs == 'string' ? [xs] : xs ).describe('append-chrome-argument', 'Append positional argument to internal Chrome browser argument').default('append-chrome-argument',[])
 .boolean('use-minimal-chrome-cli').describe('use-minimal-chrome-cli', 'Don\'t append anything to the internal Chrome command line by default')
 .usage('Kiosk Web Browser\n    Usage: $0 [options] [url]' )
 .fail((msg,err,yargs) => {
@@ -228,122 +228,14 @@ const urlPrefixPromise = typeof htmlPath === "undefined" ? Promise.resolve("") :
         return urlPrefix;
     });
 
-// --enable-pinch --flag-switches-begin 
-//--enable-experimental-canvas-features --enable-gpu-rasterization --javascript-harmony --enable-touch-editing --enable-webgl-draft-extensions --enable-experimental-extension-apis --ignore-gpu-blacklist --show-fps-counter --ash-touch-hud --touch-events=enabled
-// --flag-switches-end
+if (args.port)
+    args['append-chrome-switch'].push({key: 'remote-debugging-port', value: args.port});
 
-function sw() 
-{
-  // https://github.com/atom/electron/issues/1277
-  // https://bugs.launchpad.net/ubuntu/+source/chromium-browser/+bug/1463598
-  // https://code.google.com/p/chromium/issues/detail?id=121183
-  // http://peter.sh/experiments/chromium-command-line-switches/
-  // https://xwartz.gitbooks.io/electron-gitbook/content/en/api/chrome-command-line-switches.html
+if (args.localhost)
+    args['append-chrome-switch'].push({key: 'host-rules', value: 'MAP * 127.0.0.1'});
 
-  app.commandLine.appendSwitch('--js-flags="--max_old_space_size=4096"');
-  app.commandLine.appendSwitch('disable-threaded-scrolling');
-
-// app.commandLine.appendSwitch('enable-apps-show-on-first-paint');
-// app.commandLine.appendSwitch('enable-embedded-extension-options');
-// app.commandLine.appendSwitch('enable-experimental-canvas-features');
-// app.commandLine.appendSwitch('enable-gpu-rasterization');
-app.commandLine.appendSwitch('javascript-harmony');
-
-// app.commandLine.appendSwitch('enable-pinch');
-app.commandLine.appendSwitch('disable-pinch');
-
-app.commandLine.appendSwitch('enable-settings-window');
-app.commandLine.appendSwitch('enable-touch-editing');
-// app.commandLine.appendSwitch('enable-webgl-draft-extensions');
-// app.commandLine.appendSwitch('enable-experimental-extension-apis');
-app.commandLine.appendSwitch('ignore-gpu-blacklist');
-// app.commandLine.appendSwitch('disable-overlay-scrollbar');
-// app.commandLine.appendSwitch('show-fps-counter');
-// app.commandLine.appendSwitch('ash-touch-hud');
-
-//app.commandLine.appendSwitch('touch-events');
-//app.commandLine.appendSwitch('touch-events-enabled');
-//app.commandLine.appendSwitch('touch-events', 'enabled');
-
-app.commandLine.appendSwitch('disabled');
-app.commandLine.appendSwitch('disable-touch-events');
-app.commandLine.appendSwitch('touch-events-disabled');
-app.commandLine.appendSwitch('touch-events', 'disabled'); // --touch-events=disabled 
-app.commandLine.appendSwitch('disable-features', 'PassiveDocumentEventListeners,PassiveEventListenersDueToFling'); // --disable-features=PassiveDocumentEventListeners,PassiveEventListenersDueToFling
-
-
-/// app.commandLine.appendSwitch('ignore-gpu-blacklist');
-/// app.commandLine.appendSwitch('enable-gpu');
-// app.commandLine.appendSwitch('disable-gpu-sandbox');
-// app.commandLine.appendSwitch('enable-gpu-rasterization');
-/// app.commandLine.appendSwitch('enable-pinch');
-
-// app.commandLine.appendSwitch('blacklist-accelerated-compositing');
-
-app.commandLine.appendSwitch('disable-web-security');
-/// app.commandLine.appendSwitch('enable-webgl');
-
-// app.commandLine.appendSwitch('enable-webgl-draft-extensions');
-/// app.commandLine.appendSwitch('enable-webgl-image-chromium');
-
-// app.commandLine.appendSwitch('enable-touch-editing');
-// app.commandLine.appendSwitch('enable-touch-drag-drop');
-/// app.commandLine.appendSwitch('enable-touchview');
-
-/// app.commandLine.appendSwitch('compensate-for-unstable-pinch-zoom');
-
-/// app.commandLine.appendSwitch('enable-viewport');
-// app.commandLine.appendSwitch('enable-unsafe-es3-apis');
-// app.commandLine.appendSwitch('enable-experimental-canvas-features');
-// app.commandLine.appendSwitch('enable-experimental-extension-apis');
-// app.commandLine.appendSwitch('javascript-harmony');
-// app.commandLine.appendSwitch('enable-subscribe-uniform-extension');
-
-/// app.commandLine.appendSwitch('show-fps-counter');
-/// app.commandLine.appendSwitch('ash-touch-hud');
-// app.commandLine.appendSwitch('ash-enable-touch-view-testing');
-
-/// app.commandLine.appendSwitch('auto');
-
-//    '--js-flags="--max_old_space_size=4096"',
-//    'disable-threaded-scrolling',
-//    'javascript-harmony',
-//    'disable-pinch',
-
-  [
-    'disable-pinch',
-    'allow-file-access-from-files',
-    'enable_hidpi', 
-    'enable-hidpi', 
-    'disable-background-timer-throttling',
-    'enable-transparent-visuals',
-    'incognito'
-  ].forEach(app.commandLine.appendSwitch); 
-
-  app.commandLine.appendSwitch('high-dpi-support', '1');
-  app.commandLine.appendSwitch('force-device-scale-factor', '1');
-  app.commandLine.appendSwitch('set-base-background-color', '0x00000000');
-
-  /// 'enable-pinch',  // ?
-  // --disable-gpu
-
-  app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
-}
-
-
-// Append Chromium command line switches
-if(args.port){ app.commandLine.appendSwitch('remote-debugging-port', args.port ); }
-if(args.localhost){ app.commandLine.appendSwitch('host-rules', 'MAP * 127.0.0.1'); }
-
-if(!args["use-minimal-chrome-cli"]) {
-    sw(); app.commandLine.appendSwitch('flag-switches-begin'); sw(); app.commandLine.appendSwitch('flag-switches-end');
-}
-
-if(args["append-chrome-switch"])
-    args["append-chrome-switch"].forEach(s => s.hasOwnProperty("value") ? app.commandLine.appendSwitch(s.key,s.value) : app.commandLine.appendSwitch(s.key));
-
-if(args["append-chrome-argument"])
-    args["append-chrome-argument"].forEach(a => app.commandLine.appendArgument(a));
+const applyChromiumCmdLine = require(path.join(__dirname,'applyChromiumCmdLine.js'));
+applyChromiumCmdLine(args['use-minimal-chrome-cli'],args['append-chrome-switch'],args['append-chrome-argument']);
 
 // var crashReporter = require('crash-reporter');
 // crashReporter.start(); // Report crashes to our server: productName: 'Kiosk', companyName: 'IMAGINARY'???
