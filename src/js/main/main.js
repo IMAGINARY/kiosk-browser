@@ -196,37 +196,9 @@ if(args.version){
     return;
 };
 
-let server;
+const httpServer = require(path.join(__dirname,'httpServer.js'));
 const htmlPath = args.serve ? typeof settings.getWithDefault("serve") === "undefined" : args.serve;
-const urlPrefixPromise = typeof htmlPath === "undefined" ? Promise.resolve("") : require('portfinder').getPortPromise()
-    .then(port => {
-        // `port` is guaranteed to be a free port in this scope.
-        // -> start HTTP server on that port
-        const finalhandler = require('finalhandler');
-        const http = require('http');
-        const serveStatic = require('serve-static');
-
-        // Serve up folder provided via CLI option
-        const serve = serveStatic(path.resolve(args.serve), {'index': ['index.html', 'index.htm']});
-
-        // Create server
-        server = http.createServer(function onRequest(req, res) {
-            serve(req, res, finalhandler(req, res))
-        });
-
-        // Do something about errors
-        server.on('error', err => { throw err; } );
-
-        const host = 'localhost';
-        const urlPrefix = `http://${host}:${port}/`;
-
-        // Listen
-        server.listen(port,host);
-
-        DEBUG( `Serving ${args.serve} at ${urlPrefix}`);
-
-        return urlPrefix;
-    });
+const urlPrefixPromise = typeof htmlPath === "undefined" ? Promise.resolve("") : httpServer.initHttpServer(args.serve);
 
 if (args.port)
     args['append-chrome-switch'].push({key: 'remote-debugging-port', value: args.port});
