@@ -56,94 +56,49 @@ function getLinuxIcon() {
         return path.resolve(__dirname, '..', '48x48.png');
 }
 
-const yargs = require('yargs'); // https://www.npmjs.com/package/yargs
+const cmdLineDefauls = {
+    'verbose': settings.getWithDefault('verbose'),
+    'dev': settings.getWithDefault('devTools'),
+    'port': settings.getWithDefault('remoteDebuggingPort'),
+    'menu': settings.getWithDefault('menu'),
+    'kiosk': settings.getWithDefault('kiosk'),
+    'always-on-top': settings.getWithDefault('alwaysOnTop'),
+    'fullscreen': settings.getWithDefault('fullscreen'),
+    'integration': settings.getWithDefault('integration'),
+    'localhost': settings.getWithDefault('localhost'),
+    'zoom': settings.getWithDefault('zoom'),
+    'transparent': settings.getWithDefault('transparent'),
+    'retry': settings.getWithDefault('retryTimeout'),
+    'append-chrome-switch': [],
+    'append-chrome-argument': [],
+};
+const cmdLineOptions = require(path.join(__dirname, 'cmdLine.js'));
 
-//   if(args.dev){ mainWindow.openDevTools(); } // --remote-debugging-port=8315 .port
+const yargs = require('yargs');
 
-// TODO: mouse cursor? language?
-const options = yargs.wrap(yargs.terminalWidth())
-.alias('h', 'help').boolean('h').describe('h', 'Print this usage message.')
-.alias('V', 'version').boolean('V').describe('V', 'Print the version. Combine with -v to get more details.')
-.alias('v', 'verbose').count('v').describe('v', 'Increase Verbosity').default('v', settings.getWithDefault("verbose"))
-.alias('d', 'dev').boolean('d').describe('d', 'Run in development mode.').default('d', settings.getWithDefault("devTools"))
-.alias('p', 'port').number('p').describe('p', 'Specify remote debugging port.').coerce('p', p => {
-    if(p === undefined) {
-        return settings.getWithDefault("remoteDebuggingPort");
-    } else {
-        const pInt = Number.parseInt(p);
-        if( /[0-9]+/.test(p) && pInt >= 0 && pInt <= 65535) {
-            return pInt;
-        } else {
-            throw new Error(`Invalid remote debugging port: ${p}`);
-        }
-    }
-} )
-.alias('c', 'cursor').boolean('c').describe('c', 'Toggle Mouse Cursor (TODO)').default('m', settings.getWithDefault("cursor"))
-.alias('m', 'menu').boolean('m').describe('m', 'Toggle Main Menu').default('m', settings.getWithDefault("menu"))
-.alias('k', 'kiosk').boolean('k').describe('k', 'Toggle Kiosk Mode').default('k', settings.getWithDefault("kiosk"))
-.alias('T', 'always-on-top').boolean('T').describe('T', 'Toggle Always On Top').default('T', settings.getWithDefault("alwaysOnTop"))
-.alias('f', 'fullscreen').boolean('f').describe('f', 'Toggle Fullscreen Mode').default('f', settings.getWithDefault("fullscreen"))
-.alias('i', 'integration').boolean('i').describe('i', 'node Integration').default('i', settings.getWithDefault("integration"))
-.boolean('localhost').describe('localhost', 'Restrict to LocalHost').default('localhost', settings.getWithDefault("localhost"))
-.alias('z', 'zoom').number('z').describe('z', 'Set Zoom Factor').default('z', settings.getWithDefault("zoom"))
-.alias('l', 'url').string('l').requiresArg('l').describe('l', 'URL to load')
-.alias('s','serve').string('s').nargs('s',1).describe('s','Open url relative to this path served via built-in HTTP server').coerce('s',path => {
-    const nsdError = new Error(`No such directory: ${path}`);
-    try {
-        if (fsExtra.lstatSync(path).isDirectory())
-            return path;
-        else
-            throw nsdError;
-    } catch (err) {
-        // handle lstat error
-        if (err.code == 'ENOENT') {
-            //no such file or directory
-            throw nsdError;
-        } else {
-            throw err;
-        }
-    }
-})
-.alias('t', 'transparent').boolean('t').describe('t', 'Transparent Browser Window').default('t', settings.getWithDefault("transparent"))
-.number('retry').describe('retry', 'Retry after given number of seconds if loading the page failed (0 to disable)').default('retry',settings.getWithDefault('retryTimeout'))
-.string('preload').describe('preload', 'preload a JavaScript file')
-.string('append-chrome-switch').coerce('append-chrome-switch',function(xs){
-    function processSwitch(s) {
-        if(s.length==0)
-            throw new Error("Empty Chrome CLI switch");
-        
-        if(!s.startsWith('--'))
-            throw new Error("Chrome CLI switch must start with '--'");
-            
-        var parts = s.substr(2).split("=",2);
-        return parts.length == 1 ? { key: parts[0] } : { key: parts[0], value: parts[1] };
-    };
-    xs = typeof xs == 'string' ? [xs] : xs;
-    return xs.map(processSwitch);
-}).describe('append-chrome-switch', 'Append switch to internal Chrome browser switches').default('append-chrome-switch',[])
-.string('append-chrome-argument').coerce('append-chrome-argument', xs=>typeof xs == 'string' ? [xs] : xs ).describe('append-chrome-argument', 'Append positional argument to internal Chrome browser argument').default('append-chrome-argument',[])
-.boolean('use-minimal-chrome-cli').describe('use-minimal-chrome-cli', 'Don\'t append anything to the internal Chrome command line by default')
-.usage('Kiosk Web Browser\n    Usage: $0 [options] [url]' )
-.fail((msg,err,yargs) => {
+function onYargsFailure(msg, err) {
     yargs.showHelp();
     console.error(msg);
-    throw( err ? err : new Error("CLI option parsing failed") );
-})
-.help(false) // automatic exit after help doesn't work after app.onReady
-.version(false) // automatic exit after version doesn't work after app.onReady
-.strict();
-/*.fail(function (msg, err, yargs) { f (err) throw err // preserve stack
-    console.error('You broke it!'); console.error(msg); console.error('You should be doing', yargs.help()); process.exit(1); })*/
+    throw(err ? err : new Error("CLI option parsing failed"));
+}
 
-// settings.getWithDefault("default_html")
+const yargsOptions = yargs
+    .usage('Kiosk Web Browser\n    Usage: $0 [options] [url]')
+    .wrap(yargs.terminalWidth())
+    .help(false)
+    .version(false)
+    .strict()
+    .fail(onYargsFailure)
+    .options(cmdLineOptions.getOptions(cmdLineDefauls));
 
 var args;
 try {
 
     // running electron via npm/yarn adds an extra '.' cli argument after the exe path
     // and we need to strip that away.
-    args = options.parse(process.argv.slice(app.isPackaged ? 1 : 2 ));
-} catch(err) {
+    args = yargsOptions.parse(process.argv.slice(app.isPackaged ? 1 : 2));
+} catch (err) {
+    console.error(err.msg);
     app.exit(1);
     return;
 }
@@ -181,7 +136,7 @@ DEBUG('Chrome arguments to append: ' + JSON.stringify(args["append-chrome-argume
 
 DEBUG('Further Args: [' + (args._) + '], #: [' + args._.length + ']');
 
-if(args.help){ options.showHelp(); app.quit(); return; };
+if(args.help){ yargsOptions.showHelp(); app.quit(); return; };
 
 if(args.version){
     if( VERBOSE_LEVEL == 0 ) {
