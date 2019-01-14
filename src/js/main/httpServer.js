@@ -4,6 +4,8 @@ const path = require('path');
 const portfinder = require('portfinder');
 const serveStatic = require('serve-static');
 
+const {logger} = require(path.join(__dirname, 'logging.js'));
+
 // reference to server needs to be kept to avoid garbage collecting
 let server;
 
@@ -37,8 +39,7 @@ function initHttpServer(wwwRootDir) {
             // Listen
             server.listen(port, host);
 
-            // TODO: use logging framework
-            //DEBUG(`Serving ${args.serve} at ${urlPrefix}`);
+            logger.info('Serving %s at %s', wwwRootDir, urlPrefix);
 
             return urlPrefix;
         });

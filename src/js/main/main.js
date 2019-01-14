@@ -15,6 +15,8 @@ const path = require('path');
 const fsExtra = require('fs-extra');
 const settings = require('electron-settings');
 const settingsPath = app.getPath('userData');
+const logging = require(path.join(__dirname,"logging.js"));
+const logger = logging.logger;
 
 // ensure that the directory for the settings actually exists
 // otherwise, electron-settings may fail if used before the 'ready' event
@@ -78,7 +80,7 @@ const yargs = require('yargs');
 
 function onYargsFailure(msg, err) {
     yargs.showHelp();
-    console.error(msg);
+    logger.error(msg);
     throw(err ? err : new Error("CLI option parsing failed"));
 }
 
@@ -98,48 +100,21 @@ try {
     // and we need to strip that away.
     args = yargsOptions.parse(process.argv.slice(app.isPackaged ? 1 : 2));
 } catch (err) {
-    console.error(err.msg);
+    logger.error(err.msg);
     app.exit(1);
     return;
 }
 
-var VERBOSE_LEVEL = args.verbose;
+logging.setLevelNumeric(args.verbose);
 
-function WARN()  { VERBOSE_LEVEL >= 0 && console.log.apply(console, arguments); }
-function INFO()  { VERBOSE_LEVEL >= 1 && console.log.apply(console, arguments); }
-function DEBUG() { VERBOSE_LEVEL >= 2 && console.log.apply(console, arguments); }
-function TRACE(a) { VERBOSE_LEVEL >= 2 && console.trace(a); }
-DEBUG(process.argv); // [1..]; // ????
-
-DEBUG('Help: ' + (args.help) );
-DEBUG('Version: ' + (args.version) );
-DEBUG('Verbose: ' + (args.verbose) );
-DEBUG('Dirname: ' + (__dirname) );
-DEBUG('Dev: ' + (args.dev) );
-DEBUG('RemoteDebuggingPort: ' + (args.port) );
-DEBUG('Cursor: ' + (args.cursor) );
-
-DEBUG('Menu: ' + (args.menu) );
-DEBUG('Fullscreen Mode: ' + (args.fullscreen));
-DEBUG('Testing?: ' + (args.testapp));
-DEBUG('Kiosk Mode: ' + (args.kiosk));
-DEBUG('Always On Top: ' + (args["always-on-top"]));
-DEBUG('Zoom Factor: ' + (args.zoom));
-DEBUG('Node Integration: ' + (args.integration));
-DEBUG('Serve files: ' + (args.serve));
-DEBUG('--url: ' + (args.url) );
-DEBUG('Retry: ' + (args.retry));
-DEBUG('Preload: ' + (args.preload));
-DEBUG('Minimal Chrome CLI: ' + (args["use-minimal-chrome-cli"]));
-DEBUG('Chrome options to append: ' + JSON.stringify(args["append-chrome-switch"]));
-DEBUG('Chrome arguments to append: ' + JSON.stringify(args["append-chrome-argument"]));
-
-DEBUG('Further Args: [' + (args._) + '], #: [' + args._.length + ']');
+// log parsed options
+logger.debug(process.argv);
+logger.debug('%o',args);
 
 if(args.help){ yargsOptions.showHelp(); app.quit(); return; };
 
 if(args.version){
-    if( VERBOSE_LEVEL == 0 ) {
+    if( args.verbose == 0 ) {
         console.log(`v${app.getVersion()}`);
     } else {
         console.log(`Kiosk browser: v${app.getVersion()}`);
@@ -168,13 +143,11 @@ applyChromiumCmdLine(args['use-minimal-chrome-cli'],args['append-chrome-switch']
 // crashReporter.start(); // Report crashes to our server: productName: 'Kiosk', companyName: 'IMAGINARY'???
 
 function logAndExit(title,error) {
-    WARN(title);
-    WARN(error);
+    logger.error('%s: %O', title, error);
 
     // unhandled exceptions should be considered fatal
     app.exit(-1);
 }
-
 ['uncaughtException','unhandledRejection'].forEach(e => process.on(e,error=>logAndExit(e,error)));
 
 // delay all execution until server has been started
@@ -378,7 +351,7 @@ function _max(a, b){ if(a >= b) return (a); else return (b); }
      _r = _max(_r, _d.x + _d.width);
      _b = _max(_b, _d.y + _d.height);
    };
-   DEBUG('MAX SCREEN: (' + _x + ' , ' + _y + ') - (' + _r + ' , ' + _b + ')!');
+   logger.debug('MAX SCREEN: (' + _x + ' , ' + _y + ') - (' + _r + ' , ' + _b + ')!');
 
     const options = { show: false
     , x: _x, y: _y, width: _r - _x, height: _b - _y
@@ -421,10 +394,10 @@ function _max(a, b){ if(a >= b) return (a); else return (b); }
 
    // In the main process.
    mainWindow.webContents.session.on('will-download', function(event, item, webContents) {
-     INFO("Trying to Download: ");
-     INFO(item.getFilename());
-     INFO(item.getMimeType());
-     INFO(item.getTotalBytes());
+     logger.info("Trying to Download: ");
+     logger.info(item.getFilename());
+     logger.info(item.getMimeType());
+     logger.info(item.getTotalBytes());
      item.cancel(); // Nope... this is a kiosk!
    });
 
@@ -444,7 +417,7 @@ function _max(a, b){ if(a >= b) return (a); else return (b); }
         if( errorCode == -3 || errorCode == 0 )
             return;
 
-        WARN(`Loading ${validatedURL} failed with Error ${errorCode}: ${errorDescription}`);
+        logger.warn(`Loading ${validatedURL} failed with Error ${errorCode}: ${errorDescription}`);
         var errorMsgDiv  = `
             <div style="position:absolute;top:0px;left:0px;width: 100%;color: white;background-color: black;">
                 Error ${errorCode}: ${errorDescription}<br />
@@ -473,7 +446,7 @@ function _max(a, b){ if(a >= b) return (a); else return (b); }
    const partialUrl = (args._.length > 0)? args._[0] : (args.url ? args.url : (args.serve ? 'index.html' : settings.getWithDefault('home')));
    const parseUrl = require('url').parse;
    const parsedPartialUrl = parseUrl(partialUrl);
-   DEBUG(parsedPartialUrl);
+   logger.debug('%o', parsedPartialUrl);
    if(parsedPartialUrl.protocol === "kiosk:" ) {
        switch(parsedPartialUrl.hostname) {
            case 'home':
@@ -483,14 +456,14 @@ function _max(a, b){ if(a >= b) return (a); else return (b); }
                mainWindow.loadURL('file://'+path.normalize(`${__dirname}/../../html/testapp.html`));
                break;
            default:
-               console.error(`Unknown kiosk:// url: ${partialUrl}`);
+               logger.error(`Unknown kiosk:// url: ${partialUrl}`);
                app.exit(-1);
        }
    } else {
        const fullUrl = parsedPartialUrl.protocol === null ? ( args.serve ? urlPrefix + partialUrl : `file://${path.resolve(partialUrl)}`) : partialUrl;
-       DEBUG(`urlPrefix: ${urlPrefix}`);
-       DEBUG(`partialUrl: ${partialUrl}`);
-       DEBUG( `Loading ${fullUrl}`);
+       logger.debug(`urlPrefix: ${urlPrefix}`);
+       logger.debug(`partialUrl: ${partialUrl}`);
+       logger.debug( `Loading ${fullUrl}`);
        mainWindow.loadURL(fullUrl);
    }
 
