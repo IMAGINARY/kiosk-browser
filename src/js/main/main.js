@@ -7,9 +7,7 @@
 global.shellStartTime = Date.now();
 
 const electron = require('electron');
-
-// Module to control application life.
-const app = electron.app;
+const {app, BrowserWindow, Menu} = electron;
 
 const path = require('path');
 const fsExtra = require('fs-extra');
@@ -107,14 +105,9 @@ urlPrefixPromise.then( urlPrefix => {
 // initialization and is ready to create browser windows.
 app.on('ready', function()
 {
-// Module to create native browser window.
-const BrowserWindow = electron.BrowserWindow
-
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow = null;
-
-var {Menu} = electron; //require('menu'); // var MenuItem = require('menu-item');
 
 if(!args.menu) 
 {
