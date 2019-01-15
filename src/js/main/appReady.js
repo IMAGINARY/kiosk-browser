@@ -44,8 +44,6 @@ function appReady(settings, args, urlPrefix) {
             java: true,
             webSecurity: false,
             experimentalFeatures: true,
-            overlayFullscreenVideo: true,
-            experimentalCanvasFeatures: true,
             allowRunningInsecureContent: true,
             zoomFactor: args.zoom,
             nodeIntegration: args.integration,
