@@ -6,13 +6,6 @@ const {logger} = require(path.join(__dirname, 'logging.js'));
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 
-function getLinuxIcon() {
-    if (process.mainModule.filename.indexOf('app.asar') === -1)
-        return path.resolve(__dirname, 'build', '48x48.png');
-    else
-        return path.resolve(__dirname, '..', '48x48.png');
-}
-
 function appReady(settings, args, urlPrefix) {
     const {app, BrowserWindow, Menu, MenuItem, screen} = require('electron');
 
@@ -74,7 +67,6 @@ function appReady(settings, args, urlPrefix) {
             titleBarStyle: 'hidden-inset',
             fullscreenable: true,
             fullscreen: args.fullscreen,
-            icon: getLinuxIcon(),
             kiosk: args.kiosk,
             resizable: !args.transparent,
             transparent: args.transparent,
