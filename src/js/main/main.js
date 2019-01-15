@@ -7,7 +7,7 @@
 global.shellStartTime = Date.now();
 
 const electron = require('electron');
-const {app, BrowserWindow, Menu} = electron;
+const {app, BrowserWindow, Menu, MenuItem} = electron;
 
 const path = require('path');
 const fsExtra = require('fs-extra');
@@ -109,151 +109,23 @@ app.on('ready', function()
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow = null;
 
-if(!args.menu) 
-{
-  menu = Menu.buildFromTemplate([]);
-  Menu.setApplicationMenu(menu);
-} else 
-{
- var template = 
- [
-  {
-    label: 'Edit',
-    submenu: [
-      {
-        label: 'Undo',
-        accelerator: 'CmdOrCtrl+Z',
-        role: 'undo'
-      },
-      {
-        label: 'Redo',
-        accelerator: 'Shift+CmdOrCtrl+Z',
-        role: 'redo'
-      },
-      {
-        type: 'separator'
-      },
-      {
-        label: 'Cut',
-        accelerator: 'CmdOrCtrl+X',
-        role: 'cut'
-      },
-      {
-        label: 'Copy',
-        accelerator: 'CmdOrCtrl+C',
-        role: 'copy'
-      },
-      {
-        label: 'Paste',
-        accelerator: 'CmdOrCtrl+V',
-        role: 'paste'
-      },
-      {
-        label: 'Select All',
-        accelerator: 'CmdOrCtrl+A',
-        role: 'selectall'
-      },
-    ]
-  },
-  {
-    label: 'View',
-    submenu: [
-      {
-        label: 'Reload',
-        accelerator: 'CmdOrCtrl+R',
-        click: function(item, focusedWindow) {
-          if (focusedWindow)
-            focusedWindow.reload();
-        }
-      },
-      {
-        label: 'Toggle Full Screen',
-        accelerator: (function() {
-          if (process.platform == 'darwin')
-            return 'Ctrl+Command+F';
-          else
-            return 'F11';
-        })(),
-        click: function(item, focusedWindow) {
-          if (focusedWindow)
-            focusedWindow.setFullScreen(!focusedWindow.isFullScreen());
-        }
-      },
-      {
-        label: 'Toggle Developer Tools',
-        accelerator: (function() {
-          if (process.platform == 'darwin')
-            return 'Alt+Command+I';
-          else
-            return 'Ctrl+Shift+I';
-        })(),
-        click: function(item, focusedWindow) {
-          if (focusedWindow)
-            focusedWindow.toggleDevTools();
-        }
-      },
-    ]
-  },
-  {
-    label: 'Window',
-    role: 'window',
-    submenu: [
-      {
-        label: 'Minimize',
-        accelerator: 'CmdOrCtrl+M',
-        role: 'minimize'
-      },
-      {
-        label: 'GoBack',
-        click: function(item, focusedWindow) {
-//      console.log(focusedWindow);
-          if (focusedWindow) { // .webContents.canGoBack()
-            focusedWindow.webContents.goBack();
-          }
-        }
-      },
-//      {
-//        label: 'Index',
-//        click: function(item, focusedWindow) {
-////      console.log(focusedWindow);
-//          if (focusedWindow) {
-//            focusedWindow.loadURL(`kiosk://home`);
-//          }
-//        }
-//      },
-//      {
-//        label: 'Learn More',
-//        click: function(item, focusedWindow) {
-//          if (focusedWindow) {
-//           focusedWindow.loadURL(`https://github.com/hilbert/hilbert-docker-images/`);
-//        // require('shell').openExternal('https://github.com/hilbert/hilbert-docker-images/tree/devel/images/kiosk') ;
-//           }
-//        }
-//      },
-    ]
-  },
-  {
-        label: 'Close',
-        accelerator: 'CmdOrCtrl+W',
-        role: 'close'
-  },
-  {
-        label: 'Quit',
-        accelerator: 'CmdOrCtrl+Q',
-        role: 'quit'
-  },
- ];
-  var menu = Menu.getApplicationMenu();
-
-  if( menu ) {
-    Menu.buildFromTemplate(template).items.forEach((val, index) => {
-      // console.log(`${index}: ${val}`);
-      menu.append(val);
-    });
-  } else { menu = Menu.buildFromTemplate(template); }
-
-  Menu.setApplicationMenu(menu);
-};
+if (args.menu) {
+    // add some entries to the default menu
+    const menu = Menu.getApplicationMenu();
+    const windowMenu = menu.items.find(item => item.role === 'window').submenu;
+    windowMenu.insert(0, new MenuItem({
+        label: 'Go forward one page',
+        click: (menuItem, window) => window.webContents.goForward()
+    }));
+    windowMenu.insert(0, new MenuItem({
+        label: 'Go back one page',
+        click: (menuItem, window) => window.webContents.goBack()
+    }));
+    Menu.setApplicationMenu(menu);
+} else {
+    // remove the menu entirely (does nothing on macOS)
+    Menu.setApplicationMenu(null);
+}
 
 process.on('SIGUSR1', () => mainWindow.webContents.toggleDevTools() );
 
