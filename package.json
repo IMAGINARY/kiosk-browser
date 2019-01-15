@@ -50,7 +50,6 @@
     "appId": "org.imaginary.kiosk",
     "npmRebuild": false,
     "linux": {
-      "icon": "build/256x256.png",
       "executableName": "kiosk-browser",
       "target": [
         "deb",
@@ -74,14 +73,8 @@
     "files": [
       "package.json",
       "src/**/*",
+      "build/48x48.png",
       "!**/.DS_Store"
-    ],
-    "extraResources": [
-      {
-        "from": "build",
-        "to": ".",
-        "filter": "**/256x256.png"
-      }
     ]
   },
   "yargs": {

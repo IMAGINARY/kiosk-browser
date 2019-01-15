@@ -74,6 +74,8 @@ function appReady(settings, args, urlPrefix) {
             webPreferences: webprefs,
             acceptFirstMouse: true,
         };
+        if (process.platform === 'linux')
+            options.icon = path.resolve(__dirname, '../../../build/48x48.png');
 
         mainWindow = new BrowserWindow(options);
 
