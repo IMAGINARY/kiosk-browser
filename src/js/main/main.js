@@ -13,43 +13,8 @@ const app = electron.app;
 
 const path = require('path');
 const fsExtra = require('fs-extra');
-const settings = require('electron-settings');
-const settingsPath = app.getPath('userData');
 const logging = require(path.join(__dirname,"logging.js"));
 const logger = logging.logger;
-
-// ensure that the directory for the settings actually exists
-// otherwise, electron-settings may fail if used before the 'ready' event
-fsExtra.ensureDirSync(settingsPath);
-
-// write defautl settings to Settings only file if it is empty
-const defaultSettings = require(path.join(__dirname,"../../json/defaults.json"));
-if(Object.keys(settings.getAll()).length==0)
-    settings.setAll(defaultSettings,{ prettify: true });
-
-// like get() function, but with automatic fallback to defaults
-settings.getWithDefault = function(keyPath) {
-    if(this.has(keyPath)) {
-        // return value from the Settings
-        return this.get(keyPath);
-    } else {
-        // return value from the defaults
-        var obj = defaultSettings;
-        const keys = keyPath.split(/\./);
-
-        for(let i = 0, len = keys.length; i < len; i++) {
-            const key = keys[i];
-
-            if(Object.prototype.hasOwnProperty.call(obj, key)) {
-                obj = obj[key];
-            } else {
-                return undefined;
-            }
-        }
-
-        return obj;
-    }
-}
 
 function getLinuxIcon() {
     if(process.mainModule.filename.indexOf('app.asar') === -1)
@@ -58,22 +23,8 @@ function getLinuxIcon() {
         return path.resolve(__dirname, '..', '48x48.png');
 }
 
-const cmdLineDefauls = {
-    'verbose': settings.getWithDefault('verbose'),
-    'dev': settings.getWithDefault('devTools'),
-    'port': settings.getWithDefault('remoteDebuggingPort'),
-    'menu': settings.getWithDefault('menu'),
-    'kiosk': settings.getWithDefault('kiosk'),
-    'always-on-top': settings.getWithDefault('alwaysOnTop'),
-    'fullscreen': settings.getWithDefault('fullscreen'),
-    'integration': settings.getWithDefault('integration'),
-    'localhost': settings.getWithDefault('localhost'),
-    'zoom': settings.getWithDefault('zoom'),
-    'transparent': settings.getWithDefault('transparent'),
-    'retry': settings.getWithDefault('retryTimeout'),
-    'append-chrome-switch': [],
-    'append-chrome-argument': [],
-};
+const settings = require(path.join(__dirname,"settings.js"));
+const convertToCmdLineFormat = require(path.join(__dirname,"settingsConverter.js"));
 const cmdLineOptions = require(path.join(__dirname, 'cmdLine.js'));
 
 const yargs = require('yargs');
@@ -91,7 +42,7 @@ const yargsOptions = yargs
     .version(false)
     .strict()
     .fail(onYargsFailure)
-    .options(cmdLineOptions.getOptions(cmdLineDefauls));
+    .options(cmdLineOptions.getOptions(convertToCmdLineFormat(settings)));
 
 var args;
 try {
@@ -127,8 +78,7 @@ if(args.version){
 };
 
 const httpServer = require(path.join(__dirname,'httpServer.js'));
-const htmlPath = args.serve ? typeof settings.getWithDefault("serve") === "undefined" : args.serve;
-const urlPrefixPromise = typeof htmlPath === "undefined" ? Promise.resolve("") : httpServer.initHttpServer(args.serve);
+const urlPrefixPromise = typeof args.serve === "undefined" ? Promise.resolve("") : httpServer.initHttpServer(args.serve);
 
 if (args.port)
     args['append-chrome-switch'].push({key: 'remote-debugging-port', value: args.port});
@@ -443,7 +393,7 @@ function _max(a, b){ if(a >= b) return (a); else return (b); }
    if(args.dev){ mainWindow.openDevTools(); } // --remote-debugging-port=8315
 
    // and load some URL?!
-   const partialUrl = (args._.length > 0)? args._[0] : (args.url ? args.url : (args.serve ? 'index.html' : settings.getWithDefault('home')));
+   const partialUrl = (args._.length > 0)? args._[0] : (args.url ? args.url : (args.serve ? 'index.html' : settings.home));
    const parseUrl = require('url').parse;
    const parsedPartialUrl = parseUrl(partialUrl);
    logger.debug('%o', parsedPartialUrl);

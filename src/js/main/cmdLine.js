@@ -13,8 +13,9 @@ function coercePort(port, defaultPort) {
     }
 }
 
-function coerceServe(path) {
-    console.log('coerceServe called');
+function coerceServe(path, defaultPath) {
+    if(path === undefined)
+        path = defaultPath;
 
     let isDir;
     try {
@@ -77,7 +78,7 @@ const options = {
         description: 'Specify remote debugging port',
         coerceFunc: coercePort,
         coerce: port => coercePort(port, 9222),
-        setDefault: (option, defaultPort) => option.coerce = port => option.coerceFunc(port, defaultPort),
+        setDefault: (option, defaultValue) => option.coerce = value => option.coerceFunc(value, defaultValue),
     },
     'menu': {
         alias: 'm',
@@ -124,7 +125,8 @@ const options = {
         type: 'string',
         description: 'Open URL relative to this path served via built-in HTTP server.',
         requiresArg: true,
-        coerce: coerceServe,
+        coerceFunc: coerceServe,
+        setDefault: (option, defaultValue) => option.coerce = value => option.coerceFunc(value, defaultValue),
     },
     'transparent': {
         alias: 't',
@@ -143,11 +145,13 @@ const options = {
         type: 'string',
         description: 'Append switch to internal Chrome browser switches',
         coerce: coerceAppendChromeSwitch,
+        default: []
     },
     'append-chrome-argument': {
         type: 'string',
         description: 'Append positional argument to internal Chrome browser argument',
         coerce: coerceAppendChromeArgument,
+        default: []
     },
 };
 
