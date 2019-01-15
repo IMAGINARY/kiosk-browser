@@ -80,9 +80,6 @@ if (args.localhost)
 const applyChromiumCmdLine = require(path.join(__dirname,'applyChromiumCmdLine.js'));
 applyChromiumCmdLine(args['use-minimal-chrome-cli'],args['append-chrome-switch'],args['append-chrome-argument']);
 
-// var crashReporter = require('crash-reporter');
-// crashReporter.start(); // Report crashes to our server: productName: 'Kiosk', companyName: 'IMAGINARY'???
-
 function logAndExit(title,error) {
     logger.error('%s: %O', title, error);
 
