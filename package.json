@@ -23,8 +23,7 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "electron": "~4.0.1",
-    "electron-builder": "^20.38.2",
-    "electron-rebuild": "^1.8.2"
+    "electron-builder": "^20.38.2"
   },
   "dependencies": {
     "electron-settings": "^3.1.4",
@@ -42,9 +41,8 @@
   "scripts": {
     "postinstall": "electron-builder install-app-deps",
     "start": "electron .",
-    "rebuild": "electron-rebuild",
-    "pack": "electron-rebuild && CSC_IDENTITY_AUTO_DISCOVERY=false build --x64 --dir",
-    "dist": "electron-rebuild && CSC_IDENTITY_AUTO_DISCOVERY=false build --x64"
+    "pack": "CSC_IDENTITY_AUTO_DISCOVERY=false build --x64 --dir",
+    "dist": "CSC_IDENTITY_AUTO_DISCOVERY=false build --x64"
   },
   "build": {
     "appId": "org.imaginary.kiosk",
