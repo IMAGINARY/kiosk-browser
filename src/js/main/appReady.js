@@ -36,12 +36,7 @@ function appReady(settings, args, urlPrefix) {
 
     {
         const webprefs = {
-            javascript: true,
-            images: true,
-            webaudio: true,
             plugins: true,
-            webgl: true,
-            java: true,
             webSecurity: false,
             experimentalFeatures: true,
             allowRunningInsecureContent: true,
