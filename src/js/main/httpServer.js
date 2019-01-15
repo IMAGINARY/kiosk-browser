@@ -14,7 +14,7 @@ let server;
  * @param wwwRootDir The directory that will be served via HTTP.
  * @returns {Promise<string | never>} A promise that resolves to the URL of the server (typically http://localhost:port).
  */
-function initHttpServer(wwwRootDir) {
+function init(wwwRootDir) {
     return portfinder.getPortPromise()
         .then(port => {
             // `port` is guaranteed to be a free port in this scope.
@@ -45,4 +45,4 @@ function initHttpServer(wwwRootDir) {
         });
 }
 
-module.exports = {initHttpServer: initHttpServer};
+module.exports = {init: init};

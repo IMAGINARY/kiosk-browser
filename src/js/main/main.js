@@ -69,7 +69,7 @@ if(args.version){
 };
 
 const httpServer = require(path.join(__dirname,'httpServer.js'));
-const urlPrefixPromise = typeof args.serve === "undefined" ? Promise.resolve("") : httpServer.initHttpServer(args.serve);
+const urlPrefixPromise = typeof args.serve === "undefined" ? Promise.resolve("") : httpServer.init(args.serve);
 
 if (args.port)
     args['append-chrome-switch'].push({key: 'remote-debugging-port', value: args.port});
