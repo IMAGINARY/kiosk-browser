@@ -72,24 +72,9 @@
       ]
     },
     "files": [
-      "main.js",
-      "defaults.json",
-      "index.html",
-      "testapp.html",
-      "prototype.min.js",
-      "arrow.png",
-      "Center.mp3",
-      "Left.mp3",
-      "Right.mp3",
-      "!yarn-error.log",
-      "!.gitignore",
-      "!yarn.lock",
-      "!hooks",
-      "!Makefile",
-      "!*.sh",
-      "!*~",
-      "!dist",
-      "!*Dockerfile"
+      "package.json",
+      "src/**/*",
+      "!**/.DS_Store"
     ],
     "extraResources": [
       {
