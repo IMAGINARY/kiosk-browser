@@ -1,4 +1,5 @@
 const path = require('path');
+const {app, BrowserWindow, Menu, MenuItem} = require('electron');
 
 const {logger} = require(path.join(__dirname, 'logging.js'));
 
@@ -6,26 +7,28 @@ const {logger} = require(path.join(__dirname, 'logging.js'));
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 
-function appReady(settings, args, urlPrefix) {
-    const {app, BrowserWindow, Menu, MenuItem, screen} = require('electron');
-
-    if (args.menu) {
-        // add some entries to the default menu
-        const menu = Menu.getApplicationMenu();
-        const windowMenu = menu.items.find(item => item.role === 'window').submenu;
-        windowMenu.insert(0, new MenuItem({
-            label: 'Go forward one page',
-            click: (menuItem, window) => window.webContents.goForward()
-        }));
-        windowMenu.insert(0, new MenuItem({
-            label: 'Go back one page',
-            click: (menuItem, window) => window.webContents.goBack()
-        }));
-        Menu.setApplicationMenu(menu);
-    } else {
-        // remove the menu entirely (does nothing on macOS)
-        Menu.setApplicationMenu(null);
+function extendMenu(menu) {
+    // add some entries to the supplied menu
+    let windowMenuItem = menu.items.find(item => item.role === 'window');
+    if (windowMenuItem === undefined) {
+        windowMenuItem = new MenuItem({role: 'window', submenu: new Menu()});
+        menu.append(windowMenuItem);
     }
+    const windowSubmenu = windowMenuItem.submenu;
+    windowSubmenu.insert(0, new MenuItem({
+        label: 'Go forward one page',
+        click: (menuItem, window) => window.webContents.goForward()
+    }));
+    windowSubmenu.insert(0, new MenuItem({
+        label: 'Go back one page',
+        click: (menuItem, window) => window.webContents.goBack()
+    }));
+    return menu;
+}
+
+function appReady(settings, args, urlPrefix) {
+    // either disable default menu (noop on macOS) or set custom menu (based on default)
+    Menu.setApplicationMenu(args.menu ? extendMenu(Menu.getApplicationMenu()) : null);
 
     {
         const webprefs = {
@@ -39,6 +42,8 @@ function appReady(settings, args, urlPrefix) {
 
         if (args.preload)
             webprefs.preload = path.resolve(args.preload);
+
+        const {screen} = require('electron');
 
         const size = screen.getPrimaryDisplay().bounds;
 
