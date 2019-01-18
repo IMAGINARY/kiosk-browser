@@ -96,6 +96,9 @@ function appReady(settings, args, urlPrefix) {
 
     mainWindow = new BrowserWindow(options);
 
+    // open the developers now if requested or toggle them when SIGUSR1 is received
+    if (args.dev)
+        mainWindow.openDevTools();
     process.on('SIGUSR1', () => mainWindow.webContents.toggleDevTools());
 
     mainWindow.webContents.on('new-window', event => event.preventDefault());
@@ -146,11 +149,6 @@ function appReady(settings, args, urlPrefix) {
             }
         });
     });
-
-    // Open the DevTools?
-    if (args.dev) {
-        mainWindow.openDevTools();
-    } // --remote-debugging-port=8315
 
     // and load some URL?!
     const partialUrl = (args._.length > 0) ? args._[0] : (args.url ? args.url : (args.serve ? 'index.html' : settings['home']));
