@@ -92,13 +92,6 @@ function appReady(settings, args, urlPrefix) {
 
         mainWindow.webContents.on('new-window', event => event.preventDefault());
 
-        mainWindow.on('app-command', function (e, cmd) {
-            // Navigate the window back when the user hits their mouse back button
-            if (cmd === 'browser-backward' && mainWindow.webContents.canGoBack() && (!args.kiosk)) {
-                mainWindow.webContents.goBack();
-            }
-        });
-
         // In the main process.
         mainWindow.webContents.session.on('will-download', (event, item) => {
             logger.info("Trying to Download: ");
