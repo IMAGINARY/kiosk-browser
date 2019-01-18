@@ -26,6 +26,42 @@ function extendMenu(menu) {
     return menu;
 }
 
+/***
+ * Tries to ensure that the window spans all available displays in fullscreen mode.
+ * Also works around a bug in Chrome that causes a 1px wide frame around the window when no window manager is used.
+ * @see https://bugs.chromium.org/p/chromium/issues/detail?id=478133
+ * @param window
+ */
+function fixFullscreenMode(window) {
+    const {screen} = require('electron');
+
+    const size = screen.getPrimaryDisplay().bounds;
+
+    let _x = size.x;
+    let _y = size.y;
+    let _r = _x + size.width;
+    let _b = _y + size.height;
+    const displays = screen.getAllDisplays();
+    for (let d in displays) {
+        const _d = displays[d].bounds;
+
+        _x = Math.min(_x, _d.x);
+        _y = Math.min(_y, _d.y);
+        _r = Math.max(_r, _d.x + _d.width);
+        _b = Math.max(_b, _d.y + _d.height);
+    }
+
+    logger.debug('MAX SCREEN: (' + _x + ' , ' + _y + ') - (' + _r + ' , ' + _b + ')!');
+
+    window.setMinimumSize(_r - _x, _b - _y);
+    window.setMinimumSize(_r - _x, _b - _y);
+    window.setContentSize(_r - _x, _b - _y);
+
+    window.setFullScreen(true);
+
+    window.maximize();
+}
+
 function appReady(settings, args, urlPrefix) {
     // either disable default menu (noop on macOS) or set custom menu (based on default)
     Menu.setApplicationMenu(args.menu && !args.kiosk ? extendMenu(Menu.getApplicationMenu()) : null);
@@ -43,31 +79,8 @@ function appReady(settings, args, urlPrefix) {
         if (args.preload)
             webprefs.preload = path.resolve(args.preload);
 
-        const {screen} = require('electron');
-
-        const size = screen.getPrimaryDisplay().bounds;
-
-        // NOTE: span all enabled displays:
-        let _x = size.x;
-        let _y = size.y;
-        let _r = _x + size.width;
-        let _b = _y + size.height;
-        const displays = screen.getAllDisplays();
-        let _d;
-        for (let d in displays) {
-            _d = displays[d].bounds;
-
-            _x = Math.min(_x, _d.x);
-            _y = Math.min(_y, _d.y);
-            _r = Math.max(_r, _d.x + _d.width);
-            _b = Math.max(_b, _d.y + _d.height);
-        }
-
-        logger.debug('MAX SCREEN: (' + _x + ' , ' + _y + ') - (' + _r + ' , ' + _b + ')!');
-
         const options = {
             show: false,
-            x: _x, y: _y, width: _r - _x, height: _b - _y,
             frame: !args.transparent,
             titleBarStyle: 'hidden-inset',
             fullscreenable: true,
@@ -86,11 +99,6 @@ function appReady(settings, args, urlPrefix) {
 
         process.on('SIGUSR1', () => mainWindow.webContents.toggleDevTools());
 
-        if (args.fullscreen) {
-            mainWindow.setMinimumSize(_r - _x, _b - _y);
-            mainWindow.setContentSize(_r - _x, _b - _y);
-        }
-
         mainWindow.webContents.on('new-window', event => event.preventDefault());
 
         // In the main process.
@@ -103,17 +111,13 @@ function appReady(settings, args, urlPrefix) {
         });
 
         mainWindow.once('ready-to-show', () => {
-            if (args.fullscreen) {
-                mainWindow.maximize();
-            }
+            if (args.fullscreen)
+                fixFullscreenMode(mainWindow);
             mainWindow.show();
             mainWindow.focus();
         });
 
-        mainWindow.webContents.on('did-finish-load', () => {
-            mainWindow.webContents.setZoomFactor(args.zoom);
-            mainWindow.setFullScreen(args.fullscreen);
-        });
+        mainWindow.webContents.on('did-finish-load', () => mainWindow.webContents.setZoomFactor(args.zoom));
 
         // retry loading the page if it failed
         mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
@@ -139,8 +143,6 @@ function appReady(settings, args, urlPrefix) {
                 }
             });
         });
-
-        mainWindow.setFullScreen(args.fullscreen);
 
         // Open the DevTools?
         if (args.dev) {
