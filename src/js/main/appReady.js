@@ -28,7 +28,7 @@ function extendMenu(menu) {
 
 function appReady(settings, args, urlPrefix) {
     // either disable default menu (noop on macOS) or set custom menu (based on default)
-    Menu.setApplicationMenu(args.menu ? extendMenu(Menu.getApplicationMenu()) : null);
+    Menu.setApplicationMenu(args.menu && !args.kiosk ? extendMenu(Menu.getApplicationMenu()) : null);
 
     {
         const webprefs = {
@@ -85,10 +85,6 @@ function appReady(settings, args, urlPrefix) {
         mainWindow = new BrowserWindow(options);
 
         process.on('SIGUSR1', () => mainWindow.webContents.toggleDevTools());
-
-        if ((!args.menu) || args.kiosk) {
-            mainWindow.setMenu(null);
-        }
 
         if (args.fullscreen) {
             mainWindow.setMinimumSize(_r - _x, _b - _y);
