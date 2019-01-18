@@ -117,6 +117,10 @@ function appReady(settings, args, urlPrefix) {
             mainWindow.focus();
         });
 
+        /***
+         * Work around a Chrome bug that caches previously used zoom factors on a per page basis
+         * @see https://github.com/electron/electron/issues/10572
+         */
         mainWindow.webContents.on('did-finish-load', () => mainWindow.webContents.setZoomFactor(args.zoom));
 
         // retry loading the page if it failed
