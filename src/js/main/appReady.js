@@ -103,13 +103,9 @@ function appReady(settings, args, urlPrefix) {
 
     mainWindow.webContents.on('new-window', event => event.preventDefault());
 
-    // In the main process.
     mainWindow.webContents.session.on('will-download', (event, item) => {
-        logger.info("Trying to Download: ");
-        logger.info(item.getFilename());
-        logger.info(item.getMimeType());
-        logger.info(item.getTotalBytes());
-        item.cancel(); // Nope... this is a kiosk!
+        logger.info('Preventing download of %s (%s, %i Bytes)', item.getURL(), item.getMimeType(), item.getTotalBytes());
+        event.preventDefault();
     });
 
     mainWindow.once('ready-to-show', () => {
