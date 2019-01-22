@@ -62,6 +62,19 @@ function fixFullscreenMode(window) {
     window.maximize();
 }
 
+function handleFailedLoad(mainWindow, errorCode, errorDescription, validatedUrl, retry) {
+    const ignoredErrorCodes = [-3, 0];
+    if (!ignoredErrorCodes.includes(errorCode)) {
+        const errorPageUrl = new URL('file://' + path.join(__dirname, '/../..', 'html/error.html'));
+        errorPageUrl.searchParams.set('errorCode', errorCode);
+        errorPageUrl.searchParams.set('errorDescription', errorDescription);
+        errorPageUrl.searchParams.set('validatedUrl', validatedUrl);
+        errorPageUrl.searchParams.set('retry', retry);
+        logger.warn("Unable to load %s (Error %i: %s)", validatedUrl, errorCode, errorDescription);
+        mainWindow.loadURL(errorPageUrl.href);
+    }
+}
+
 function appReady(settings, args, urlPrefix) {
     // either disable default menu (noop on macOS) or set custom menu (based on default)
     Menu.setApplicationMenu(args.menu && !args.kiosk ? extendMenu(Menu.getApplicationMenu()) : null);
@@ -121,30 +134,10 @@ function appReady(settings, args, urlPrefix) {
      */
     mainWindow.webContents.on('did-finish-load', () => mainWindow.webContents.setZoomFactor(args.zoom));
 
-    // retry loading the page if it failed
-    mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
-        if (errorCode === -3 || errorCode === 0)
-            return;
-
-        logger.warn(`Loading ${validatedURL} failed with Error ${errorCode}: ${errorDescription}`);
-        let errorMsgDiv = `
-            <div style="position:absolute;top:0;left:0;width: 100%;color: white;background-color: black;">
-                Error ${errorCode}: ${errorDescription}<br />
-                URL: ${validatedURL}<br />
-        `;
-
-        if (args.retry > 0)
-            errorMsgDiv += `Reloading in ${args.retry}s`;
-
-        errorMsgDiv += `</div>`;
-
-        mainWindow.webContents.once('dom-ready', () => {
-            mainWindow.webContents.executeJavaScript(`document.body.innerHTML += ${JSON.stringify(errorMsgDiv)};`);
-            if (args.retry > 0) {
-                mainWindow.webContents.executeJavaScript(`setTimeout(()=>window.location.reload(),${args.retry * 1000});`);
-            }
-        });
-    });
+    /***
+     * Display error on failed page loads and reload the page after a certain delay if requested.
+     */
+    mainWindow.webContents.on('did-fail-load', (e, code, desc, url) => handleFailedLoad(mainWindow, code, desc, url, args.retry));
 
     // and load some URL?!
     const partialUrl = (args._.length > 0) ? args._[0] : (args.url ? args.url : (args.serve ? 'index.html' : settings['home']));
