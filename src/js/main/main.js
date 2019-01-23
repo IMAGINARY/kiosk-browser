@@ -8,6 +8,7 @@ global.shellStartTime = Date.now();
 
 const {app} = require('electron');
 
+const {pathToFileURL} = require('url');
 const path = require('path');
 const fsExtra = require('fs-extra');
 const logging = require(path.join(__dirname,"logging.js"));
@@ -16,9 +17,26 @@ const logger = logging.logger;
 const settings = require(path.join(__dirname,"settings.js"));
 const convertToCmdLineFormat = require(path.join(__dirname,"settingsConverter.js"));
 const cmdLineOptions = require(path.join(__dirname, 'cmdLine.js'));
+const httpServer = require(path.join(__dirname,'httpServer.js'));
 const appReady = require(path.join(__dirname, 'appReady.js'));
 
 const yargs = require('yargs');
+
+function isKioskUrl(url) {
+    return /^kiosk:\/\//.test(url);
+}
+
+function resolveKioskUrl(kioskUrl) {
+    const url = new URL(kioskUrl);
+    const kioskUrls = {
+        home: 'index.html',
+        testapp: 'testapp.html'
+    };
+    if (kioskUrls[url.hostname])
+        return pathToFileURL(path.join(__dirname, '../../html/', kioskUrls[url.hostname])).href;
+    else
+        throw new Error(`Unknown kiosk:// url: ${url}`)
+}
 
 function onYargsFailure(msg, err) {
     yargs.showHelp();
@@ -26,6 +44,7 @@ function onYargsFailure(msg, err) {
     throw(err ? err : new Error("CLI option parsing failed"));
 }
 
+// TODO: describe positional argument
 const yargsOptions = yargs
     .usage('Kiosk Web Browser\n    Usage: $0 [options] [url]')
     .wrap(yargs.terminalWidth())
@@ -68,9 +87,6 @@ if(args.version){
     return;
 };
 
-const httpServer = require(path.join(__dirname,'httpServer.js'));
-const urlPrefixPromise = typeof args.serve === "undefined" ? Promise.resolve("") : httpServer.init(args.serve);
-
 if (args.port)
     args['append-chrome-switch'].push({key: 'remote-debugging-port', value: args.port});
 
@@ -91,5 +107,25 @@ function logAndExit(title,error) {
 // Quit when all windows are closed.
 app.on('window-all-closed', () => app.quit());
 
+// If there are no positional arguments, use one of the default URLs
+let url = (args._.length > 0) ? args._[0] : (args.serve ? 'index.html' : settings['home']);
+
+// If a kiosk:// URL is given, resolve it to the actual URL and add node integration
+if (isKioskUrl(url)) {
+    url = resolveKioskUrl(url);
+    args.integration = args.i = true;
+}
+
+// Run the built-in server if requested and, if the current URL is without protocol, interpret it as a URL relative to
+// the server root
+let urlReady = (args.serve ? httpServer.init(args.serve) : Promise.resolve(''))
+    .then(prefix => !/^[A-Za-z]+:\/\//.test(url) ? prefix + url : url);
+
 // Delay further execution until electron and the built-in HTTP server are initialized
-app.whenReady().then(() => urlPrefixPromise).then(urlPrefix => appReady(settings, args, urlPrefix));
+app.whenReady().then(() =>
+    urlReady.then(url => {
+        args.url = args.l = url;
+        logger.info('URL after preprocessing: %s', url);
+        appReady(args);
+    })
+);

@@ -77,7 +77,7 @@ function handleFailedLoad(mainWindow, errorCode, errorDescription, validatedUrl,
     }
 }
 
-function appReady(settings, args, urlPrefix) {
+function appReady(args) {
     // either disable default menu (noop on macOS) or set custom menu (based on default)
     Menu.setApplicationMenu(args.menu && !args.kiosk ? extendMenu(Menu.getApplicationMenu()) : null);
 
@@ -154,30 +154,10 @@ function appReady(settings, args, urlPrefix) {
      */
     mainWindow.webContents.on('did-fail-load', (e, code, desc, url) => handleFailedLoad(mainWindow, code, desc, url, args.retry));
 
-    // and load some URL?!
-    const partialUrl = (args._.length > 0) ? args._[0] : (args.serve ? 'index.html' : settings['home']);
-    const parseUrl = require('url').parse;
-    const parsedPartialUrl = parseUrl(partialUrl);
-    logger.debug('%o', parsedPartialUrl);
-    if (parsedPartialUrl.protocol === "kiosk:") {
-        switch (parsedPartialUrl.hostname) {
-            case 'home':
-                mainWindow.loadURL('file://' + path.normalize(`${__dirname}/../../html/index.html`));
-                break;
-            case 'testapp':
-                mainWindow.loadURL('file://' + path.normalize(`${__dirname}/../../html/testapp.html`));
-                break;
-            default:
-                logger.error(`Unknown kiosk:// url: ${partialUrl}`);
-                app.exit(-1);
-        }
-    } else {
-        const fullUrl = parsedPartialUrl.protocol === null ? (args.serve ? urlPrefix + partialUrl : `file://${path.resolve(partialUrl)}`) : partialUrl;
-        logger.debug(`urlPrefix: ${urlPrefix}`);
-        logger.debug(`partialUrl: ${partialUrl}`);
-        logger.debug(`Loading ${fullUrl}`);
-        mainWindow.loadURL(fullUrl);
-    }
+    /***
+     * Load the page into the main window
+     */
+    mainWindow.loadURL(args.url);
 
     return mainWindow;
 }
