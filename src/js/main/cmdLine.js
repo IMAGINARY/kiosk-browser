@@ -114,12 +114,6 @@ const options = {
         type: 'number',
         description: 'Set zoom factor',
     },
-    'url': {
-        alias: 'l',
-        type: 'string',
-        description: 'URL to load',
-        requiresArg: true,
-    },
     'serve': {
         alias: 's',
         type: 'string',

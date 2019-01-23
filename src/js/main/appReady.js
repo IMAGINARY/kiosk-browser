@@ -155,7 +155,7 @@ function appReady(settings, args, urlPrefix) {
     mainWindow.webContents.on('did-fail-load', (e, code, desc, url) => handleFailedLoad(mainWindow, code, desc, url, args.retry));
 
     // and load some URL?!
-    const partialUrl = (args._.length > 0) ? args._[0] : (args.url ? args.url : (args.serve ? 'index.html' : settings['home']));
+    const partialUrl = (args._.length > 0) ? args._[0] : (args.serve ? 'index.html' : settings['home']);
     const parseUrl = require('url').parse;
     const parsedPartialUrl = parseUrl(partialUrl);
     logger.debug('%o', parsedPartialUrl);
