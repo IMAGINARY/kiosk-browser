@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 const {app, BrowserWindow, Menu, MenuItem} = require('electron');
 
@@ -95,7 +96,7 @@ function appReady(settings, args, urlPrefix) {
     const options = {
         show: false,
         frame: !args.transparent,
-        titleBarStyle: 'hidden-inset',
+        titleBarStyle: 'hidden',
         fullscreenWindowTitle: true,
         fullscreenable: true,
         kiosk: args.kiosk,
@@ -140,6 +141,13 @@ function appReady(settings, args, urlPrefix) {
      * @see https://github.com/electron/electron/issues/10572
      */
     mainWindow.webContents.on('did-finish-load', () => mainWindow.webContents.setZoomFactor(args.zoom));
+
+    /***
+     * Add a handle for dragging the frameless window.
+     */
+    const appRegionOverlayCss = fs.readFileSync(path.join(__dirname, '../../css/app-region-overlay.css'), 'utf8');
+    mainWindow.webContents.on('did-finish-load', () => mainWindow.webContents.insertCSS(appRegionOverlayCss));
+
 
     /***
      * Display error on failed page loads and reload the page after a certain delay if requested.

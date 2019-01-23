@@ -1,0 +1,15 @@
+/***
+ * This will create an invisible overlay at the top of the window that acts as a handle to move the window.
+ * It is necessary since frameless windows are not draggable by default and we can not expect web pages running in the
+ * kiosk browser to take of that. In fullscreen mode, it seems to do nothing.
+ * TODO: check impact on Linux
+ */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 22px;
+    -webkit-app-region: drag;
+}
