@@ -10,14 +10,14 @@ const {app} = require('electron');
 
 const {pathToFileURL} = require('url');
 const path = require('path');
-const fsExtra = require('fs-extra');
-const logging = require(path.join(__dirname,"logging.js"));
+const logging = require(path.join(__dirname, "logging.js"));
 const logger = logging.logger;
 
-const settings = require(path.join(__dirname,"settings.js"));
-const convertToCmdLineFormat = require(path.join(__dirname,"settingsConverter.js"));
+const settings = require(path.join(__dirname, "settings.js"));
+const convertToCmdLineFormat = require(path.join(__dirname, "settingsConverter.js"));
 const cmdLineOptions = require(path.join(__dirname, 'cmdLine.js'));
-const httpServer = require(path.join(__dirname,'httpServer.js'));
+const applyChromiumCmdLine = require(path.join(__dirname, 'applyChromiumCmdLine.js'));
+const httpServer = require(path.join(__dirname, 'httpServer.js'));
 const appReady = require(path.join(__dirname, 'appReady.js'));
 
 const yargs = require('yargs');
@@ -93,7 +93,6 @@ if (args.port)
 if (args.localhost)
     args['append-chrome-switch'].push({key: 'host-rules', value: 'MAP * 127.0.0.1'});
 
-const applyChromiumCmdLine = require(path.join(__dirname,'applyChromiumCmdLine.js'));
 applyChromiumCmdLine(args['use-minimal-chrome-cli'],args['append-chrome-switch'],args['append-chrome-argument']);
 
 function logAndExit(title,error) {

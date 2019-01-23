@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const {app, BrowserWindow, Menu, MenuItem} = require('electron');
+const {BrowserWindow, Menu, MenuItem} = require('electron');
 
 const {logger} = require(path.join(__dirname, 'logging.js'));
 
