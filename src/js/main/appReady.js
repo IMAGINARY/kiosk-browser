@@ -31,6 +31,7 @@ function extendMenu(menu) {
  * Also works around a bug in Chrome that causes a 1px wide frame around the window when no window manager is used.
  * @see https://bugs.chromium.org/p/chromium/issues/detail?id=478133
  * @param window
+ * @todo Factor out the part the resizes the window to cover all available displays and make it configurable via the command line
  */
 function fixFullscreenMode(window) {
     const {screen} = require('electron');
@@ -96,7 +97,6 @@ function appReady(settings, args, urlPrefix) {
         frame: !args.transparent,
         titleBarStyle: 'hidden-inset',
         fullscreenable: true,
-        fullscreen: args.fullscreen,
         kiosk: args.kiosk,
         resizable: !args.transparent,
         transparent: args.transparent,
@@ -122,10 +122,16 @@ function appReady(settings, args, urlPrefix) {
     });
 
     mainWindow.once('ready-to-show', () => {
-        if (args.fullscreen)
-            fixFullscreenMode(mainWindow);
+        if (args.fullscreen) {
+            // setting this to false will also disable the fullscreen button on macOS, so better don't call it at all
+            // if args.fullscreen is false
+            mainWindow.setFullScreen(true);
+
+            // work around a fullscreen-related bug imn Chrome on Linux when no window manager is used
+            if (process.platform === 'linux')
+                fixFullscreenMode(mainWindow);
+        }
         mainWindow.show();
-        mainWindow.focus();
     });
 
     /***
