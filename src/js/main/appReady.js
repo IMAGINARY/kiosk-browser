@@ -96,6 +96,7 @@ function appReady(settings, args, urlPrefix) {
         show: false,
         frame: !args.transparent,
         titleBarStyle: 'hidden-inset',
+        fullscreenWindowTitle: true,
         fullscreenable: true,
         kiosk: args.kiosk,
         resizable: !args.transparent,
