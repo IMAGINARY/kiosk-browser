@@ -15,12 +15,9 @@
     {"key": "disable-web-security"},
     {"key": "disable-pinch"},
     {"key": "allow-file-access-from-files"},
-    {"key": "enable_hidpi"},
-    {"key": "enable-hidpi"},
     {"key": "disable-background-timer-throttling"},
     {"key": "enable-transparent-visuals"},
     {"key": "incognito"},
-    {"key": "high-dpi-support", "value": "1"},
     {"key": "set-base-background-color", "value": "0x00000000"},
     {"key": "autoplay-policy", "value": "no-user-gesture-required"}
   ],
