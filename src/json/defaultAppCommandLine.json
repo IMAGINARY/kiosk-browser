@@ -2,7 +2,6 @@
   "switches": [
     {"key": "--js-flags=--max_old_space_size=4096"},
     {"key": "ignore-gpu-blacklist"},
-    {"key": "touch-events", "value": "disabled"},
     {"key": "disable-web-security"},
     {"key": "disable-pinch"},
     {"key": "allow-file-access-from-files"},
