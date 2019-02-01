@@ -2,9 +2,7 @@
   "switches": [
     {"key": "--js-flags=--max_old_space_size=4096"},
     {"key": "ignore-gpu-blacklist"},
-    {"key": "disable-web-security"},
     {"key": "disable-pinch"},
-    {"key": "allow-file-access-from-files"},
     {"key": "disable-background-timer-throttling"},
     {"key": "incognito"},
     {"key": "autoplay-policy", "value": "no-user-gesture-required"}
