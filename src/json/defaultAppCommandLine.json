@@ -1,7 +1,6 @@
 {
   "switches": [
     {"key": "--js-flags=--max_old_space_size=4096"},
-    {"key": "javascript-harmony"},
     {"key": "ignore-gpu-blacklist"},
     {"key": "touch-events", "value": "disabled"},
     {"key": "disable-features", "value": "PassiveDocumentEventListeners,PassiveEventListenersDueToFling"},
