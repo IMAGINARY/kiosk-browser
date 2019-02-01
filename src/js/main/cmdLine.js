@@ -147,6 +147,11 @@ const options = {
         coerce: coerceAppendChromeArgument,
         default: []
     },
+    'use-minimal-chrome-cli': {
+        type: 'boolean',
+        description: 'Don\'t append anything to the internal Chrome command line by default',
+        default: false
+    },
 };
 
 function assignDefault(option, defaultValue) {
