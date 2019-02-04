@@ -110,15 +110,16 @@ function appReady(args) {
         options.icon = path.resolve(__dirname, '../../../build/48x48.png');
 
     mainWindow = new BrowserWindow(options);
+    const webContents = mainWindow.webContents;
 
     // open the developers now if requested or toggle them when SIGUSR1 is received
     if (args.dev)
         mainWindow.openDevTools();
-    process.on('SIGUSR1', () => mainWindow.webContents.toggleDevTools());
+    process.on('SIGUSR1', () => webContents.toggleDevTools());
 
-    mainWindow.webContents.on('new-window', event => event.preventDefault());
+    webContents.on('new-window', event => event.preventDefault());
 
-    mainWindow.webContents.session.on('will-download', (event, item) => {
+    webContents.session.on('will-download', (event, item) => {
         logger.info('Preventing download of %s (%s, %i Bytes)', item.getURL(), item.getMimeType(), item.getTotalBytes());
         event.preventDefault();
     });
@@ -140,19 +141,18 @@ function appReady(args) {
      * Work around a Chrome bug that caches previously used zoom factors on a per page basis
      * @see https://github.com/electron/electron/issues/10572
      */
-    mainWindow.webContents.on('did-finish-load', () => mainWindow.webContents.setZoomFactor(args.zoom));
+    webContents.on('did-finish-load', () => webContents.setZoomFactor(args.zoom)));
 
     /***
      * Add a handle for dragging the frameless window.
      */
     const appRegionOverlayCss = fs.readFileSync(path.join(__dirname, '../../css/app-region-overlay.css'), 'utf8');
-    mainWindow.webContents.on('did-finish-load', () => mainWindow.webContents.insertCSS(appRegionOverlayCss));
-
+    webContents.on('did-finish-load', () => webContents.insertCSS(appRegionOverlayCss));
 
     /***
      * Display error on failed page loads and reload the page after a certain delay if requested.
      */
-    mainWindow.webContents.on('did-fail-load', (e, code, desc, url) => handleFailedLoad(mainWindow, code, desc, url, args.retry));
+    webContents.on('did-fail-load', (e, code, desc, url) => handleFailedLoad(mainWindow, code, desc, url, args.retry));
 
     /***
      * Load the page into the main window
