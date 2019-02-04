@@ -77,6 +77,21 @@ function handleFailedLoad(mainWindow, errorCode, errorDescription, validatedUrl,
     }
 }
 
+function computeZoomFactor(newBounds, fit, zoom) {
+    if (fit.forceZoomFactor) {
+        let zoomFactor = Number.MAX_VALUE;
+        if (fit.width !== '_') {
+            zoomFactor = Math.min(zoomFactor, newBounds.width / fit.width);
+        }
+        if (fit.height !== '_') {
+            zoomFactor = Math.min(zoomFactor, newBounds.height / fit.height);
+        }
+        return zoomFactor * zoom;
+    } else {
+        return zoom;
+    }
+}
+
 function appReady(args) {
     // either disable default menu (noop on macOS) or set custom menu (based on default)
     Menu.setApplicationMenu(args.menu && !args.kiosk ? extendMenu(Menu.getApplicationMenu()) : null);
@@ -86,7 +101,7 @@ function appReady(args) {
         webSecurity: false,
         experimentalFeatures: true,
         allowRunningInsecureContent: true,
-        zoomFactor: args.zoom,
+        zoomFactor: computeZoomFactor({width: 800, height: 600}, args.fit, args.zoom),
         nodeIntegration: args.integration,
     };
 
@@ -137,11 +152,15 @@ function appReady(args) {
         mainWindow.show();
     });
 
+    if (args.fit.forceZoomFactor)
+        mainWindow.on('resize', (event, newBounds) => webContents.setZoomFactor(computeZoomFactor(mainWindow.getContentBounds(), args.fit, args.zoom)));
+
+
     /***
      * Work around a Chrome bug that caches previously used zoom factors on a per page basis
      * @see https://github.com/electron/electron/issues/10572
      */
-    webContents.on('did-finish-load', () => webContents.setZoomFactor(args.zoom)));
+    webContents.on('did-finish-load', () => webContents.setZoomFactor(computeZoomFactor(mainWindow.getContentBounds(), args.fit, args.zoom)));
 
     /***
      * Add a handle for dragging the frameless window.

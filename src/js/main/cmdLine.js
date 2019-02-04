@@ -50,6 +50,21 @@ function coerceAppendChromeArgument(xs) {
     return typeof xs == 'string' ? [xs] : xs;
 }
 
+function coerceFit(s) {
+    const regex = /^(_|[0-9]+)x(_|[0-9]+)$/;
+    const match = s.match(regex);
+    if (match === null) {
+        throw new Error(`Invalid viewport size: ${s}`);
+    } else {
+        return {
+            width: match[1] === '_' ? '_' : parseInt(match[1]),
+            height: match[2] === '_' ? '_' : parseInt(match[2]),
+            get forceZoomFactor() {
+                return match[1] !== '_' || match[2] !== '_'
+            }
+        };
+    }
+}
 
 const options = {
     'help': {
@@ -151,6 +166,13 @@ const options = {
         type: 'boolean',
         description: 'Don\'t append anything to the internal Chrome command line by default',
         default: false
+    },
+    'fit': {
+        type: 'string',
+        description: 'Automatically adjust the zoom level to fit a given viewport of the page to the window size while preserving the viewports aspect ratio. Valid formats are wxh, wx_, _xh and _x_ (don\'t fit). The value supplied to --zoom acts as an additional multiplier.',
+        requiresArg: true,
+        default: '_x_',
+        coerce: coerceFit
     },
 };
 
