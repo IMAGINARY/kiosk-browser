@@ -23,7 +23,7 @@ const settingsFileContents = (() => {
         // create a new settings file with just comments based on the default settings
         const regex = /^(\s*)([^{}])/gm;
         const settingsDefaultFileContents = defaultsFileContents.replace(regex, "$1// $2");
-        fsExtra.writeFileSync(settingsFilePath, settingsFileContents, 'utf8');
+        fsExtra.writeFileSync(settingsFilePath, settingsDefaultFileContents, 'utf8');
         return settingsDefaultFileContents;
     }
 })();
