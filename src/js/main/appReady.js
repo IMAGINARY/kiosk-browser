@@ -3,6 +3,7 @@ const path = require('path');
 const {BrowserWindow, Menu, MenuItem} = require('electron');
 
 const {logger} = require(path.join(__dirname, 'logging.js'));
+const preloadModules = require(path.join(__dirname, 'preloadModules.js'));
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -118,10 +119,11 @@ function appReady(args) {
         allowRunningInsecureContent: true,
         zoomFactor: computeZoomFactor({width: 800, height: 600}, args.fit, args.zoom),
         nodeIntegration: args.integration,
+        preload: path.join(__dirname, '../renderer/preload.js')
     };
 
     if (args.preload)
-        webprefs.preload = path.resolve(args.preload);
+        preloadModules.push(path.resolve(args.preload));
 
     const options = {
         show: false,
