@@ -129,7 +129,7 @@ function appReady(args) {
         acceptFirstMouse: true,
     };
     if (process.platform === 'linux')
-        options.icon = path.resolve(__dirname, '../../../build/48x48.png');
+        options.icon = path.resolve(__dirname, '../../../build/fallbackicon.png');
 
     mainWindow = new BrowserWindow(options);
     const webContents = mainWindow.webContents;

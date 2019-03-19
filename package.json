@@ -71,7 +71,7 @@
     "files": [
       "package.json",
       "src/**/*",
-      "build/48x48.png",
+      "build/fallbackicon.png",
       "!**/.DS_Store"
     ]
   },
