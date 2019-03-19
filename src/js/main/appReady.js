@@ -64,6 +64,12 @@ function fixFullscreenMode(window) {
     window.maximize();
 }
 
+function setOverlayVisible(webContents, visible) {
+    const display = visible ? 'unset' : 'none';
+    const jsCode = `document.documentElement.style.setProperty('--kiosk-drag-handle-display', '${display}');`
+    webContents.executeJavaScript(jsCode)
+}
+
 function handleFailedLoad(mainWindow, errorCode, errorDescription, validatedUrl, retry) {
     const ignoredErrorCodes = [-3, 0];
     if (!ignoredErrorCodes.includes(errorCode)) {
@@ -95,8 +101,10 @@ function computeZoomFactor(newBounds, fit, zoom) {
 function setZoomFactor(webContents, zoomFactor) {
     zoomFactor = Math.max(0.25, Math.min(zoomFactor, 5.0));
     webContents.setZoomFactor(zoomFactor);
-    const jsCode = `document.documentElement.style.setProperty('--kiosk-zoom', ${zoomFactor});`;
-    webContents.executeJavaScript(jsCode);
+    if (process.platform === 'darwin') {
+        const jsCode = `document.documentElement.style.setProperty('--kiosk-zoom', ${zoomFactor});`;
+        webContents.executeJavaScript(jsCode);
+    }
 }
 
 function appReady(args) {
@@ -165,16 +173,27 @@ function appReady(args) {
         mainWindow.on('resize', (event, newBounds) => setZoomFactor(webContents, computeZoomFactor(mainWindow.getContentBounds(), args.fit, args.zoom)));
 
     /***
+     * Add a handle for dragging windows on macOS due to hidden title bar.
+     */
+    if (process.platform === 'darwin') {
+        const appRegionOverlayCss = fs.readFileSync(path.join(__dirname, '../../css/app-region-overlay.css'), 'utf8');
+        webContents.on('dom-ready', () => {
+            webContents.insertCSS(appRegionOverlayCss);
+            setOverlayVisible(webContents, !mainWindow.isFullScreen());
+        });
+
+        /***
+         * Hide handle in fullscreen mode.
+         */
+        mainWindow.on('enter-full-screen', () => setOverlayVisible(webContents, !mainWindow.isFullScreen()));
+        mainWindow.on('leave-full-screen', () => setOverlayVisible(webContents, !mainWindow.isFullScreen()));
+    }
+
+    /***
      * Work around a Chrome bug that caches previously used zoom factors on a per page basis
      * @see https://github.com/electron/electron/issues/10572
      */
-    webContents.on('did-finish-load', () => setZoomFactor(webContents, computeZoomFactor(mainWindow.getContentBounds(), args.fit, args.zoom)));
-
-    /***
-     * Add a handle for dragging the frameless window.
-     */
-    const appRegionOverlayCss = fs.readFileSync(path.join(__dirname, '../../css/app-region-overlay.css'), 'utf8');
-    webContents.on('did-finish-load', () => webContents.insertCSS(appRegionOverlayCss));
+    webContents.on('dom-ready', () => setZoomFactor(webContents, computeZoomFactor(mainWindow.getContentBounds(), args.fit, args.zoom)));
 
     /***
      * Display error on failed page loads and reload the page after a certain delay if requested.
