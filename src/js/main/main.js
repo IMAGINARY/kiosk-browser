@@ -4,6 +4,20 @@
 
 'use strict';
 
+// exit in case of unhandled exceptions or rejections
+function logAndExit(title, error) {
+    if (error instanceof SyntaxError) {
+        // do nothing since electron logs syntax errors to the console on its own
+    } else {
+        logger.error('%s: %O', title, error);
+    }
+
+    // unhandled exceptions should be considered fatal
+    app.exit(-1);
+}
+
+['uncaughtException', 'unhandledRejection'].forEach(e => process.on(e, error => logAndExit(e, error)));
+
 global.shellStartTime = Date.now();
 
 const {app} = require('electron');
@@ -94,14 +108,6 @@ if (args.localhost)
     args['append-chrome-switch'].push({key: 'host-rules', value: 'MAP * 127.0.0.1'});
 
 applyChromiumCmdLine(args['use-minimal-chrome-cli'],args['append-chrome-switch'],args['append-chrome-argument']);
-
-function logAndExit(title,error) {
-    logger.error('%s: %O', title, error);
-
-    // unhandled exceptions should be considered fatal
-    app.exit(-1);
-}
-['uncaughtException','unhandledRejection'].forEach(e => process.on(e,error=>logAndExit(e,error)));
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => app.quit());
