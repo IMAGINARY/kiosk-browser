@@ -66,9 +66,8 @@ function coerceFit(s) {
     }
 }
 
-function coerceDisplay(n) {
+function coerceCoverDisplay(n) {
     const parsedNum = Number.parseInt(n, 10);
-    console.log(n, typeof n, parsedNum, typeof parsedNum);
     if (Number.isNaN(parsedNum) || parsedNum < 0) {
         throw new Error(`Invalid display number: ${n}`);
     } else {
@@ -184,11 +183,11 @@ const options = {
         default: '_x_',
         coerce: coerceFit
     },
-    'display': {
+    'cover-display': {
         type: 'number',
-        description: 'Open the browser window on certain display.',
+        description: 'Let the browser window cover a certain display.',
         requiresArg: true,
-        coerce: coerceDisplay,
+        coerce: coerceCoverDisplay,
     }
 };
 

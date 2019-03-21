@@ -139,9 +139,9 @@ function appReady(args) {
         acceptFirstMouse: true,
     };
 
-    if (args.display) {
+    if (args['cover-display']) {
         const displays = require('electron').screen.getAllDisplays();
-        const display = displays[Math.min(args.display, displays.length - 1)];
+        const display = displays[Math.min(args['cover-display'], displays.length - 1)];
         options.x = display.workArea.x;
         options.y = display.workArea.y;
         options.width = display.workAreaSize.width;
