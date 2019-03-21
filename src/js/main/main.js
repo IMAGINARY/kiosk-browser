@@ -34,7 +34,13 @@ const applyChromiumCmdLine = require(path.join(__dirname, 'applyChromiumCmdLine.
 const httpServer = require(path.join(__dirname, 'httpServer.js'));
 const appReady = require(path.join(__dirname, 'appReady.js'));
 
-const yargs = require('yargs');
+const yargsParserConfig = {
+    "short-option-groups": true,
+    "camel-case-expansion": false,
+    "dot-notation": true,
+    "parse-numbers": true,
+};
+const yargs = require('yargs').parserConfiguration(yargsParserConfig);
 
 function isKioskUrl(url) {
     return /^kiosk:\/\//.test(url);
