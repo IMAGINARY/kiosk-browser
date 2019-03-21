@@ -66,6 +66,16 @@ function coerceFit(s) {
     }
 }
 
+function coerceDisplay(n) {
+    const parsedNum = Number.parseInt(n, 10);
+    console.log(n, typeof n, parsedNum, typeof parsedNum);
+    if (Number.isNaN(parsedNum) || parsedNum < 0) {
+        throw new Error(`Invalid display number: ${n}`);
+    } else {
+        return n;
+    }
+}
+
 const options = {
     'help': {
         alias: 'h',
@@ -174,6 +184,12 @@ const options = {
         default: '_x_',
         coerce: coerceFit
     },
+    'display': {
+        type: 'number',
+        description: 'Open the browser window on certain display.',
+        requiresArg: true,
+        coerce: coerceDisplay,
+    }
 };
 
 function assignDefault(option, defaultValue) {

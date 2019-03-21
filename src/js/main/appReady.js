@@ -138,6 +138,16 @@ function appReady(args) {
         webPreferences: webprefs,
         acceptFirstMouse: true,
     };
+
+    if (args.display) {
+        const displays = require('electron').screen.getAllDisplays();
+        const display = displays[Math.min(args.display, displays.length - 1)];
+        options.x = display.workArea.x;
+        options.y = display.workArea.y;
+        options.width = display.workAreaSize.width;
+        options.height = display.workAreaSize.height;
+    }
+
     if (process.platform === 'linux')
         options.icon = path.resolve(__dirname, '../../../build/fallbackicon.png');
 
