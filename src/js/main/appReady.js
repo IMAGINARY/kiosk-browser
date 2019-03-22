@@ -28,41 +28,60 @@ function extendMenu(menu) {
     return menu;
 }
 
-/***
- * Tries to ensure that the window spans all available displays in fullscreen mode.
- * Also works around a bug in Chrome that causes a 1px wide frame around the window when no window manager is used.
- * @see https://bugs.chromium.org/p/chromium/issues/detail?id=478133
- * @param window
- * @todo Factor out the part the resizes the window to cover all available displays and make it configurable via the command line
- */
-function fixFullscreenMode(window) {
+function joinRectangles(rectangles) {
+    let l = Number.POSITIVE_INFINITY;
+    let t = Number.POSITIVE_INFINITY;
+    let r = Number.NEGATIVE_INFINITY;
+    let b = Number.NEGATIVE_INFINITY;
+    for (let rect of rectangles) {
+        l = Math.min(l, rect.x);
+        t = Math.min(t, rect.y);
+        r = Math.max(r, rect.x + rect.width);
+        b = Math.max(b, rect.y + rect.height);
+    }
+    return {x: l, y: t, width: r - l, height: b - t};
+}
+
+function compareRectangles(r1, r2) {
+    return r1.x === r2.x
+        && r1.y === r2.y
+        && r1.width === r2.width
+        && r1.height === r2.height;
+}
+
+function computeDisplayCover(displayNums) {
     const {screen} = require('electron');
+    const allDisplays = screen.getAllDisplays();
 
-    const size = screen.getPrimaryDisplay().bounds;
-
-    let _x = size.x;
-    let _y = size.y;
-    let _r = _x + size.width;
-    let _b = _y + size.height;
-    const displays = screen.getAllDisplays();
-    for (let d in displays) {
-        const _d = displays[d].bounds;
-
-        _x = Math.min(_x, _d.x);
-        _y = Math.min(_y, _d.y);
-        _r = Math.max(_r, _d.x + _d.width);
-        _b = Math.max(_b, _d.y + _d.height);
+    if (!Array.isArray(displayNums) || displayNums.length === 0) {
+        displayNums = [0];
+    } else {
+        // keep only display nums that are not out of range
+        displayNums = displayNums.map(n => Math.min(n, allDisplays.length - 1));
     }
 
-    logger.debug('MAX SCREEN: (' + _x + ' , ' + _y + ') - (' + _r + ' , ' + _b + ')!');
+    if (displayNums.length > 1) {
+        for (let n = 0; n < displayNums.length; ++n) {
+            const {bounds, workArea} = allDisplays[displayNums[n]];
+            if (!compareRectangles(bounds, workArea))
+                logger.warn("Work area of display %i differs from bounds. Expect incomplete display coverage. (%o vs. %o)", n, workArea, bounds);
+        }
+    }
+    return joinRectangles(displayNums.map(n => allDisplays[n].workArea));
+}
 
-    window.setMinimumSize(_r - _x, _b - _y);
-    window.setMinimumSize(_r - _x, _b - _y);
-    window.setContentSize(_r - _x, _b - _y);
-
-    window.setFullScreen(true);
-
-    window.maximize();
+/***
+ * Fixed the windows min, max and content size to the current bounds.
+ * This works around a bug in Chrome that causes a 1px wide frame around the window in fullscreen mode
+ * when no window manager is used.
+ * @see https://bugs.chromium.org/p/chromium/issues/detail?id=478133
+ * @param window
+ */
+function fixFullscreenModeLinux(window) {
+    const bounds = window.getBounds();
+    window.setMinimumSize(bounds.width, bounds.height);
+    window.setMaximumSize(bounds.width, bounds.height);
+    window.setContentSize(bounds.width, bounds.height);
 }
 
 function setOverlayVisible(webContents, visible) {
@@ -127,7 +146,7 @@ function appReady(args) {
 
     const options = {
         show: false,
-        frame: !args.transparent,
+        frame: !(args.transparent || args['cover-displays']),
         titleBarStyle: 'hidden',
         fullscreenWindowTitle: true,
         fullscreenable: true,
@@ -138,11 +157,33 @@ function appReady(args) {
         webPreferences: webprefs,
         acceptFirstMouse: true,
     };
+
     if (process.platform === 'linux')
         options.icon = path.resolve(__dirname, '../../../build/fallbackicon.png');
 
     mainWindow = new BrowserWindow(options);
     const webContents = mainWindow.webContents;
+
+    const {adjustWindowSize, adjustWindowPosition} = (() => {
+        if (args['cover-displays']) {
+            const displayCover = computeDisplayCover(args['cover-displays']);
+            logger.debug('Trying to cover display area {}', displayCover);
+            return {
+                adjustWindowSize: () => mainWindow.setSize(displayCover.width, displayCover.height),
+                adjustWindowPosition: () => mainWindow.setPosition(displayCover.x, displayCover.y)
+            };
+        } else {
+            return {
+                adjustWindowSize: () => {
+                }, adjustWindowPosition: () => {
+                }
+            }; // NOOPS
+        }
+    })();
+
+    adjustWindowPosition();
+    if (args['cover-displays'] && args['cover-displays'].length == 1)
+        adjustWindowSize();
 
     // open the developers now if requested or toggle them when SIGUSR1 is received
     if (args.dev)
@@ -164,11 +205,20 @@ function appReady(args) {
 
             // work around a fullscreen-related bug imn Chrome on Linux when no window manager is used
             if (process.platform === 'linux')
-                fixFullscreenMode(mainWindow);
+                fixFullscreenModeLinux(mainWindow);
         }
         // also adjust the zoom of the draggable area
         setZoomFactor(webContents, webContents.getZoomFactor());
         mainWindow.show();
+    });
+
+    // On Linux, windows can span multiple displays, but it seems to only work reliably after the window has been actually shown.
+    // On other platforms, is doesn't seem to do anything bad.
+    mainWindow.once('show', () => {
+        setTimeout(() => {
+            adjustWindowSize();
+            adjustWindowPosition();
+        }, 1);
     });
 
     if (args.fit.forceZoomFactor)

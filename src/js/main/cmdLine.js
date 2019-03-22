@@ -66,6 +66,19 @@ function coerceFit(s) {
     }
 }
 
+function coerceCoverDisplays(s) {
+    const stringNums = s.split(',');
+    const nums = stringNums.map(s => Number.parseInt(s, 10));
+    for (let i = 0; i < nums.length; ++i) {
+        if (Number.isNaN(nums[i]) || nums[i] < 0) {
+            throw new Error(`Invalid display number: ${stringNums[i]}`);
+        }
+    }
+    if (nums.length > 1 && process.platform !== 'linux')
+        throw new Error(`Covering multiple display in only supported on Linux.`);
+    return nums;
+}
+
 const options = {
     'help': {
         alias: 'h',
@@ -173,6 +186,11 @@ const options = {
         requiresArg: true,
         default: '_x_',
         coerce: coerceFit
+    },
+    'cover-displays': {
+        description: 'Let the browser window cover the displays provided by comma separated display numbers. Spanning multiple displays is not supported on all platforms.',
+        requiresArg: true,
+        coerce: coerceCoverDisplays,
     },
     'inspect': {
         type: 'number',
