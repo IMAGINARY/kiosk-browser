@@ -7,7 +7,7 @@ const preloadModules = require(path.join(__dirname, 'preloadModules.js'));
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow;
+global.mainWindow = null;
 
 function extendMenu(menu) {
     // add some entries to the supplied menu
@@ -68,7 +68,7 @@ function fixFullscreenModeLinux(window) {
 
 function setOverlayVisible(webContents, visible) {
     const display = visible ? 'unset' : 'none';
-    const jsCode = `document.documentElement.style.setProperty('--kiosk-drag-handle-display', '${display}');`
+    const jsCode = `document.documentElement.style.setProperty('--kiosk-drag-handle-display', '${display}');`;
     webContents.executeJavaScript(jsCode)
 }
 

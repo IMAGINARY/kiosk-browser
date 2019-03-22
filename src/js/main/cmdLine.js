@@ -14,7 +14,7 @@ function coercePort(port, defaultPort) {
 }
 
 function coerceServe(path, defaultPath) {
-    if(path === undefined)
+    if (path === undefined)
         path = defaultPath;
 
     let isDir;
@@ -189,7 +189,12 @@ const options = {
         description: 'Let the browser window cover the displays provided by comma separated display numbers. Spanning multiple displays is not supported on all platforms.',
         requiresArg: true,
         coerce: coerceCoverDisplays,
-    }
+    },
+    'inspect': {
+        type: 'number',
+        description: 'Enable remote inspection for the main process on the given port. Connect via chrome://inspect',
+        hidden: true,
+    },
 };
 
 function assignDefault(option, defaultValue) {
