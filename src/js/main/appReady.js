@@ -128,7 +128,7 @@ function appReady(args) {
 
     const options = {
         show: false,
-        frame: !args.transparent,
+        frame: !(args.transparent || args['cover-displays']),
         titleBarStyle: 'hidden',
         fullscreenWindowTitle: true,
         fullscreenable: true,
@@ -146,11 +146,26 @@ function appReady(args) {
     mainWindow = new BrowserWindow(options);
     const webContents = mainWindow.webContents;
 
-    if (args['cover-displays']) {
-        const displayCover = computeDisplayCover(args['cover-displays']);
-        logger.debug('Trying to cover display area {}', displayCover);
-        mainWindow.setBounds(displayCover);
-    }
+    const {adjustWindowSize, adjustWindowPosition} = (() => {
+        if (args['cover-displays']) {
+            const displayCover = computeDisplayCover(args['cover-displays']);
+            logger.debug('Trying to cover display area {}', displayCover);
+            return {
+                adjustWindowSize: () => mainWindow.setSize(displayCover.width, displayCover.height),
+                adjustWindowPosition: () => mainWindow.setPosition(displayCover.x, displayCover.y)
+            };
+        } else {
+            return {
+                adjustWindowSize: () => {
+                }, adjustWindowPosition: () => {
+                }
+            }; // NOOPS
+        }
+    })();
+
+    adjustWindowPosition();
+    if (args['cover-displays'] && args['cover-displays'].length == 1)
+        adjustWindowSize();
 
     // open the developers now if requested or toggle them when SIGUSR1 is received
     if (args.dev)
@@ -179,8 +194,17 @@ function appReady(args) {
         mainWindow.show();
     });
 
+    // On Linux, windows can span multiple displays, but it seems to only work reliably after the window has been actually shown.
+    // On other platforms, is doesn't seem to do anything bad.
+    mainWindow.once('show', () => {
+        setTimeout(() => {
+            adjustWindowSize();
+            adjustWindowPosition();
+        }, 1);
+    });
+
     if (args.fit.forceZoomFactor)
-        mainWindow.on('resize', (event, newBounds) => setZoomFactor(webContents, computeZoomFactor(mainWindow.getContentBounds(), args.fit, args.zoom)));
+        mainWindow.on('resize', () => setZoomFactor(webContents, computeZoomFactor(mainWindow.getContentBounds(), args.fit, args.zoom)));
 
     /***
      * Add a handle for dragging windows on macOS due to hidden title bar.
