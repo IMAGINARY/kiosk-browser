@@ -7,7 +7,7 @@ const preloadModules = require(path.join(__dirname, 'preloadModules.js'));
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow;
+global.mainWindow = null;
 
 function extendMenu(menu) {
     // add some entries to the supplied menu
