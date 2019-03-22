@@ -14,7 +14,7 @@ function coercePort(port, defaultPort) {
 }
 
 function coerceServe(path, defaultPath) {
-    if(path === undefined)
+    if (path === undefined)
         path = defaultPath;
 
     let isDir;

@@ -67,7 +67,7 @@ function fixFullscreenMode(window) {
 
 function setOverlayVisible(webContents, visible) {
     const display = visible ? 'unset' : 'none';
-    const jsCode = `document.documentElement.style.setProperty('--kiosk-drag-handle-display', '${display}');`
+    const jsCode = `document.documentElement.style.setProperty('--kiosk-drag-handle-display', '${display}');`;
     webContents.executeJavaScript(jsCode)
 }
 
@@ -172,7 +172,7 @@ function appReady(args) {
     });
 
     if (args.fit.forceZoomFactor)
-        mainWindow.on('resize', (event, newBounds) => setZoomFactor(webContents, computeZoomFactor(mainWindow.getContentBounds(), args.fit, args.zoom)));
+        mainWindow.on('resize', () => setZoomFactor(webContents, computeZoomFactor(mainWindow.getContentBounds(), args.fit, args.zoom)));
 
     /***
      * Add a handle for dragging windows on macOS due to hidden title bar.
