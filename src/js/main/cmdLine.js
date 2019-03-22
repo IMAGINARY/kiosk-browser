@@ -74,6 +74,8 @@ function coerceCoverDisplays(s) {
             throw new Error(`Invalid display number: ${stringNums[i]}`);
         }
     }
+    if (nums.length > 1 && process.platform !== 'linux')
+        throw new Error(`Covering multiple display in only supported on Linux.`);
     return nums;
 }
 
