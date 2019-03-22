@@ -42,14 +42,32 @@ function joinRectangles(rectangles) {
     return {x: l, y: t, width: r - l, height: b - t};
 }
 
-function computeDisplayCover(displayNums) {
-    if (!Array.isArray(displayNums) || displayNums.length === 0)
-        displayNums = [0];
+function compareRectangles(r1, r2) {
+    return r1.x === r2.x
+        && r1.y === r2.y
+        && r1.width === r2.width
+        && r1.height === r2.height;
+}
 
+function computeDisplayCover(displayNums) {
     const {screen} = require('electron');
     const allDisplays = screen.getAllDisplays();
-    const displayBounds = displayNums.map(n => allDisplays[Math.min(n, allDisplays.length - 1)].bounds);
-    return joinRectangles(displayBounds);
+
+    if (!Array.isArray(displayNums) || displayNums.length === 0) {
+        displayNums = [0];
+    } else {
+        // keep only display nums that are not out of range
+        displayNums = displayNums.map(n => Math.min(n, allDisplays.length - 1));
+    }
+
+    if (displayNums.length > 1) {
+        for (let n = 0; n < displayNums.length; ++n) {
+            const {bounds, workArea} = allDisplays[displayNums[n]];
+            if (!compareRectangles(bounds, workArea))
+                logger.warn("Work area of display %i differs from bounds. Expect incomplete display coverage. (%o vs. %o)", n, workArea, bounds);
+        }
+    }
+    return joinRectangles(displayNums.map(n => allDisplays[n].workArea));
 }
 
 /***
