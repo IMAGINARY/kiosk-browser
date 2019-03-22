@@ -174,6 +174,11 @@ const options = {
         default: '_x_',
         coerce: coerceFit
     },
+    'inspect': {
+        type: 'number',
+        description: 'Enable remote inspection for the main process on the given port. Connect via chrome://inspect',
+        hidden: true,
+    },
 };
 
 function assignDefault(option, defaultValue) {
