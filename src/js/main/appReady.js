@@ -28,41 +28,42 @@ function extendMenu(menu) {
     return menu;
 }
 
+function joinRectangles(rectangles) {
+    let l = Number.POSITIVE_INFINITY;
+    let t = Number.POSITIVE_INFINITY;
+    let r = Number.NEGATIVE_INFINITY;
+    let b = Number.NEGATIVE_INFINITY;
+    for (let rect of rectangles) {
+        l = Math.min(l, rect.x);
+        t = Math.min(t, rect.y);
+        r = Math.max(r, rect.x + rect.width);
+        b = Math.max(b, rect.y + rect.height);
+    }
+    return {x: l, y: t, width: r - l, height: b - t};
+}
+
+function computeDisplayCover(displayNums) {
+    if (!Array.isArray(displayNums) || displayNums.length === 0)
+        displayNums = [0];
+
+    const {screen} = require('electron');
+    const allDisplays = screen.getAllDisplays();
+    const displayBounds = displayNums.map(n => allDisplays[Math.min(n, allDisplays.length - 1)].bounds);
+    return joinRectangles(displayBounds);
+}
+
 /***
- * Tries to ensure that the window spans all available displays in fullscreen mode.
- * Also works around a bug in Chrome that causes a 1px wide frame around the window when no window manager is used.
+ * Fixed the windows min, max and content size to the current bounds.
+ * This works around a bug in Chrome that causes a 1px wide frame around the window in fullscreen mode
+ * when no window manager is used.
  * @see https://bugs.chromium.org/p/chromium/issues/detail?id=478133
  * @param window
- * @todo Factor out the part the resizes the window to cover all available displays and make it configurable via the command line
  */
-function fixFullscreenMode(window) {
-    const {screen} = require('electron');
-
-    const size = screen.getPrimaryDisplay().bounds;
-
-    let _x = size.x;
-    let _y = size.y;
-    let _r = _x + size.width;
-    let _b = _y + size.height;
-    const displays = screen.getAllDisplays();
-    for (let d in displays) {
-        const _d = displays[d].bounds;
-
-        _x = Math.min(_x, _d.x);
-        _y = Math.min(_y, _d.y);
-        _r = Math.max(_r, _d.x + _d.width);
-        _b = Math.max(_b, _d.y + _d.height);
-    }
-
-    logger.debug('MAX SCREEN: (' + _x + ' , ' + _y + ') - (' + _r + ' , ' + _b + ')!');
-
-    window.setMinimumSize(_r - _x, _b - _y);
-    window.setMinimumSize(_r - _x, _b - _y);
-    window.setContentSize(_r - _x, _b - _y);
-
-    window.setFullScreen(true);
-
-    window.maximize();
+function fixFullscreenModeLinux(window) {
+    const bounds = window.getBounds();
+    window.setMinimumSize(bounds.width, bounds.height);
+    window.setMaximumSize(bounds.width, bounds.height);
+    window.setContentSize(bounds.width, bounds.height);
 }
 
 function setOverlayVisible(webContents, visible) {
@@ -139,20 +140,17 @@ function appReady(args) {
         acceptFirstMouse: true,
     };
 
-    if (args['cover-display']) {
-        const displays = require('electron').screen.getAllDisplays();
-        const display = displays[Math.min(args['cover-display'], displays.length - 1)];
-        options.x = display.workArea.x;
-        options.y = display.workArea.y;
-        options.width = display.workAreaSize.width;
-        options.height = display.workAreaSize.height;
-    }
-
     if (process.platform === 'linux')
         options.icon = path.resolve(__dirname, '../../../build/fallbackicon.png');
 
     mainWindow = new BrowserWindow(options);
     const webContents = mainWindow.webContents;
+
+    if (args['cover-displays']) {
+        const displayCover = computeDisplayCover(args['cover-displays']);
+        logger.debug('Trying to cover display area {}', displayCover);
+        mainWindow.setBounds(displayCover);
+    }
 
     // open the developers now if requested or toggle them when SIGUSR1 is received
     if (args.dev)
@@ -174,7 +172,7 @@ function appReady(args) {
 
             // work around a fullscreen-related bug imn Chrome on Linux when no window manager is used
             if (process.platform === 'linux')
-                fixFullscreenMode(mainWindow);
+                fixFullscreenModeLinux(mainWindow);
         }
         // also adjust the zoom of the draggable area
         setZoomFactor(webContents, webContents.getZoomFactor());

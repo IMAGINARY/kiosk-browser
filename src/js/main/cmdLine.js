@@ -66,13 +66,15 @@ function coerceFit(s) {
     }
 }
 
-function coerceCoverDisplay(n) {
-    const parsedNum = Number.parseInt(n, 10);
-    if (Number.isNaN(parsedNum) || parsedNum < 0) {
-        throw new Error(`Invalid display number: ${n}`);
-    } else {
-        return n;
+function coerceCoverDisplays(s) {
+    const stringNums = s.split(',');
+    const nums = stringNums.map(s => Number.parseInt(s, 10));
+    for (let i = 0; i < nums.length; ++i) {
+        if (Number.isNaN(nums[i]) || nums[i] < 0) {
+            throw new Error(`Invalid display number: ${stringNums[i]}`);
+        }
     }
+    return nums;
 }
 
 const options = {
@@ -183,11 +185,10 @@ const options = {
         default: '_x_',
         coerce: coerceFit
     },
-    'cover-display': {
-        type: 'number',
-        description: 'Let the browser window cover a certain display.',
+    'cover-displays': {
+        description: 'Let the browser window cover the displays provided by comma separated display numbers. Spanning multiple displays is not supported on all platforms.',
         requiresArg: true,
-        coerce: coerceCoverDisplay,
+        coerce: coerceCoverDisplays,
     }
 };
 
