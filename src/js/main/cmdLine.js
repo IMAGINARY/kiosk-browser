@@ -194,7 +194,12 @@ const options = {
     },
     'inspect': {
         type: 'number',
-        description: 'Enable remote inspection for the main process on the given port. Connect via chrome://inspect',
+        description: 'Enable remote inspection for the main process on the given port. Connect via chrome://inspect in Chromium based browsers.',
+        hidden: true,
+    },
+    'inspect-brk': {
+        type: 'number',
+        description: 'Like --inspect but pauses execution on the first line of JavaScript.',
         hidden: true,
     },
 };
