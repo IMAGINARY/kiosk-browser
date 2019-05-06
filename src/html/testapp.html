@@ -4,7 +4,7 @@
   <head>
     <title>System Testing Application</title> <!-- Modified version of scripty2's Touchspector -->
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <script src="prototype.min.js" type="text/javascript"></script>
+    <script src="../js/renderer/prototype.min.js" type="text/javascript"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <style type="text/css" media="screen">
       html {
@@ -40,7 +40,7 @@
         border: 0;
         height: 21px;
         width: 29px;
-        background: url(arrow.png);
+        background: url(../assets/arrow.png);
       }
       .mouse {
         border: 1px solid #2CC9DB;
@@ -195,7 +195,7 @@
         function getHostName(){ return (require('os').hostname()); }
 
         function createAudio(file){ var A = new Audio(file); A.muted = false; A.loop = false; A.currentTime = 0; return (A); };
-        var L = createAudio("Left.mp3"), C = createAudio("Center.mp3"), R = createAudio("Right.mp3");
+        var L = createAudio("../assets/Left.mp3"), C = createAudio("../assets/Center.mp3"), R = createAudio("../assets/Right.mp3");
 
         function restartAudio(P){ P.pause(); P.currentTime = 0; P.play(); };
 

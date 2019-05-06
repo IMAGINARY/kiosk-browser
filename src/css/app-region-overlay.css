@@ -1,0 +1,29 @@
+/***
+ * This will create an invisible overlay at the top of the window that acts as a handle to move the window.
+ * It is necessary since frameless windows are not draggable by default and we can not expect web pages running in the
+ * kiosk browser to take of that. In fullscreen mode, it seems to do nothing.
+ */
+
+:root {
+    /***
+     * Initialize with some huge number to make the draggable area practically invisible until
+     * --kiosk-zoom has been set to a meaningful value.
+     */
+    --kiosk-zoom: 100000;
+    --kiosk-drag-handle-display: unset;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: var(--kiosk-drag-handle-display);
+    z-index: 10000000;
+    width: calc(66px / var(--kiosk-zoom));
+    height: calc(22px / var(--kiosk-zoom));
+    background-color: #77777777;
+    border-bottom-right-radius: calc(8px / var(--kiosk-zoom));;
+    -webkit-user-select: none;
+    -webkit-app-region: drag;
+}
