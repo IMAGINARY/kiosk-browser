@@ -5,20 +5,41 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
 ### Added
-- change log
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+
+## [0.11.0] 2019-05-06
+
+### Added
+- `--fit` command line option for scaling content to a specific screen resolution
+- `--cover-displays` option that allows to maximize the browser window across several displays on supported platforms
+- hidden `--inspect` and `--inspect-brk` command line options for [debugging the main kiosk-browser process](https://electronjs.org/docs/tutorial/debugging-main-process)
+- kiosk browsers version to `process.versions` of the rendering process
+- change log and readme
 
 ### Changed
-- upgrade to Electron v4.0.1, Node v10.11.0, Chromium v69.0.3497.106
+- upgrade to Electron v5.0.1, Node v12.0.0, Chromium v73.0.3683.121
+- support multiple preload scripts
 - repository structure
-
-### Deprecated
+- new program icon
 
 ### Removed
 - wrapper scripts for launching the kiosk-browser in different modes
+- `-l`/`--url` command line option
 
 ### Fixed
+- settings file creation one first run
+- fullscreen windows loosing focus right after they are shown on macOS
+- blurry rendering on macOS
+- dragging non-fullscreen windows on macOS
+
 ### Security
+- enable Chromium's web security features and file access restrictions
 
 ## [0.10.0] - 2019-01-07
 ### Added
