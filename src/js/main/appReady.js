@@ -168,7 +168,10 @@ function appReady(args) {
             const displayCover = computeDisplayCover(args['cover-displays']);
             logger.debug('Trying to cover display area {}', displayCover);
             return {
-                adjustWindowSize: () => mainWindow.setSize(displayCover.width, displayCover.height),
+                adjustWindowSize: () => {
+                    mainWindow.setSize(displayCover.width, displayCover.height);
+                    mainWindow.setContentSize(displayCover.width, displayCover.height);
+                },
                 adjustWindowPosition: () => mainWindow.setPosition(displayCover.x, displayCover.y)
             };
         } else {
