@@ -145,6 +145,7 @@ function appReady(args) {
         preloadModules.push(path.resolve(args.preload));
 
     const options = {
+        backgroundColor: '#ffffff',
         show: false,
         frame: !(args.transparent || args['cover-displays']),
         titleBarStyle: 'hidden',
