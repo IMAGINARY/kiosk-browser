@@ -150,7 +150,6 @@ function appReady(args) {
         titleBarStyle: 'hidden',
         fullscreenWindowTitle: true,
         fullscreenable: true,
-        kiosk: args.kiosk,
         resizable: !args.transparent,
         transparent: args.transparent,
         alwaysOnTop: args["always-on-top"],
@@ -198,6 +197,9 @@ function appReady(args) {
     });
 
     mainWindow.once('ready-to-show', () => {
+        if (args.kiosk)
+            mainWindow.setKiosk(args.kiosk);
+
         if (args.fullscreen) {
             // setting this to false will also disable the fullscreen button on macOS, so better don't call it at all
             // if args.fullscreen is false
