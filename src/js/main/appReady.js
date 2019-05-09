@@ -71,6 +71,16 @@ function computeDisplayCover(displayNums) {
 }
 
 /***
+ * Computes the size the window will have when it goes to fullscreen on the current display.
+ * @param window The window to compute the fullscreen resolution for.
+ * @returns {Electron.Size} The resolution the window would have in full screen mode.
+ */
+function computeFullscreenResolution(window) {
+    const {screen} = require('electron');
+    return screen.getDisplayMatching(window.getBounds()).size;
+}
+
+/***
  * Fixed the windows min, max and content size to the current bounds.
  * This works around a bug in Chrome that causes a 1px wide frame around the window in fullscreen mode
  * when no window manager is used.
@@ -145,7 +155,7 @@ function appReady(args) {
         preloadModules.push(path.resolve(args.preload));
 
     const options = {
-        backgroundColor: '#ffffff',
+        backgroundColor: args.transparent ? '#0fff' : '#fff',
         show: false,
         frame: !(args.transparent || args['cover-displays']),
         titleBarStyle: 'hidden',
@@ -187,6 +197,11 @@ function appReady(args) {
     adjustWindowPosition();
     if (args['cover-displays'] && args['cover-displays'].length == 1)
         adjustWindowSize();
+
+    if (args.fullscreen) {
+        const fullscreenSize = computeFullscreenResolution(mainWindow);
+        mainWindow.setContentSize(fullscreenSize.width, fullscreenSize.height);
+    }
 
     // open the developers now if requested or toggle them when SIGUSR1 is received
     if (args.dev)
