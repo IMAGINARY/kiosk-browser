@@ -81,17 +81,29 @@ function computeFullscreenBounds(window) {
 }
 
 /***
- * Fixed the windows min, max and content size to the current bounds.
- * This works around a bug in Chrome that causes a 1px wide frame around the window in fullscreen mode
- * when no window manager is used.
+ * Fixed the windows min, max and content size to the specified bounds.
+ * This works around a bug in Chrome that causes the window size being 1px off in certain situations, e.g.
+ * when no X11 window manager is present on Linux.
  * @see https://bugs.chromium.org/p/chromium/issues/detail?id=478133
  * @param window
+ * @param bounds
  */
-function fixFullscreenModeLinux(window) {
-    const bounds = window.getBounds();
+function fixWindowSize(window, bounds) {
+    logger.debug("Initial content bounds: %o", window.getContentBounds());
+
+    const oldMin = window.getMinimumSize();
+    const oldMax = window.getMaximumSize();
+
     window.setMinimumSize(bounds.width, bounds.height);
     window.setMaximumSize(bounds.width, bounds.height);
-    window.setContentSize(bounds.width, bounds.height);
+
+    window.setBounds(bounds);
+    window.setContentBounds(bounds);
+
+    window.setMinimumSize(oldMin[0], oldMin[1]);
+    window.setMaximumSize(oldMax[0], oldMax[1]);
+
+    logger.debug("Fixed content bounds:   %o", window.getContentBounds());
 }
 
 function setOverlayVisible(webContents, visible) {
@@ -178,13 +190,12 @@ function appReady(args) {
         if (args['cover-displays']) {
             const displayCover = computeDisplayCover(args['cover-displays']);
             logger.debug('Trying to cover display area {}', displayCover);
-            return () => mainWindow.setContentBounds(displayCover);
+            return () => fixWindowSize(mainWindow, displayCover);
         } else if (args.fullscreen) {
             const fullscreenBounds = computeFullscreenBounds(mainWindow);
-            return () => mainWindow.setContentBounds(fullscreenBounds);
+            return () => fixWindowSize(mainWindow, fullscreenBounds);
         } else {
-            return () => {
-            }; // NOOPS
+            return () => undefined; // NOOP
         }
     })();
 
@@ -210,19 +221,14 @@ function appReady(args) {
             // setting this to false will also disable the fullscreen button on macOS, so better don't call it at all
             // if args.fullscreen is false
             mainWindow.setFullScreen(true);
-
-            // work around a fullscreen-related bug imn Chrome on Linux when no window manager is used
-            if (process.platform === 'linux')
-                fixFullscreenModeLinux(mainWindow);
         }
+
+        adjustWindowBounds();
+
         // also adjust the zoom of the draggable area
         setZoomFactor(webContents, webContents.getZoomFactor());
         mainWindow.show();
     });
-
-    // On Linux, windows can span multiple displays, but it seems to only work reliably after the window has been actually shown.
-    // On other platforms, is doesn't seem to do anything bad.
-    mainWindow.once('show', () => setTimeout(() => adjustWindowBounds(), 1));
 
     if (args.fit.forceZoomFactor)
         mainWindow.on('resize', () => setZoomFactor(webContents, computeZoomFactor(mainWindow.getContentBounds(), args.fit, args.zoom)));
