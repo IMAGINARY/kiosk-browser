@@ -49,7 +49,7 @@ function compareRectangles(r1, r2) {
         && r1.height === r2.height;
 }
 
-function computeDisplayCover(displayNums) {
+function computeDisplayCover(displayNums, fullscreen) {
     const {screen} = require('electron');
     const allDisplays = screen.getAllDisplays();
 
@@ -67,7 +67,7 @@ function computeDisplayCover(displayNums) {
                 logger.warn("Work area of display %i differs from bounds. Expect incomplete display coverage. (%o vs. %o)", n, workArea, bounds);
         }
     }
-    return joinRectangles(displayNums.map(n => allDisplays[n].workArea));
+    return joinRectangles(displayNums.map(n => fullscreen ? allDisplays[n].bounds : allDisplays[n].workArea));
 }
 
 /***
@@ -92,16 +92,13 @@ function fixWindowSize(window, bounds) {
     logger.debug("Initial content bounds: %o", window.getContentBounds());
 
     const oldMin = window.getMinimumSize();
-    const oldMax = window.getMaximumSize();
 
     window.setMinimumSize(bounds.width, bounds.height);
-    window.setMaximumSize(bounds.width, bounds.height);
 
     window.setBounds(bounds);
     window.setContentBounds(bounds);
 
     window.setMinimumSize(oldMin[0], oldMin[1]);
-    window.setMaximumSize(oldMax[0], oldMax[1]);
 
     logger.debug("Fixed content bounds:   %o", window.getContentBounds());
 }
@@ -188,7 +185,7 @@ function appReady(args) {
 
     const adjustWindowBounds = (() => {
         if (args['cover-displays']) {
-            const displayCover = computeDisplayCover(args['cover-displays']);
+            const displayCover = computeDisplayCover(args['cover-displays'], args.fullscreen);
             logger.debug('Trying to cover display area {}', displayCover);
             return () => fixWindowSize(mainWindow, displayCover);
         } else if (args.fullscreen) {
