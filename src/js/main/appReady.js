@@ -71,13 +71,13 @@ function computeDisplayCover(displayNums) {
 }
 
 /***
- * Computes the size the window will have when it goes to fullscreen on the current display.
- * @param window The window to compute the fullscreen resolution for.
- * @returns {Electron.Size} The resolution the window would have in full screen mode.
+ * Computes the bounds the window will have when it goes to fullscreen on the current display.
+ * @param window The window to compute the fullscreen bounds for.
+ * @returns {Electron.Rectangle} The bounds the window would have in full screen mode.
  */
-function computeFullscreenResolution(window) {
+function computeFullscreenBounds(window) {
     const {screen} = require('electron');
-    return screen.getDisplayMatching(window.getBounds()).size;
+    return screen.getDisplayMatching(window.getBounds()).bounds;
 }
 
 /***
@@ -174,34 +174,21 @@ function appReady(args) {
     mainWindow = new BrowserWindow(options);
     const webContents = mainWindow.webContents;
 
-    const {adjustWindowSize, adjustWindowPosition} = (() => {
+    const adjustWindowBounds = (() => {
         if (args['cover-displays']) {
             const displayCover = computeDisplayCover(args['cover-displays']);
             logger.debug('Trying to cover display area {}', displayCover);
-            return {
-                adjustWindowSize: () => {
-                    mainWindow.setSize(displayCover.width, displayCover.height);
-                    mainWindow.setContentSize(displayCover.width, displayCover.height);
-                },
-                adjustWindowPosition: () => mainWindow.setPosition(displayCover.x, displayCover.y)
-            };
+            return () => mainWindow.setContentBounds(displayCover);
+        } else if (args.fullscreen) {
+            const fullscreenBounds = computeFullscreenBounds(mainWindow);
+            return () => mainWindow.setContentBounds(fullscreenBounds);
         } else {
-            return {
-                adjustWindowSize: () => {
-                }, adjustWindowPosition: () => {
-                }
+            return () => {
             }; // NOOPS
         }
     })();
 
-    adjustWindowPosition();
-    if (args['cover-displays'] && args['cover-displays'].length == 1)
-        adjustWindowSize();
-
-    if (args.fullscreen) {
-        const fullscreenSize = computeFullscreenResolution(mainWindow);
-        mainWindow.setContentSize(fullscreenSize.width, fullscreenSize.height);
-    }
+    adjustWindowBounds();
 
     // open the developers now if requested or toggle them when SIGUSR1 is received
     if (args.dev)
@@ -235,12 +222,7 @@ function appReady(args) {
 
     // On Linux, windows can span multiple displays, but it seems to only work reliably after the window has been actually shown.
     // On other platforms, is doesn't seem to do anything bad.
-    mainWindow.once('show', () => {
-        setTimeout(() => {
-            adjustWindowSize();
-            adjustWindowPosition();
-        }, 1);
-    });
+    mainWindow.once('show', () => setTimeout(() => adjustWindowBounds(), 1));
 
     if (args.fit.forceZoomFactor)
         mainWindow.on('resize', () => setZoomFactor(webContents, computeZoomFactor(mainWindow.getContentBounds(), args.fit, args.zoom)));
