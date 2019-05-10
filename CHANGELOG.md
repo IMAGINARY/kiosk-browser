@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Deprecated
 ### Removed
 ### Fixed
+- wrong window size in `--fullscreen` and `--cover-displays` modes
+- transparent windows on Linux 
+
 ### Security
 
 ## [0.11.0] 2019-05-06
