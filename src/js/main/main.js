@@ -137,6 +137,8 @@ app.whenReady().then(() =>
     urlReady.then(url => {
         args.url = args.l = url;
         logger.info('URL after preprocessing: %s', url);
-        appReady(args);
+        // FIXME: For transparent windows, initialization it not ready yet (window is opaque).
+        //  A delayed start serves as a temporary workaround until the problem is fixed in electron upstream.
+        setTimeout(() => appReady(args), process.platform === 'linux' && args.transparent ? 500 : 0);
     })
 );

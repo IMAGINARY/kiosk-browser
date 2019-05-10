@@ -49,7 +49,7 @@ function compareRectangles(r1, r2) {
         && r1.height === r2.height;
 }
 
-function computeDisplayCover(displayNums) {
+function computeDisplayCover(displayNums, fullscreen) {
     const {screen} = require('electron');
     const allDisplays = screen.getAllDisplays();
 
@@ -67,21 +67,40 @@ function computeDisplayCover(displayNums) {
                 logger.warn("Work area of display %i differs from bounds. Expect incomplete display coverage. (%o vs. %o)", n, workArea, bounds);
         }
     }
-    return joinRectangles(displayNums.map(n => allDisplays[n].workArea));
+    return joinRectangles(displayNums.map(n => fullscreen ? allDisplays[n].bounds : allDisplays[n].workArea));
 }
 
 /***
- * Fixed the windows min, max and content size to the current bounds.
- * This works around a bug in Chrome that causes a 1px wide frame around the window in fullscreen mode
- * when no window manager is used.
+ * Computes the bounds the window will have when it goes to fullscreen on the current display.
+ * @param window The window to compute the fullscreen bounds for.
+ * @returns {Electron.Rectangle} The bounds the window would have in full screen mode.
+ */
+function computeFullscreenBounds(window) {
+    const {screen} = require('electron');
+    return screen.getDisplayMatching(window.getBounds()).bounds;
+}
+
+/***
+ * Fixed the windows min, max and content size to the specified bounds.
+ * This works around a bug in Chrome that causes the window size being 1px off in certain situations, e.g.
+ * when no X11 window manager is present on Linux.
  * @see https://bugs.chromium.org/p/chromium/issues/detail?id=478133
  * @param window
+ * @param bounds
  */
-function fixFullscreenModeLinux(window) {
-    const bounds = window.getBounds();
+function fixWindowSize(window, bounds) {
+    logger.debug("Initial content bounds: %o", window.getContentBounds());
+
+    const oldMin = window.getMinimumSize();
+
     window.setMinimumSize(bounds.width, bounds.height);
-    window.setMaximumSize(bounds.width, bounds.height);
-    window.setContentSize(bounds.width, bounds.height);
+
+    window.setBounds(bounds);
+    window.setContentBounds(bounds);
+
+    window.setMinimumSize(oldMin[0], oldMin[1]);
+
+    logger.debug("Fixed content bounds:   %o", window.getContentBounds());
 }
 
 function setOverlayVisible(webContents, visible) {
@@ -145,12 +164,12 @@ function appReady(args) {
         preloadModules.push(path.resolve(args.preload));
 
     const options = {
+        backgroundColor: args.transparent ? '#0fff' : '#fff',
         show: false,
         frame: !(args.transparent || args['cover-displays']),
         titleBarStyle: 'hidden',
         fullscreenWindowTitle: true,
         fullscreenable: true,
-        kiosk: args.kiosk,
         resizable: !args.transparent,
         transparent: args.transparent,
         alwaysOnTop: args["always-on-top"],
@@ -164,26 +183,20 @@ function appReady(args) {
     mainWindow = new BrowserWindow(options);
     const webContents = mainWindow.webContents;
 
-    const {adjustWindowSize, adjustWindowPosition} = (() => {
+    const adjustWindowBounds = (() => {
         if (args['cover-displays']) {
-            const displayCover = computeDisplayCover(args['cover-displays']);
+            const displayCover = computeDisplayCover(args['cover-displays'], args.fullscreen);
             logger.debug('Trying to cover display area {}', displayCover);
-            return {
-                adjustWindowSize: () => mainWindow.setSize(displayCover.width, displayCover.height),
-                adjustWindowPosition: () => mainWindow.setPosition(displayCover.x, displayCover.y)
-            };
+            return () => fixWindowSize(mainWindow, displayCover);
+        } else if (args.fullscreen) {
+            const fullscreenBounds = computeFullscreenBounds(mainWindow);
+            return () => fixWindowSize(mainWindow, fullscreenBounds);
         } else {
-            return {
-                adjustWindowSize: () => {
-                }, adjustWindowPosition: () => {
-                }
-            }; // NOOPS
+            return () => undefined; // NOOP
         }
     })();
 
-    adjustWindowPosition();
-    if (args['cover-displays'] && args['cover-displays'].length == 1)
-        adjustWindowSize();
+    adjustWindowBounds();
 
     // open the developers now if requested or toggle them when SIGUSR1 is received
     if (args.dev)
@@ -198,27 +211,20 @@ function appReady(args) {
     });
 
     mainWindow.once('ready-to-show', () => {
+        if (args.kiosk)
+            mainWindow.setKiosk(args.kiosk);
+
         if (args.fullscreen) {
             // setting this to false will also disable the fullscreen button on macOS, so better don't call it at all
             // if args.fullscreen is false
             mainWindow.setFullScreen(true);
-
-            // work around a fullscreen-related bug imn Chrome on Linux when no window manager is used
-            if (process.platform === 'linux')
-                fixFullscreenModeLinux(mainWindow);
         }
+
+        adjustWindowBounds();
+
         // also adjust the zoom of the draggable area
         setZoomFactor(webContents, webContents.getZoomFactor());
         mainWindow.show();
-    });
-
-    // On Linux, windows can span multiple displays, but it seems to only work reliably after the window has been actually shown.
-    // On other platforms, is doesn't seem to do anything bad.
-    mainWindow.once('show', () => {
-        setTimeout(() => {
-            adjustWindowSize();
-            adjustWindowPosition();
-        }, 1);
     });
 
     if (args.fit.forceZoomFactor)

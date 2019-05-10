@@ -13,6 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 ### Security
 
+## [0.11.1] 2019-05-10
+
+### Fixed
+- wrong window size in `--fullscreen` and `--cover-displays` modes
+- kiosk mode starting with empty white screen
+- transparent windows on Linux 
+
 ## [0.11.0] 2019-05-06
 
 ### Added
@@ -188,7 +195,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [library for sending heartbearts]: https://github.com/hilbert/hilbert-heartbeat
 
-[Unreleased]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.10.0...HEAD
+[Unreleased]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.11.1...HEAD
+[0.11.1]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.11.0...v0.11.1
+[0.11.0]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.9.12...v0.10.0
 [0.9.12]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.9.11...v0.9.12
 [0.9.11]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.9.10...v0.9.11
