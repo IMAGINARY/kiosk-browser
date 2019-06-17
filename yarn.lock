@@ -742,10 +742,10 @@ electron-settings@^3.1.4:
     clone "^2.1.1"
     jsonfile "^4.0.0"
 
-electron@6.0.0-beta.7:
-  version "6.0.0-beta.7"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-6.0.0-beta.7.tgz#5fd19e3aeaa9c6266a01d8dd0a2c414960a27844"
-  integrity sha512-GYG/uAG8VcZnbhd7zYo5lfkqsQElwdjBxoI+eg9xmKiU13QqtVhoyofZPb1OadVqfkyOTjGm4GlW75KlTNgdyw==
+electron@6.0.0-beta.8:
+  version "6.0.0-beta.8"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-6.0.0-beta.8.tgz#2b7fb5610c768c0ab39dcf1750c95bae1ec9908f"
+  integrity sha512-TqgsK90V9Mkal24uw9/fGJiRob9J7WnSjlshDQjtmDYYD4xfDqk6U9+FRg638nst44J22BK8ew3HyaguuVqEWw==
   dependencies:
     "@types/node" "^10.12.18"
     electron-download "^4.1.0"
