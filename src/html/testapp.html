@@ -24,7 +24,7 @@
         width: 100%;
         overflow: hidden;
       }
-      .touch, .indicator, .mouse {
+      .touch, .mouse {
         position: absolute;
         background: transparent;
         border: 2px solid #0f0;
@@ -36,20 +36,14 @@
         color: #0f0;
         z-index: 0;
       }
-      .indicator {
-        border: 0;
-        height: 21px;
-        width: 29px;
-        background: url(../assets/arrow.png);
-      }
       .mouse {
         border: 1px solid #2CC9DB;
         height: 5px;
         width: 5px;
-        margin: -3px 0 0 3px;
+        margin: -3px 0 0 -3px;
         padding: 0;
       }
-      .touch span, .indicator span, .mouse span {
+      .touch span, .mouse span {
         display: block;
         position: relative;
         margin-left: -90px;
@@ -57,48 +51,36 @@
         text-align: right;
         font-size: 20px;
       }
-      .indicator span {
-        margin-left: 40px;
-        text-align: left;
-        color: #fff;
-        font-size: 12px;
-      }
       .mouse span {
         font-size: 12px;
         color: #175A68;
         margin-top:-5px;
         margin-left:-80px;
       }
-      .trackpoint {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        background: #fff;
-      }
-      
-      #footer {
+      #infobox {
         font-family: 'Lucida Console', monospace;
         position: absolute;
         color: #fff;
         font-size: 15px;
-	line-height: 110%;
+        line-height: 110%;
         top: 7px;
         left: 5px;
         right: 5px;
       }
       #events {
+        font-family: 'Lucida Console', monospace;
         position: absolute;
         bottom: 10px;
-        right: 10px;
+        left: 10px;
         padding: 10px;
       }
       #events div {
-        width:150px;
+        width:200px;
         float:left;
         color: #fff;
       }
       #events div span {
-        width: 79px;
+        width: 90px;
         display: inline-block;
         color: #888;
       }
@@ -111,141 +93,181 @@
       #mouse span {
         color: #175A68 !important;
       }
-      #panspeed {
-        display: none;
-        position: absolute;
-        height: 1px;
-        width: 1px;
-      }
-      #panspeed div {
-        position: absolute;
-        height: 1px;
-        width: 1px;
-        background: #aaa;
-      }
-      #debug {
-        position: absolute;
-        top:0; left:0;
-        font-size: 50px;
-        color: #8f8;
-      }
       .off {
         display: none;
       }
-.vsync-demo-box {
-  z-index: -1;
-  position: absolute;
-  background-color:white;
-  animation-duration: 1s;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-  animation-fill-mode: forwards;
-  animation-name: expandBox;
-}
-@keyframes expandBox {
-    0%   {top: 0%; left: 0%; width:100%; height: 0%;}
-    50%  {top: 0%; left: 0%; width:100%; height: 100%;}
-    100% {top: 0%; left: 100%; width:0%; height: 100%;}
-}
+      table {
+        width: 100%;
+	table-layout: fixed;
+	align: center;
+      }     
+      .vsync-demo-box {
+        z-index: -1;
+	position: absolute;
+	background-color:white;
+	animation-duration: 1s;
+	animation-timing-function: linear;
+	animation-iteration-count: infinite;
+	animation-fill-mode: forwards;
+	animation-name: expandBox;
+      }
+      @keyframes expandBox {
+        0%   {top: 0%; left: 0%; width:100%; height: 0%;}
+	50%  {top: 0%; left: 0%; width:100%; height: 100%;}
+	100% {top: 0%; left: 100%; width:0%; height: 100%;}
+      }
     </style>
   </head>
   <body id="body">
-<!-- class="vsync-demo-box" -->
+    <div id="screen" style="cursor:none;position:absolute;top:0;left:0;width:2048px;height:20480px;background:rgba(255,255,255,0);z-index:1000"></div>
     <div id="vsyncDemoBox"></div>
-    <div id="panspeed"><div></div></div>
     <div id="events">
       <div id="mouse"></div>
       <div id="touch"></div>
-      <div id="transformaction"></div>
       <div id="touches"></div>
     </div>
-    <div id="indicator" class="indicator"><span>transformaction</span></div>
-    
-    <div id="screen" style="cursor:none;position:absolute;top:0;left:0;width:2048px;height:20480px;background:rgba(255,255,255,0);z-index:1000"></div>    
-    <div id="debug"></div>
-    
-    <div id="footer"><br/>
+    <div id="infobox"><br/>
           <b style="background:#eee;color:#111">LOCAL INFO:</b>
           <ul style="list-style: square;">
-            <li>HOSTNAME: <b><span id="local_hostname"></span></b></li>
-            <li>DATETIME: <b><span id="local_datetime"></span></b></li>
-            <li>DISPLAYS: <span id="display_data"></span></li>
-<!--            <li>VSYNC TEST:  <input onclick="vsyncTestStart();" value="Start" type="button"> <input onclick="vsyncTestStop();" value="Stop" type="button"></li>
--->
-            <li>ACTIVE  NETWORK INTERFACES: <span id="active_network_data"></span></li>
+            <li>HOSTNAME: <b><span id="local_hostname"/></b></li> 
+            <li>DATETIME: <b><span id="local_datetime"/></b></li>
             <li>PASSIVE NETWORK INTERFACES: <span id="passive_network_data"></span></li>
+            <li>ACTIVE  NETWORK INTERFACES: <span id="active_network_data"></span></li>
+            <li>DISPLAYS: <span id="display_data"></span></li>
           </ul>
           <hr/>
           <div id="soundtest">
-          <b style="background:#eee;color:#111">SOUND/VSYNC TEST:</b><table width="100%" align="center"><tr><th><i>left + vsync stop</i></th><th><i>center + vsync start</i></th><th><i>right + vsync stop</i></th></tr></table>
-          <br/></div>
+	     <b style="background:#eee;color:#111">SOUND TEST:</b><br/>
+             <table>
+              <tr align="center">
+	        <th width="33%" align="center"><div id="soundtest_left"><i>LEFT</i></div></th>
+	        <th width="33%" align="center"><div id="soundtest_center"><i>CENTER</i></div></th>
+		<th width="33%" align="center"><div id="soundtest_right"><i>RIGHT</i></div></th>
+	      </tr>
+             </table>
+	     <br/>
+          </div>
+          <hr/>
+          <div id="synctest">
+    	     <br/>
+             <table>
+              <tr align="center"> 
+  	      <th width="100%" align="center"><b><i><span id="synctest_toggle"/></i> V/H-SYNC TEST</b></th>
+	      </tr>
+             </table>
+	     <br/>
+          </div>
           <hr/>
     </div>
     <script type="text/javascript">
       document.addEventListener("DOMContentLoaded", function() { // (function(){
-        var footer = $('footer'); // var footer = document.getElementById('footer'); 
-        var soundtest = $('soundtest');
-        var vsyncDemoBox = $('vsyncDemoBox');
-        var clock_time = document.getElementById('local_datetime');
-        var local_hostname = document.getElementById('local_hostname');
-        var display_data = document.getElementById('display_data');
-        var network_data = document.getElementById('active_network_data');
-        var passive_network_data = document.getElementById('passive_network_data');
+        var b = document.body,
+          colors = $w('#0f0 #f00 #00f #f0f #ff0 #0ff #8f8 #f88 #88f #f8f #0f0 #f00 #00f #f0f #ff0 #0ff #8f8 #f88 #88f #f8f'),
+          touchcounter = 0, mousecounter = 0,
+          inc = 0;
 
-        function getHostName(){ return (require('os').hostname()); }
+        var _screen = $('screen'),
+	    _mouse = $('mouse'), 
+	    _touch = $('touch');
+	    
+        var _clock_time = $('local_datetime');
+        var _display_data = $('display_data');
+        var _network_data = $('active_network_data');
+        var _passive_network_data = $('passive_network_data');
 
-        function createAudio(file){ var A = new Audio(file); A.muted = false; A.loop = false; A.currentTime = 0; return (A); };
-        var L = createAudio("../assets/Left.mp3"), C = createAudio("../assets/Center.mp3"), R = createAudio("../assets/Right.mp3");
+        $('local_hostname').innerHTML = getHostName(); // run once!
+
+        function getHostName(){ return require('os').hostname(); }
+
+	////////////////////////////////////////////////////////////////////////////
+	// SYNC TEST
+
+	var _vsyncDemoBox = $('vsyncDemoBox');
+        var _synctest = $('synctest'), _synctest_toggle = $('synctest_toggle');
+
+	function vsyncTestIsRunning(){ return _vsyncDemoBox.classList.contains('vsync-demo-box'); }
+
+        function vsyncTestUpdate(){
+  	   _synctest_toggle.innerHTML = vsyncTestIsRunning() ? 'STOP': 'START';
+	}
+
+	vsyncTestUpdate(); // do it on document load!	
+	
+        function vsyncTestStart(){
+	  _vsyncDemoBox.classList.add('vsync-demo-box'); 
+	  vsyncTestUpdate(); 
+	}
+	
+        function vsyncTestStop(){ 
+	  _vsyncDemoBox.classList.remove('vsync-demo-box'); 
+	  vsyncTestUpdate();
+	}
+ 
+	  
+        function syncTestRun(X, Y)
+        { 
+          var d = _synctest.getBoundingClientRect();
+          var dx = (X - d.left), dy = (Y - d.top);
+	  
+          if( (dx >= 0) && (dy >= 0) && (d.width > dx) && (d.height > dy)) // inside synctest?
+          {
+	    if(vsyncTestIsRunning())
+	      vsyncTestStop();
+	    else 
+	      vsyncTestStart();
+          };
+          return false;
+        };
+	
+	////////////////////////////////////////////////////////////////////////////
+	// SOUND TEST
+
+        function createAudio(file){ var A = new Audio("../assets/" + file); A.muted = false; A.loop = false; A.currentTime = 0; return A; };
+	
+        var L = createAudio("Left.mp3"), 
+	    C = createAudio("Center.mp3"), 
+	    R = createAudio("Right.mp3");
 
         function restartAudio(P){ P.pause(); P.currentTime = 0; P.play(); };
 
-        function vsyncTestStart(){ vsyncDemoBox.classList.add('vsync-demo-box');
-// document.querySelector('#vsyncDemoBox').classList.add('vsync-demo-box'); 
-}
-        function vsyncTestStop(){ vsyncDemoBox.classList.remove('vsync-demo-box'); 
-// document.querySelector('#vsyncDemoBox').classList.remove('vsync-demo-box'); 
-}
+        var _soundtest = $('soundtest'),
+	    _soundtest_l = $('soundtest_left'),
+	    _soundtest_r = $('soundtest_right'),
+	    _soundtest_c = $('soundtest_center');
 
-        function talkAt(d, X, Y) // d: HTMLDivElement
+        function soundTestRun(X, Y)
         { 
-          if(!d) d = document.getElementById('soundtest'); 
-          if(!d) return; 
-
-          d = d.getBoundingClientRect(); // console.log("Footer at " + (d.left) +"x" + (d.top) + "::" + (d.width) +"x" + (d.height));
-
-          var dx = (X - d.left), dy = (Y - d.top), ww = d.width; // console.log("Delta " + (dx) +"x" + (dy));
-          if( (dx >= 0) && (dy >= 0) && (ww > dx) && (d.height > dy)) // inside footer? 
+          var d = _soundtest.getBoundingClientRect();
+          var dx = (X - d.left), dy = (Y - d.top);
+	  
+          if( (dx >= 0) && (dy >= 0) && (d.width > dx) && (d.height > dy)) // inside soundtest?
           { 
-            if( ww > 3*dx ){ restartAudio(L); vsyncTestStop(); } else 
-            {
-              if( 3*dx > 2*ww ){ restartAudio(R); vsyncTestStop(); } else { restartAudio(C); vsyncTestStart(); }; 
-            };
-            return (true); 
+            d = _soundtest_l.getBoundingClientRect(); dx = (X - d.left);
+            if( (dx >= 0) && (d.width > dx) ){ restartAudio(L); return true; }
+
+            d = _soundtest_r.getBoundingClientRect(); dx = (X - d.left);
+            if( (dx >= 0) && (d.width > dx) ){ restartAudio(R); return true; }
+
+            d = _soundtest_c.getBoundingClientRect(); dx = (X - d.left);
+            if( (dx >= 0) && (d.width > dx) ){ restartAudio(C); return true; }
           };
-          return (false);
+          return false;
         };
 
 
-        function displaysText(){ 
+        function infoDisplays(){ 
           var displays = require('electron').screen.getAllDisplays(); var ndisplays = displays.length;
 
-          var t = '';
+          var t = '<ul>';
 
           for (var i = 0; ndisplays > i; i++)
           {
             var display = displays[i];
-            /* { id: 13761487533244416,
-                  bounds: { x: 0, y: 0, width: 1920, height: 1080 },
-                  workArea: { x: 0, y: 0, width: 1920, height: 1080 },
-                  size: { width: 1920, height: 1080 },
-                  workAreaSize: { width: 1920, height: 1080 },
-                  scaleFactor: 1, rotation: 0, touchSupport: 'unknown' }
-            */
 
             t += '<li><span style="float:left;"><b>0x' + (display.id.toString(16).toUpperCase()) + '</b>' +
                  ', rotation: <b>' + (display.rotation) + '</b>&deg; &#x21bb;' +
                  ', touch support: <b>' + (display.touchSupport.toUpperCase()) + '</b>' +
-                 '</span>, <span>' + //  style="float:right;"
+                 '</span>, <span>' + 
                  'scale factor: <b>' + (display.scaleFactor) + '</b>' +
                  ', size: <b>' + (display.size.width) + '</b>x<b>' + (display.size.height) + '</b>' +
                  ', work area size: <b>' + (display.workAreaSize.width) + '</b>x<b>' + (display.workAreaSize.height) + '</b>' +
@@ -253,18 +275,17 @@
                  ' - <b>' + (display.bounds.width) + '</b>x<b>' + (display.bounds.height) + '</b>' +
                  '</span></li>';
           }
-          return ('<ul>' + t + '</ul>');
+          return t + '</ul>';
         };
 
-        function NetworkTextPassive()
+        function renderPasiveNetworkInterfaces()
         { 
-//          var list = require('os').networkInterfaces(); // Active (!) interfaces!
             var EOL = require('os').EOL;
             var cmd  = "egrep . /sys/class/net/*/address";
             require('child_process').exec(cmd, function(err, stdout) {
               var t = '';
               var raw = stdout.toString().trim();
-              if (err) { passive_network_data.innerHTML = ''; console.log('Error: [' + err + '] from command ['+cmd+']. Output: ['+ raw +'].'); } else
+              if (err) { _passive_network_data.innerHTML = ''; console.log('Error: [' + err + '] from command ['+cmd+']. Output: ['+ raw +'].'); } else
               {
                 var list = raw.split(EOL); // if (list.length === 0 || list === ['']) {  return (); }
                 var len = list.length; var s, id, d, mac;
@@ -272,87 +293,54 @@
                   s = list[i].split("/address:");
                   id = s[0].split('/')[4];
                   mac = s[1].toUpperCase();
-//                  if (mac != '' ) mac = '<span style="float:right;"> mac: <b>' + mac + '</b></span>';
                   if (mac != '' ) mac = ' <span>(mac: <b>' + mac + '</b>)</span>'; //  style="float:right;"
-//                  d = ;
                   if( !id.startsWith("docker") && id != 'lo' && id != 'lo0' )
-                    if( !document.getElementById('interface_' + id) ) // { console.log(d); d.innerHTML += '<li>' + mac  + '</li>'; } else
+                    if( ! $('interface_' + id) ) // { console.log(d); d.innerHTML += '<li>' + mac  + '</li>'; } else
                     { t += '<li><span id="passive_interface_' + id + '">Interface <b>' + id + '</b>' +  mac + '</span></li>'; }
                 }
-                if (t != '') { t = '<ul>' + t + '</ul>'; } else { passive_network_data.innerHTML = ''; console.log('Warning: No network interface found...'); }
+                if (t != '') { t = '<ul>' + t + '</ul>'; } else { _passive_network_data.innerHTML = ''; console.log('Warning: No network interface found...'); }
               };
-              if (passive_network_data.innerHTML != t) passive_network_data.innerHTML = t;
+              if (_passive_network_data.innerHTML != t) _passive_network_data.innerHTML = t;
             });
-//          for (var i in list){var d = document.getElementById('interface_' + i); if(d) t += '<li>Interface: ' +i+'</li>'; };
-//          return (t); 
         };
 
-//  require('network').get_interfaces_list(function(err, _list)   { if (err) throw err;
-  function networkText() {
-    var t = ''; var mac, tt, L, len;
-    var list=require('os').networkInterfaces(); // Active (!) interfaces!
-    //     console.log(list);
-    for (var i in list)
-    { //console.log(i);
-      if( !i.startsWith("docker") && i != 'lo' && i != 'lo0' ) 
-      {
-        L = list[i]; len = L.length; mac = ''; tt = '';
-        for (var j = 0; len > j; j++)  // address family internal mac netmask // scopeid?
-        { var f = L[j]; // console.log(f);
-//        if (!f.internal)
-//        {
-          tt +=  '<li><span style="float:left;">family: <b>' + f.family + '</b>'+
-              '</span>, ' + // <span style="float:right;">' +
-              'address: <b>' + f.address.toUpperCase() + '</b>, ' + 
-              'netmask: <b>' + f.netmask + '</b>' +  //              '</span>' +
-              '</span></li>';
-          mac = f.mac.toUpperCase();
-//        };
-        };
-        if (mac != '' ) mac = ' <span>(mac: <b>' + mac + '</b>)</span>'; //  style="float:right;"
-//        if (mac != '' ) mac = '<span>mac: <b>' + mac + '</b></span>'; //  style="float:right;"
-        t +=  '<li><span id="interface_' + i + '">Interface <b>' + i + '</b>' + mac + ':<ul>' + tt + '</ul></span></li>';
-      };
-    };
-    if (t != '')    t = '<ul>' + t + '</ul>';
-    return(t); //  var d = document.getElementById('network_data'); if(d) d.innerHTML = t; });
-   };
+        function infoNetworkInterfaces() {
+	  var mac, tt, L, len;
+          var t = ''; 
+	  var list = require('os').networkInterfaces(); // Active (!) interfaces!
+	  for (var i in list)
+	  {
+	    if( !i.startsWith("docker") && i != 'lo' && i != 'lo0' ) 
+	    {
+	      L = list[i]; len = L.length; mac = ''; tt = '';
+	      for (var j = 0; len > j; j++)  // address family internal mac netmask // scopeid?
+	      { 
+	        var f = L[j];
+		tt +=  '<li><span style="float:left;">family: <b>' + f.family + '</b>'+
+		       '</span>, ' + 
+                       'address: <b>' + f.address.toUpperCase() + '</b>, ' + 
+		       'netmask: <b>' + f.netmask + '</b>' + 
+		       '</span></li>';
+		mac = f.mac.toUpperCase();
+	      };
+	      
+	      if (mac != '' ) mac = ' <span>(mac: <b>' + mac + '</b>)</span>';
 
-        $('screen').observe('mousedown', function(event){ // event: MouseEvent
-          talkAt(soundtest, event.clientX, event.clientY);
-        });
+              t +=  '<li><span id="interface_' + i + '">Interface <b>' + i + '</b>' + mac + ':<ul>' + tt + '</ul></span></li>';
+	    };
+	  };
+	  
+	  return (t == '') ? t : '<ul>' + t + '</ul>';
+	};
+	
 
-        $('screen').observe('touchstart', function(event){  // event: TouchEvent
-          var l = event.changedTouches; // l: TouchList
-          for( var i = l.length - 1; i >= 0; i-- )
-          { 
-            talkAt(footer, l[i].pageX, l[i].pageY); // l[i]: Touch
-          }
-          event.preventDefault();
-        });
-
-
-        window.setInterval(function() { clock_time.innerHTML = Date(); }, 500);
-        window.setInterval(function() { network_data.innerHTML = networkText(); NetworkTextPassive(); }, 4000);
-
-        local_hostname.innerHTML = getHostName();
-        window.setInterval(function() { display_data.innerHTML = displaysText(); }, 3000);
-
-//        window.nodeRequire = require;delete window.require;delete window.exports;delete window.module;
-      });
-    </script>
-    <script type="text/javascript">
-      document.addEventListener("DOMContentLoaded", function() { // (function(){
-        var b = document.body, indicator = $('indicator'), mouse,
-          colors = $w('#0f0 #f00 #00f #f0f #ff0 #0ff #8f8 #f88 #88f #f8f #0f0 #f00 #00f #f0f #ff0 #0ff #8f8 #f88 #88f #f8f'),
-          touchcounter = 0, transformactioncounter = 0, mousecounter = 0,
-          panspeed = $('panspeed'), panspeedDiv = panspeed.down('div'), inc = 0;
-
+        // insert all possible touch-fingertips
         for( var i = 0; 50 >= i; i++ ){ var e = new Element('div', { className: 'touch' }); e.setAttribute("id", "f" + (i)); b.insert(e); }
 
-        //setInterval(function(){
-        //  $('debug').innerHTML = ['|','/','-','\\'][inc%4];
-        //},10);
+        var mouse_pointer = new Element('div', { className: 'mouse' });
+        _mouse.addClassName('inactive');
+        mouse_pointer.innerHTML = '<span>mouse</span>';
+        b.insert(mouse_pointer);
 
         function setPos(element, event){
           if(!element) return;
@@ -361,37 +349,21 @@
             ('width:'+event.rectWidth+'px;height:'+event.rectHeight+'px;'+
             'margin:-'+(event.rectHeight/2).round()+'px 0 0 -'+(event.rectWidth/2).round()+'px') 
             : ''));
-            
-          //if('panSpeedX' in event){
-          //  var length = Math.sqrt(event.panSpeedX*event.panSpeedX+event.panSpeedX*event.panSpeedY).round(),
-          //         dir = Math.atan2(event.panSpeedY,event.panSpeedX);
-          //  panspeed.setStyle('left:'+event.clientX+'px;top:'+event.clientY+'px;'+
-          //    '-webkit-transform:rotate('+dir+'rad)');
-          //  panspeedDiv.setStyle('width:'+length+'px');
-          //}
         }
 
-        function track(event){
-          //var el = new Element('div', { className: 'trackpoint' });
-          //el.setStyle('background-color:'+colors[event.id]+';'+
-          //  'left:'+event.clientX+'px;top:'+event.clientY+'px;');
-          //b.insert(el);
-          //setTimeout(function(){ el.remove(); }, 1000);
-        }
-        
         var touchfingers = $$('div.touch');
-        
+
         function infoForTouchEvent(event, phase){
-          return '<span>touchevent#</span>'+(touchcounter)+'<br/>'+
-            '<span>phase</span>'+phase+'<br/>'+
-            '<span>touches</span>'+(event.touches.length)+'<br/>';
+          return '<span><b>touch</b></span><br/>' +
+	         '<span>event#</span>'+(touchcounter)+'<br/>'+
+                 '<span>phase</span>'+phase+'<br/>'+
+                 '<span>touches</span>'+(event.touches.length)+'<br/>';
         }
-        
+
         function infoForTouch(touch){
-          return '<span>touch'+(touch.identifier)+'</span>'+
-            (touch.clientX)+'/'+(touch.clientY)+'<br/>';
+          return '<span>touch'+(touch.identifier)+'</span>'+(touch.clientX)+'/'+(touch.clientY)+'<br/>';
         }
-        
+
         function renderInfoForTouches(touches){
           var info = '';
 
@@ -401,101 +373,63 @@
             info += infoForTouch(touch,index);
             setPos(touchfingers[touch.identifier].removeClassName('off'), touch);            
           });
-          
+  
           $('touches').innerHTML = info;
         }
 
-        function start(event){
+        _screen.observe('touchstart', function(event){ // event: TouchEvent
           touchcounter++;
-          $('touch').removeClassName('inactive').show().innerHTML = infoForTouchEvent(event, 'start');
+          _touch.removeClassName('inactive').show().innerHTML = infoForTouchEvent(event, 'start');
+	  
+          var l = event.changedTouches; // l: TouchList
+	  
+          for( var i = l.length - 1; i >= 0; i-- )
+          {
+	    if( !syncTestRun(l[i].pageX, l[i].pageY) ) soundTestRun(l[i].pageX, l[i].pageY); // l[i]: Touch
+          }
+	  
           event.preventDefault();
-        }
-        function move(event){
+        });
+
+        _screen.observe('touchmove', function(event){
           touchcounter++;
-          $('touch').show().innerHTML = infoForTouchEvent(event, 'move');
+          _touch.show().innerHTML = infoForTouchEvent(event, 'move');
           renderInfoForTouches(event.touches);
-        }
-        function end(event){
+        });
+	
+        _screen.observe('touchend', function(event){
           touchcounter++;
-          $('touch').show().innerHTML = infoForTouchEvent(event, 'end');
-          if(event.touches.length==0) $('touch').addClassName('inactive');
+          _touch.show().innerHTML = infoForTouchEvent(event, 'end');
+          if(event.touches.length==0) _touch.addClassName('inactive');
           renderInfoForTouches(event.touches);
-        }
-        
-        function infoForTransformactionEvent(event, phase){
-          return '<span><b>transformaction</b></span><br/>'+
-            '<span>transf#</span>'+(transformactioncounter++)+'<br/>'+
-            '<span>phase</span>'+phase+'<br/>'+
-            '<span>clientX/Y</span>'+event.clientX+'/'+event.clientY+'<br/>'+
-            '<span>scale</span>'+event.scale.toFixed(2)+'<br/>'+
-            '<span>scaleSpeed</span>'+event.scaleSpeed.toFixed(2)+'<br/>'+
-            '<span>rotate</span>'+event.rotate.toFixed(2)+'<br/>'+
-            '<span>rotSpeed</span>'+event.rotateSpeed.toFixed(2)+'<br/>'+
-            '<span>panX/Y</span>'+event.panX+'/'+event.panY+'<br/>'+
-            '<span>panSpeedX/Y</span>'+event.panSpeedX+'/'+event.panSpeedY+'<br/>'
-        }
-        function transformactionStart(event){
-          setPos(indicator, event);
-          indicator.show();
-          panspeed.show();
-          $('transformaction').removeClassName('inactive').show().innerHTML = infoForTransformactionEvent(event, 'start');
-          event.stop();      
-        }
-        function transformactionUpdate(event){
-          setPos(indicator, event);
-          indicator.style.webkitTransform = 
-            'rotate('+event.rotate+'rad) scale('+event.scale+')';
-          $('transformaction').show().innerHTML = infoForTransformactionEvent(event, 'update');
-        }
-        function transformactionEnd(event){
-          $('transformaction').show().innerHTML = infoForTransformactionEvent(event, 'end');
-          $('transformaction').addClassName('inactive');
-          setPos(indicator, event);
-          indicator.hide();
-          panspeed.hide();
-        }
-        
+        });
+
+
         function infoForMouseEvent(event, phase){
           return '<span><b>mouse</b></span><br/>'+
-            '<span>mouse#</span>'+(mousecounter++)+'<br/>'+
-            '<span>phase</span>'+phase+'<br/>'+
-            '<span>phase</span>mousemove<br/>'+
-            '<span>clientX/Y</span>'+event.clientX+'/'+event.clientY+'<br/>';
-        }     
-        function mouseDown(event){
-          setPos(mouse, event);
-          $('mouse').show().removeClassName('inactive').innerHTML = infoForMouseEvent(event, 'down');
-        }
-        function mouseMove(event){
-          setPos(mouse, event);
-          $('mouse').show().innerHTML = infoForMouseEvent(event, 'move');
-        }
-        function mouseUp(event){
-          setPos(mouse, event);
-          $('mouse').show().addClassName('inactive').innerHTML = infoForMouseEvent(event, 'up');
-        }
+                 '<span>event#</span>'+(mousecounter++)+'<br/>'+
+		 '<span>phase</span>'+phase+'<br/>'+
+		 '<span>clientX/Y</span>'+event.clientX+'/'+event.clientY+'<br/>';
+        } 
+	
+        _screen.observe('mousedown', function(event){
+          setPos(mouse_pointer, event);
+          _mouse.show().removeClassName('inactive').innerHTML = infoForMouseEvent(event, 'down');
+          if( !syncTestRun(event.clientX, event.clientY) ) soundTestRun(event.clientX, event.clientY);
+        });
+	
+        _screen.observe('mouseup', function(event){
+          setPos(mouse_pointer, event);
+          _mouse.show().addClassName('inactive').innerHTML = infoForMouseEvent(event, 'up');
+        });
+	
+        _screen.observe('mousemove', function(event){
+          setPos(mouse_pointer, event); _mouse.show().innerHTML = infoForMouseEvent(event, 'move');
+        });
 
-        function ignore(event){ event.stop(); }
-
-        $('screen').observe('touchstart', start);
-        $('screen').observe('touchmove', move);
-        $('screen').observe('touchend', end);
-
-        $('screen').observe('transformactionstart', transformactionStart);
-        $('screen').observe('transformactionupdate', transformactionUpdate);
-        $('screen').observe('transformactionend', transformactionEnd);
-
-        $('screen').observe('mousedown', mouseDown);
-        $('screen').observe('mouseup', mouseUp);
-        $('screen').observe('mousemove', mouseMove);
-
-        indicator.hide();
-        panspeed.hide();
-
-        mouse = new Element('div', { className: 'mouse' });
-        $('mouse').addClassName('inactive');
-        mouse.innerHTML = '<span>mouse</span>';
-        b.insert(mouse);
+        window.setInterval(function() { _clock_time.innerHTML = Date(); }, 500);
+        window.setInterval(function() { _network_data.innerHTML = infoNetworkInterfaces(); renderPasiveNetworkInterfaces(); }, 4000);
+        window.setInterval(function() { _display_data.innerHTML = infoDisplays(); }, 3000);
       });
     </script>
   </body>
