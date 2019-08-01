@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 ### Changed
+- upgrade to Electron v6.0.0, Node v12.4.0, Chromium v76.0.3809.88
+
 ### Deprecated
 ### Removed
 ### Fixed
