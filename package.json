@@ -22,8 +22,8 @@
   "author": "IMAGINARY gGmbH <info@imaginary.org>",
   "license": "Apache-2.0",
   "devDependencies": {
-    "electron": "6.0.0-beta.12",
-    "electron-builder": "^20.43.0"
+    "electron": "6.0.0",
+    "electron-builder": "^21.2.0"
   },
   "dependencies": {
     "electron-settings": "^3.1.4",
@@ -41,8 +41,8 @@
   "scripts": {
     "postinstall": "electron-builder install-app-deps",
     "start": "electron .",
-    "pack": "CSC_IDENTITY_AUTO_DISCOVERY=false build --x64 --dir",
-    "dist": "CSC_IDENTITY_AUTO_DISCOVERY=false build --x64"
+    "pack": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --x64 --dir",
+    "dist": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --x64"
   },
   "build": {
     "appId": "org.imaginary.kiosk",
