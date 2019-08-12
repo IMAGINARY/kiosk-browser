@@ -8,12 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 ### Changed
-- upgrade to Electron v6.0.0, Node v12.4.0, Chromium v76.0.3809.88
-
 ### Deprecated
 ### Removed
 ### Fixed
 ### Security
+
+## [0.12.0] 2019-08-12
+
+### Changed
+- upgrade to Electron v6.0.1, Node v12.4.0, Chromium v76.0.3809.102
 
 ## [0.11.1] 2019-05-10
 
@@ -197,7 +200,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [library for sending heartbearts]: https://github.com/hilbert/hilbert-heartbeat
 
-[Unreleased]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.11.1...HEAD
+[Unreleased]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.12.0...HEAD
+[0.12.0]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.11.1...v0.12.0
 [0.11.1]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.9.12...v0.10.0
