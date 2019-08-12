@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
+-- `--reload-unresponsive` command line option for auto-reloading web pages that are unresponsive for the given amount of time
+
 ### Changed
 ### Deprecated
 ### Removed
