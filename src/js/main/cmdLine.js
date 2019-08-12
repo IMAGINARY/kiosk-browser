@@ -159,6 +159,11 @@ const options = {
         type: 'number',
         description: 'Retry after given number of seconds if loading the page failed (0 to disable)',
     },
+    'reload-unresponsive': {
+        type: 'number',
+        description: 'Reloads websites that are unresponsive for the given number of seconds.',
+        requiresArg: true,
+    },
     'preload': {
         type: 'string',
         description: 'Preload a JavaScript file into each website',

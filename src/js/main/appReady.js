@@ -146,6 +146,26 @@ function setZoomFactor(webContents, zoomFactor) {
     }
 }
 
+function enableReloadingWhenUnresponsive(responsivenessCheck, reloadCallback, timeoutMs) {
+    logger.debug('Will reload pages that are unresponsive for %ims', timeoutMs);
+    let lastResponseMs = Date.now();
+    setInterval(() => {
+        const currentMs = Date.now();
+        if (currentMs - lastResponseMs > timeoutMs) {
+            logger.debug('Page unresponsive. Reloading.');
+            // reload the page
+            lastResponseMs = currentMs;
+            reloadCallback();
+        } else {
+            // apply responsiveness check
+            responsivenessCheck().then(() => {
+                logger.debug('Page responsiveness test succeeded.');
+                lastResponseMs = Date.now();
+            });
+        }
+    }, 500);
+}
+
 function appReady(args) {
     // either disable default menu (noop on macOS) or set custom menu (based on default)
     Menu.setApplicationMenu(args.menu && !args.kiosk ? extendMenu(Menu.getApplicationMenu()) : null);
@@ -180,7 +200,24 @@ function appReady(args) {
     if (process.platform === 'linux')
         options.icon = path.resolve(__dirname, '../../../build/fallbackicon.png');
 
-    mainWindow = new BrowserWindow(options);
+    global.mainWindow = createMainWindow(args, options);
+    const responsivenessCheck = () => global.mainWindow.webContents.executeJavaScript('true;');
+    const reloadCallback = () => {
+        // create new window before the old one is destroyed to avoid window-all-closed event from being triggered
+        const newWindow = createMainWindow(args, options);
+        global.mainWindow.destroy();
+        global.mainWindow = newWindow;
+    };
+    if (args['reload-unresponsive'])
+        enableReloadingWhenUnresponsive(responsivenessCheck, reloadCallback, args['reload-unresponsive'] * 1000);
+
+    // toggle developer tools on SIGUSR1
+    logger.info('Send SIGUSR1 to PID %i to open developer Tools', process.pid);
+    process.on('SIGUSR1', () => global.mainWindow.webContents.toggleDevTools());
+}
+
+function createMainWindow(args, options) {
+    const mainWindow = new BrowserWindow(options);
     const webContents = mainWindow.webContents;
 
     const adjustWindowBounds = (() => {
@@ -198,10 +235,9 @@ function appReady(args) {
 
     adjustWindowBounds();
 
-    // open the developers now if requested or toggle them when SIGUSR1 is received
+    // open the developer tools now if requested
     if (args.dev)
         mainWindow.openDevTools();
-    process.on('SIGUSR1', () => webContents.toggleDevTools());
 
     webContents.on('new-window', event => event.preventDefault());
 
