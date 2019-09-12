@@ -33,7 +33,7 @@
     "http": "^0.0.0",
     "network": "^0.4.0",
     "os": "^0.1.1",
-    "portfinder": "^1.0.19",
+    "portfinder": "^1.0.24",
     "serve-static": "^1.14.1",
     "winston": "^3.2.1",
     "yargs": "^13.2.2"
