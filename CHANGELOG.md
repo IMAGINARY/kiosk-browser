@@ -7,10 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-
--- `--reload-unresponsive` command line option for auto-reloading web pages that are unresponsive for the given amount of time
+- `--reload-unresponsive` command line option for auto-reloading web pages that are unresponsive for the given amount of time
 
 ### Changed
+- upgrade to Electron v6.0.11, Node v12.4.0, Chromium v76.0.3809.146
+
 ### Deprecated
 ### Removed
 ### Fixed
