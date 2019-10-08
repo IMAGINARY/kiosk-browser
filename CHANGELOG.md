@@ -13,6 +13,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 ### Security
 
+## [0.12.1] 2019-10-08
+
+### Added
+- `--reload-unresponsive` command line option for auto-reloading web pages that are unresponsive for the given amount of time
+
+### Changed
+- upgrade to Electron v6.0.11, Node v12.4.0, Chromium v76.0.3809.146
+
 ## [0.12.0] 2019-08-12
 
 ### Changed
@@ -200,7 +208,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [library for sending heartbearts]: https://github.com/hilbert/hilbert-heartbeat
 
-[Unreleased]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.12.0...HEAD
+[Unreleased]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.12.1...HEAD
+[0.12.1]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.11.1...v0.12.0
 [0.11.1]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.10.0...v0.11.0

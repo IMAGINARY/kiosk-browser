@@ -25,7 +25,8 @@ function init(wwwRootDir) {
 
             // Create server
             server = http.createServer(function onRequest(req, res) {
-                serve(req, res, finalhandler(req, res))
+                const errorHandler = err => logger.warn('HTTP %i, %s', err.statusCode, err.message);
+                serve(req, res, finalhandler(req, res, {onerror: errorHandler}));
             });
 
             // Do something about errors
