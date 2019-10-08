@@ -36,7 +36,7 @@
     "portfinder": "^1.0.24",
     "serve-static": "^1.14.1",
     "winston": "^3.2.1",
-    "yargs": "^14.1.0"
+    "yargs": "^14.2.0"
   },
   "scripts": {
     "postinstall": "electron-builder install-app-deps",
