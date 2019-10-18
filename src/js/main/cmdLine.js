@@ -195,6 +195,7 @@ const options = {
     'cover-displays': {
         description: 'Let the browser window cover the displays provided by comma separated display numbers. Spanning multiple displays is not supported on all platforms.',
         requiresArg: true,
+        type: 'string',
         coerce: coerceCoverDisplays,
     },
     'inspect': {
