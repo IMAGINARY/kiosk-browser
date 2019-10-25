@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const process = require('process');
 const {BrowserWindow, Menu, MenuItem} = require('electron');
 
 const {logger} = require(path.join(__dirname, 'logging.js'));
@@ -148,19 +149,20 @@ function setZoomFactor(webContents, zoomFactor) {
 
 function enableReloadingWhenUnresponsive(responsivenessCheck, reloadCallback, timeoutMs) {
     logger.debug('Will reload pages that are unresponsive for %ims', timeoutMs);
-    let lastResponseMs = Date.now();
+    const timeoutNs = BigInt(timeoutMs) * 1000n * 1000n;
+    let lastResponseNs = process.hrtime.bigint();
     setInterval(() => {
-        const currentMs = Date.now();
-        if (currentMs - lastResponseMs > timeoutMs) {
+        const currentNs = process.hrtime.bigint();
+        if (currentNs - lastResponseNs > timeoutNs) {
             logger.debug('Page unresponsive. Reloading.');
             // reload the page
-            lastResponseMs = currentMs;
+            lastResponseNs = currentNs;
             reloadCallback();
         } else {
             // apply responsiveness check
             responsivenessCheck().then(() => {
                 logger.debug('Page responsiveness test succeeded.');
-                lastResponseMs = Date.now();
+                lastResponseNs = process.hrtime.bigint();
             });
         }
     }, 500);

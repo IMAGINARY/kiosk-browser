@@ -1,7 +1,7 @@
 {
   "name": "kiosk-browser",
   "productName": "kiosk-browser",
-  "version": "0.12.2",
+  "version": "0.12.3",
   "description": "Hardend Kiosk Web Browser",
   "homepage": "https://github.com/IMAGINARY/kiosk-browser",
   "repository": {
@@ -22,7 +22,7 @@
   "author": "IMAGINARY gGmbH <info@imaginary.org>",
   "license": "Apache-2.0",
   "devDependencies": {
-    "electron": "6.1.0",
+    "electron": "6.1.2",
     "electron-builder": "^21.2.0"
   },
   "dependencies": {
