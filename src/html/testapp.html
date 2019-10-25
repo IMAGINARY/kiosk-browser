@@ -227,7 +227,7 @@
 
 
         function displaysText(){ 
-          var displays = require('electron').screen.getAllDisplays(); var ndisplays = displays.length;
+          var displays = require('electron').remote.screen.getAllDisplays(); var ndisplays = displays.length;
 
           var t = '';
 
