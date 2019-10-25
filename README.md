@@ -46,6 +46,21 @@ Pointing the kiosk-browser to `kiosk://testapp` will bring up a simple app for t
 as well as analyzing common problems with audio and video output such as flipped audio channels or screen tearing.
 Additionally, it displays basic network configuration and other system information.
 
+## Building redistributable files
+You need to install NodeJS 12 and yarn. Then
+```
+yarn run dist
+```
+will create the redistributable files for your current platform. Build results are placed in `dist`.
+
+For build the Linux redistributables, you can utilize the `Dockerfile` (requires `docker`):
+```
+docker build -t kiosk-browser-builder .
+mkdir -p dist
+docker run --rm -ti -v `pwd`/dist:/dist kiosk-browser-builder
+```
+This builds a docker image named `kiosk-browser-builder` and runs it in a container. The build results are placed in the `dist` folder of the current directory (same directoy that `yarn run dist` uses).
+
 ## License
 
 Copyright 2016 IMAGINARY gGmbH
