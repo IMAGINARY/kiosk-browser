@@ -140,7 +140,7 @@ function computeZoomFactor(newBounds, fit, zoom) {
 
 function setZoomFactor(webContents, zoomFactor) {
     zoomFactor = Math.max(0.25, Math.min(zoomFactor, 5.0));
-    webContents.setZoomFactor(zoomFactor);
+    webContents.zoomFactor = zoomFactor;
     if (process.platform === 'darwin') {
         const jsCode = `document.documentElement.style.setProperty('--kiosk-zoom', ${zoomFactor});`;
         webContents.executeJavaScript(jsCode);
@@ -261,7 +261,7 @@ function createMainWindow(args, options) {
         adjustWindowBounds();
 
         // also adjust the zoom of the draggable area
-        setZoomFactor(webContents, webContents.getZoomFactor());
+        setZoomFactor(webContents, webContents.zoomFactor);
         mainWindow.show();
     });
 
