@@ -221,8 +221,10 @@ function getOptions(defaults) {
     const optionsWithDefaults = Object.assign({}, options);
     Object.getOwnPropertyNames(defaults)
         .filter(optionName => optionsWithDefaults.hasOwnProperty(optionName))
-        .forEach(optionName => assignDefault(optionsWithDefaults[optionName], defaults[optionName]));
-    return optionsWithDefaults;
+        .forEach(optionName => assignDefault(optionsWithDefaults[optionName], defaults[optionName]))
+    const compare = (a, b) => a[0].localeCompare(b[0]);
+    const sortedOptionsWithDefaults = Object.fromEntries(Object.entries(optionsWithDefaults).sort(compare));
+    return sortedOptionsWithDefaults;
 }
 
 module.exports = {getOptions: getOptions};
