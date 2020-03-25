@@ -79,6 +79,20 @@ function coerceCoverDisplays(s) {
     return nums;
 }
 
+function coerceOverflow(s) {
+    const possibleRules = ["", "auto", "hidden", "inherit", "initial", "scroll", "visible"];
+    const overflowRules = s.split(",").slice(0, 2).map(r => r.trim());
+    const invalidRules = overflowRules.filter(r => possibleRules.indexOf(r) === -1);
+    if (invalidRules.length > 0)
+        throw new Error(`Invalid overflow rule: ${invalidRules[0]}`);
+    if (overflowRules.length === 1)
+        overflowRules.push(overflowRules[0]);
+    return {
+        x: overflowRules[0],
+        y: overflowRules[overflowRules.length - 1]
+    };
+}
+
 const options = {
     'help': {
         alias: 'h',
@@ -207,6 +221,18 @@ const options = {
         type: 'number',
         description: 'Like --inspect but pauses execution on the first line of JavaScript.',
         hidden: true,
+    },
+    "overflow": {
+        type: "string",
+        description: "Specify CSS overflow rules for top-level page. Use 'hidden' to hide the overflow and disable scroll bars. Separate rules for the x and y directions can be provided, e.g. 'hidden,' disables vertical scrolling but leaves the horizontal overflow rule untouched.",
+        requiresArg: true,
+        default: "",
+        coerce: coerceOverflow,
+    },
+    'hide-scrollbars': {
+        type: 'boolean',
+        description: 'Hide scroll bars without disabling scroll functionality via keyboard, mouse wheel or gestures.',
+        default: false
     },
 };
 
