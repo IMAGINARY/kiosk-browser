@@ -174,6 +174,11 @@ function setOverflowRules(webContents, rules) {
     webContents.on('dom-ready', () => webContents.insertCSS(overflowCss, {cssOrigin: 'user'}));
 }
 
+function hideScrollBars(webContents) {
+    const cssRule = 'body::-webkit-scrollbar { display: none; }';
+    webContents.on('dom-ready', () => webContents.insertCSS(cssRule, {cssOrigin: 'user'}));
+}
+
 function appReady(args) {
     // either disable default menu (noop on macOS) or set custom menu (based on default)
     Menu.setApplicationMenu(args.menu && !args.kiosk ? extendMenu(Menu.getApplicationMenu()) : null);
@@ -275,6 +280,8 @@ function createMainWindow(args, options) {
         mainWindow.on('resize', () => setZoomFactor(webContents, computeZoomFactor(mainWindow.getContentBounds(), args.fit, args.zoom)));
 
     setOverflowRules(webContents, args.overflow);
+    if (args['hide-scrollbars'])
+        hideScrollBars(webContents);
 
     /***
      * Add a handle for dragging windows on macOS due to hidden title bar.

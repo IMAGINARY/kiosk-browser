@@ -229,6 +229,11 @@ const options = {
         default: "",
         coerce: coerceOverflow,
     },
+    'hide-scrollbars': {
+        type: 'boolean',
+        description: 'Hide scroll bars without disabling scroll functionality via keyboard, mouse wheel or gestures.',
+        default: false
+    },
 };
 
 function assignDefault(option, defaultValue) {
