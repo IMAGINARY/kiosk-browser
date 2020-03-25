@@ -234,6 +234,11 @@ const options = {
         description: 'Hide scroll bars without disabling scroll functionality via keyboard, mouse wheel or gestures.',
         default: false
     },
+    'disable-selection': {
+        type: 'boolean',
+        description: 'Disable selection for all elements except form fields.',
+        default: false,
+    },
 };
 
 function assignDefault(option, defaultValue) {

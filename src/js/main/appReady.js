@@ -194,6 +194,9 @@ function appReady(args) {
         preload: path.join(__dirname, '../renderer/preload.js')
     };
 
+    if (args['disable-selection'])
+        preloadModules.push(path.join(__dirname, '../renderer/disableSelection.js'));
+
     if (args.preload)
         preloadModules.push(path.resolve(args.preload));
 
