@@ -197,6 +197,9 @@ function appReady(args) {
     if (args['disable-selection'])
         preloadModules.push(path.join(__dirname, '../renderer/disableSelection.js'));
 
+    if (args['disable-drag'])
+        preloadModules.push(path.join(__dirname, '../renderer/disableDrag.js'));
+
     if (args.preload)
         preloadModules.push(path.resolve(args.preload));
 

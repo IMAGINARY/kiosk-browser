@@ -239,6 +239,11 @@ const options = {
         description: 'Disable selection for all elements except form fields.',
         default: false,
     },
+    'disable-drag': {
+        type: 'boolean',
+        description: 'Prevent dragging of draggable elements like images.',
+        default: false,
+    },
 };
 
 function assignDefault(option, defaultValue) {
