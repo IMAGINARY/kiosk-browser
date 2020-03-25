@@ -289,7 +289,7 @@ function createMainWindow(args, options) {
     if (process.platform === 'darwin') {
         const appRegionOverlayCss = fs.readFileSync(path.join(__dirname, '../../css/app-region-overlay.css'), 'utf8');
         webContents.on('dom-ready', () => {
-            webContents.insertCSS(appRegionOverlayCss);
+            webContents.insertCSS(appRegionOverlayCss, {cssOrigin: 'user'});
             setOverlayVisible(webContents, !mainWindow.isFullScreen());
         });
 
