@@ -5,6 +5,7 @@ const {BrowserWindow, Menu, MenuItem} = require('electron');
 
 const {logger} = require(path.join(__dirname, 'logging.js'));
 const preloadModules = require(path.join(__dirname, 'preloadModules.js'));
+const IdleDetector = require('./idleDetector.js');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -317,6 +318,12 @@ function createMainWindow(args, options) {
      * Display error on failed page loads and reload the page after a certain delay if requested.
      */
     webContents.on('did-fail-load', (e, code, desc, url) => handleFailedLoad(mainWindow, code, desc, url, args.retry));
+
+    /***
+     * Load the initial page again when the system is idle for the given number of seconds.
+     */
+    if (args['reload-idle'])
+        IdleDetector.setTimeout(() => mainWindow.loadURL(args.url), args['reload-idle'] * 1000);
 
     /***
      * Load the page into the main window
