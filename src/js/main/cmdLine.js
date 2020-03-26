@@ -178,6 +178,11 @@ const options = {
         description: 'Reloads websites that are unresponsive for the given number of seconds.',
         requiresArg: true,
     },
+    'reload-idle': {
+        type: 'number',
+        description: 'Reload the initially opened web page when the system is idle for the given number of seconds.',
+        requiresArg: true,
+    },
     'preload': {
         type: 'string',
         description: 'Preload a JavaScript file into each website',
