@@ -1,6 +1,8 @@
 #### Manually added stuff to ignore ####
 tmp/
 dist/
+# I am using this file for testing quite often
+debug.html
 
 # Created by https://www.gitignore.io/api/node,webstorm+all
 # Edit at https://www.gitignore.io/?templates=node,webstorm+all
