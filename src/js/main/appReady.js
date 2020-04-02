@@ -91,18 +91,21 @@ function computeFullscreenBounds(window) {
  * @param bounds
  */
 function fixWindowSize(window, bounds) {
-    logger.debug("Initial content bounds: %o", window.getContentBounds());
+    logger.debug("Initial (content) bounds: (%o) %o", window.getBounds(), window.getContentBounds());
 
     const oldMin = window.getMinimumSize();
 
     window.setMinimumSize(bounds.width, bounds.height);
 
-    window.setBounds(bounds);
+    window.setBounds({x: bounds.x, y: bounds.y, width: bounds.width + 1, height: bounds.height + 1});
     window.setContentBounds(bounds);
 
     window.setMinimumSize(oldMin[0], oldMin[1]);
 
-    logger.debug("Fixed content bounds:   %o", window.getContentBounds());
+    window.setBounds(bounds);
+
+    logger.debug("Fixed bounds:   %o", window.getBounds());
+    logger.debug("Fixed (content) bounds:  (%o) %o", window.getBounds(), window.getContentBounds());
 }
 
 function setOverlayVisible(webContents, visible) {
