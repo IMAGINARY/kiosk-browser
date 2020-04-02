@@ -7,10 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- add `--reload-idle` cli option to auto-reload when idle
+- add `--disable-drag` cli option to disable drag & drop
+- add `--disable-selection` cli option to disable selection except for form fields
+- add `--hide-scrollbars` cli option to hide scroll bars
+- add `--overflow` cli option to specify CSS overflow rules for top-level page
+- add Dockerfile for building Linux redistributables
+
 ### Changed
+- upgrade to Electron v8.2.0, Node v12.13.0, Chromium v80.0.3987.158
+- enable preload scripts in sub-frames
+
 ### Deprecated
 ### Removed
 ### Fixed
+- fix screen handling in testapp
+
 ### Security
 
 ## [0.12.3] 2019-10-25
