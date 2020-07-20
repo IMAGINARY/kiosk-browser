@@ -79,6 +79,20 @@ function coerceCoverDisplays(s) {
     return nums;
 }
 
+function coerceOverflow(s) {
+    const possibleRules = ["", "auto", "hidden", "inherit", "initial", "scroll", "visible"];
+    const overflowRules = s.split(",").slice(0, 2).map(r => r.trim());
+    const invalidRules = overflowRules.filter(r => possibleRules.indexOf(r) === -1);
+    if (invalidRules.length > 0)
+        throw new Error(`Invalid overflow rule: ${invalidRules[0]}`);
+    if (overflowRules.length === 1)
+        overflowRules.push(overflowRules[0]);
+    return {
+        x: overflowRules[0],
+        y: overflowRules[overflowRules.length - 1]
+    };
+}
+
 const options = {
     'help': {
         alias: 'h',
@@ -164,6 +178,11 @@ const options = {
         description: 'Reloads websites that are unresponsive for the given number of seconds.',
         requiresArg: true,
     },
+    'reload-idle': {
+        type: 'number',
+        description: 'Reload the initially opened web page when the system is idle for the given number of seconds.',
+        requiresArg: true,
+    },
     'preload': {
         type: 'string',
         description: 'Preload a JavaScript file into each website',
@@ -208,6 +227,28 @@ const options = {
         description: 'Like --inspect but pauses execution on the first line of JavaScript.',
         hidden: true,
     },
+    "overflow": {
+        type: "string",
+        description: "Specify CSS overflow rules for top-level page. Use 'hidden' to hide the overflow and disable scroll bars. Separate rules for the x and y directions can be provided, e.g. 'hidden,' disables vertical scrolling but leaves the horizontal overflow rule untouched.",
+        requiresArg: true,
+        default: "",
+        coerce: coerceOverflow,
+    },
+    'hide-scrollbars': {
+        type: 'boolean',
+        description: 'Hide scroll bars without disabling scroll functionality via keyboard, mouse wheel or gestures.',
+        default: false
+    },
+    'disable-selection': {
+        type: 'boolean',
+        description: 'Disable selection for all elements except form fields.',
+        default: false,
+    },
+    'disable-drag': {
+        type: 'boolean',
+        description: 'Prevent dragging of draggable elements like images.',
+        default: false,
+    },
 };
 
 function assignDefault(option, defaultValue) {
@@ -221,8 +262,10 @@ function getOptions(defaults) {
     const optionsWithDefaults = Object.assign({}, options);
     Object.getOwnPropertyNames(defaults)
         .filter(optionName => optionsWithDefaults.hasOwnProperty(optionName))
-        .forEach(optionName => assignDefault(optionsWithDefaults[optionName], defaults[optionName]));
-    return optionsWithDefaults;
+        .forEach(optionName => assignDefault(optionsWithDefaults[optionName], defaults[optionName]))
+    const compare = (a, b) => a[0].localeCompare(b[0]);
+    const sortedOptionsWithDefaults = Object.fromEntries(Object.entries(optionsWithDefaults).sort(compare));
+    return sortedOptionsWithDefaults;
 }
 
 module.exports = {getOptions: getOptions};

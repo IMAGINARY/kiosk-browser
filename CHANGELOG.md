@@ -6,11 +6,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.0] 2020-07-20
+
 ### Added
+- add `--reload-idle` cli option to auto-reload when idle
+- add `--disable-drag` cli option to disable drag & drop
+- add `--disable-selection` cli option to disable selection except for form fields
+- add `--hide-scrollbars` cli option to hide scroll bars
+- add `--overflow` cli option to specify CSS overflow rules for top-level page
+- add Dockerfile for building Linux redistributables
+
 ### Changed
-### Deprecated
-### Removed
+- upgrade to Electron v8.2.0, Node v12.13.0, Chromium v80.0.3987.158
+- enable preload scripts in sub-frames
+
 ### Fixed
+- fix screen handling in testapp
+
 ### Security
 
 ## [0.12.3] 2019-10-25
@@ -224,7 +236,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [library for sending heartbearts]: https://github.com/hilbert/hilbert-heartbeat
 
-[Unreleased]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.12.3...HEAD
+[Unreleased]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.13.0...HEAD
+[0.13.0]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.12.3...v0.13.0
 [0.12.3]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.12.2...v0.12.3
 [0.12.2]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.12.1...v0.12.2
 [0.12.1]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.12.0...v0.12.1

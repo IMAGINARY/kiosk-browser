@@ -5,6 +5,7 @@ const {BrowserWindow, Menu, MenuItem} = require('electron');
 
 const {logger} = require(path.join(__dirname, 'logging.js'));
 const preloadModules = require(path.join(__dirname, 'preloadModules.js'));
+const IdleDetector = require('./idleDetector.js');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -90,18 +91,21 @@ function computeFullscreenBounds(window) {
  * @param bounds
  */
 function fixWindowSize(window, bounds) {
-    logger.debug("Initial content bounds: %o", window.getContentBounds());
+    logger.debug("Initial (content) bounds: (%o) %o", window.getBounds(), window.getContentBounds());
 
     const oldMin = window.getMinimumSize();
 
     window.setMinimumSize(bounds.width, bounds.height);
 
-    window.setBounds(bounds);
+    window.setBounds({x: bounds.x, y: bounds.y, width: bounds.width + 1, height: bounds.height + 1});
     window.setContentBounds(bounds);
 
     window.setMinimumSize(oldMin[0], oldMin[1]);
 
-    logger.debug("Fixed content bounds:   %o", window.getContentBounds());
+    window.setBounds(bounds);
+
+    logger.debug("Fixed bounds:   %o", window.getBounds());
+    logger.debug("Fixed (content) bounds:  (%o) %o", window.getBounds(), window.getContentBounds());
 }
 
 function setOverlayVisible(webContents, visible) {
@@ -140,7 +144,7 @@ function computeZoomFactor(newBounds, fit, zoom) {
 
 function setZoomFactor(webContents, zoomFactor) {
     zoomFactor = Math.max(0.25, Math.min(zoomFactor, 5.0));
-    webContents.setZoomFactor(zoomFactor);
+    webContents.zoomFactor = zoomFactor;
     if (process.platform === 'darwin') {
         const jsCode = `document.documentElement.style.setProperty('--kiosk-zoom', ${zoomFactor});`;
         webContents.executeJavaScript(jsCode);
@@ -168,6 +172,17 @@ function enableReloadingWhenUnresponsive(responsivenessCheck, reloadCallback, ti
     }, 500);
 }
 
+function setOverflowRules(webContents, rules) {
+    const createCssRule = dir => rules[dir] === '' ? '' : `overflow-${dir}: ${rules[dir]};`;
+    const overflowCss = `body { ${createCssRule('x')} ${createCssRule('y')} };`;
+    webContents.on('dom-ready', () => webContents.insertCSS(overflowCss, {cssOrigin: 'user'}));
+}
+
+function hideScrollBars(webContents) {
+    const cssRule = 'body::-webkit-scrollbar { display: none; }';
+    webContents.on('dom-ready', () => webContents.insertCSS(cssRule, {cssOrigin: 'user'}));
+}
+
 function appReady(args) {
     // either disable default menu (noop on macOS) or set custom menu (based on default)
     Menu.setApplicationMenu(args.menu && !args.kiosk ? extendMenu(Menu.getApplicationMenu()) : null);
@@ -179,8 +194,15 @@ function appReady(args) {
         allowRunningInsecureContent: true,
         zoomFactor: computeZoomFactor({width: 800, height: 600}, args.fit, args.zoom),
         nodeIntegration: args.integration,
+        nodeIntegrationInSubFrames: true,
         preload: path.join(__dirname, '../renderer/preload.js')
     };
+
+    if (args['disable-selection'])
+        preloadModules.push(path.join(__dirname, '../renderer/disableSelection.js'));
+
+    if (args['disable-drag'])
+        preloadModules.push(path.join(__dirname, '../renderer/disableDrag.js'));
 
     if (args.preload)
         preloadModules.push(path.resolve(args.preload));
@@ -261,12 +283,16 @@ function createMainWindow(args, options) {
         adjustWindowBounds();
 
         // also adjust the zoom of the draggable area
-        setZoomFactor(webContents, webContents.getZoomFactor());
+        setZoomFactor(webContents, webContents.zoomFactor);
         mainWindow.show();
     });
 
     if (args.fit.forceZoomFactor)
         mainWindow.on('resize', () => setZoomFactor(webContents, computeZoomFactor(mainWindow.getContentBounds(), args.fit, args.zoom)));
+
+    setOverflowRules(webContents, args.overflow);
+    if (args['hide-scrollbars'])
+        hideScrollBars(webContents);
 
     /***
      * Add a handle for dragging windows on macOS due to hidden title bar.
@@ -274,7 +300,7 @@ function createMainWindow(args, options) {
     if (process.platform === 'darwin') {
         const appRegionOverlayCss = fs.readFileSync(path.join(__dirname, '../../css/app-region-overlay.css'), 'utf8');
         webContents.on('dom-ready', () => {
-            webContents.insertCSS(appRegionOverlayCss);
+            webContents.insertCSS(appRegionOverlayCss, {cssOrigin: 'user'});
             setOverlayVisible(webContents, !mainWindow.isFullScreen());
         });
 
@@ -295,6 +321,12 @@ function createMainWindow(args, options) {
      * Display error on failed page loads and reload the page after a certain delay if requested.
      */
     webContents.on('did-fail-load', (e, code, desc, url) => handleFailedLoad(mainWindow, code, desc, url, args.retry));
+
+    /***
+     * Load the initial page again when the system is idle for the given number of seconds.
+     */
+    if (args['reload-idle'])
+        IdleDetector.setTimeout(() => mainWindow.loadURL(args.url), args['reload-idle'] * 1000);
 
     /***
      * Load the page into the main window
