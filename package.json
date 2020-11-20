@@ -40,7 +40,7 @@
     "yargs": "14.2.3"
   },
   "scripts": {
-    "postinstall": "electron-builder install-app-deps",
+    "postinstall": "electron-builder install-app-deps && syncyarnlock --save && yarn install --ignore-scripts",
     "start": "electron .",
     "pack": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --x64 --dir",
     "dist": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --x64",
