@@ -22,22 +22,22 @@
   "author": "IMAGINARY gGmbH <info@imaginary.org>",
   "license": "Apache-2.0",
   "devDependencies": {
-    "electron": "^8.2.4",
-    "electron-builder": "^21.2.0",
-    "syncyarnlock": "^1.0.19"
+    "electron": "8.4.0",
+    "electron-builder": "21.2.0",
+    "syncyarnlock": "1.0.19"
   },
   "dependencies": {
-    "electron-settings": "^3.1.4",
-    "finalhandler": "^1.1.2",
-    "fs-extra": "^8.1.0",
-    "hjson": "^3.2.0",
-    "http": "^0.0.0",
-    "network": "^0.4.0",
-    "os": "^0.1.1",
-    "portfinder": "^1.0.24",
-    "serve-static": "^1.14.1",
-    "winston": "^3.2.1",
-    "yargs": "^14.2.0"
+    "electron-settings": "3.2.0",
+    "finalhandler": "1.1.2",
+    "fs-extra": "8.1.0",
+    "hjson": "3.2.1",
+    "http": "0.0.0",
+    "network": "0.4.1",
+    "os": "0.1.1",
+    "portfinder": "1.0.27",
+    "serve-static": "1.14.1",
+    "winston": "3.3.3",
+    "yargs": "14.2.3"
   },
   "scripts": {
     "postinstall": "electron-builder install-app-deps",
