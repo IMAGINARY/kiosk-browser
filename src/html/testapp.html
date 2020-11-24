@@ -192,7 +192,7 @@
         var network_data = document.getElementById('active_network_data');
         var passive_network_data = document.getElementById('passive_network_data');
 
-        function getHostName(){ return (require('os').hostname()); }
+        function getHostName(){ return testapp.os.hostname(); }
 
         function createAudio(file){ var A = new Audio(file); A.muted = false; A.loop = false; A.currentTime = 0; return (A); };
         var L = createAudio("../assets/Left.mp3"), C = createAudio("../assets/Center.mp3"), R = createAudio("../assets/Right.mp3");
@@ -226,8 +226,8 @@
         };
 
 
-        function displaysText(){ 
-          var displays = require('electron').remote.screen.getAllDisplays(); var ndisplays = displays.length;
+        function displaysText(){
+          var displays = testapp.screen.getAllDisplays(); var ndisplays = displays.length;
 
           var t = '';
 
@@ -259,9 +259,9 @@
         function NetworkTextPassive()
         { 
 //          var list = require('os').networkInterfaces(); // Active (!) interfaces!
-            var EOL = require('os').EOL;
+            var EOL = testapp.os.EOL;
             var cmd  = "egrep . /sys/class/net/*/address";
-            require('child_process').exec(cmd, function(err, stdout) {
+            testapp.exec(cmd, function(err, stdout) {
               var t = '';
               var raw = stdout.toString().trim();
               if (err) { passive_network_data.innerHTML = ''; console.log('Error: [' + err + '] from command ['+cmd+']. Output: ['+ raw +'].'); } else
@@ -290,7 +290,7 @@
 //  require('network').get_interfaces_list(function(err, _list)   { if (err) throw err;
   function networkText() {
     var t = ''; var mac, tt, L, len;
-    var list=require('os').networkInterfaces(); // Active (!) interfaces!
+    var list=testapp.os.networkInterfaces(); // Active (!) interfaces!
     //     console.log(list);
     for (var i in list)
     { //console.log(i);

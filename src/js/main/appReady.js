@@ -190,6 +190,7 @@ function appReady(args) {
     const webprefs = {
         plugins: true,
         webSecurity: false,
+        enableRemoteModule: true,
         experimentalFeatures: true,
         allowRunningInsecureContent: true,
         zoomFactor: computeZoomFactor({width: 800, height: 600}, args.fit, args.zoom),

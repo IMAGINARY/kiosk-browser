@@ -21,8 +21,8 @@ function logAndExit(title, error) {
 global.shellStartTime = Date.now();
 
 const {app} = require('electron');
+require('@electron/remote/main').initialize();
 
-const {pathToFileURL} = require('url');
 const path = require('path');
 const logging = require(path.join(__dirname, "logging.js"));
 const logger = logging.logger;
@@ -31,6 +31,7 @@ const settings = require(path.join(__dirname, "settings.js"));
 const convertToCmdLineFormat = require(path.join(__dirname, "settingsConverter.js"));
 const cmdLineOptions = require(path.join(__dirname, 'cmdLine.js'));
 const applyChromiumCmdLine = require(path.join(__dirname, 'applyChromiumCmdLine.js'));
+const {hasKioskProtocol, kioskSiteForKioskUrl} = require('./kiosk-sites.js');
 const httpServer = require(path.join(__dirname, 'httpServer.js'));
 const appReady = require(path.join(__dirname, 'appReady.js'));
 
@@ -41,22 +42,6 @@ const yargsParserConfig = {
     "parse-numbers": true,
 };
 const yargs = require('yargs').parserConfiguration(yargsParserConfig);
-
-function isKioskUrl(url) {
-    return /^kiosk:\/\//.test(url);
-}
-
-function resolveKioskUrl(kioskUrl) {
-    const url = new URL(kioskUrl);
-    const kioskUrls = {
-        home: 'index.html',
-        testapp: 'testapp.html'
-    };
-    if (kioskUrls[url.hostname])
-        return pathToFileURL(path.join(__dirname, '../../html/', kioskUrls[url.hostname])).href;
-    else
-        throw new Error(`Unknown kiosk:// url: ${url}`)
-}
 
 function onYargsFailure(msg, err) {
     yargs.showHelp();
@@ -121,10 +106,9 @@ app.on('window-all-closed', () => app.quit());
 // If there are no positional arguments, use one of the default URLs
 let url = (args._.length > 0) ? args._[0] : (args.serve ? 'index.html' : settings['home']);
 
-// If a kiosk:// URL is given, resolve it to the actual URL and add node integration
-if (isKioskUrl(url)) {
-    url = resolveKioskUrl(url);
-    args.integration = args.i = true;
+// If a kiosk:// URL is given, resolve it to the actual URL
+if (hasKioskProtocol(url)) {
+    url = kioskSiteForKioskUrl(url).html.href;
 }
 
 // Run the built-in server if requested and, if the current URL is without protocol, interpret it as a URL relative to
