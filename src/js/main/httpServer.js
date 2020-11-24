@@ -1,7 +1,6 @@
 const finalhandler = require('finalhandler');
 const http = require('http');
 const path = require('path');
-const util = require('util');
 const portfinder = require('portfinder');
 const serveStatic = require('serve-static');
 
