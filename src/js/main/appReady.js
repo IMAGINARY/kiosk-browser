@@ -155,7 +155,7 @@ function enableReloadingWhenUnresponsive(responsivenessCheck, reloadCallback, ti
     logger.debug('Will reload pages that are unresponsive for %ims', timeoutMs);
     const timeoutNs = BigInt(timeoutMs) * 1000n * 1000n;
     let lastResponseNs = process.hrtime.bigint();
-    setInterval(() => {
+    setInterval(async () => {
         const currentNs = process.hrtime.bigint();
         if (currentNs - lastResponseNs > timeoutNs) {
             logger.debug('Page unresponsive. Reloading.');
@@ -164,10 +164,13 @@ function enableReloadingWhenUnresponsive(responsivenessCheck, reloadCallback, ti
             reloadCallback();
         } else {
             // apply responsiveness check
-            responsivenessCheck().then(() => {
+            try {
+                await responsivenessCheck();
                 logger.debug('Page responsiveness test succeeded.');
                 lastResponseNs = process.hrtime.bigint();
-            });
+            } catch(err) {
+                // Ignore silently
+            }
         }
     }, 500);
 }
