@@ -1,10 +1,11 @@
 const finalhandler = require('finalhandler');
 const http = require('http');
 const path = require('path');
+const util = require('util');
 const portfinder = require('portfinder');
 const serveStatic = require('serve-static');
 
-const {logger} = require(path.join(__dirname, 'logging.js'));
+const { logger } = require(path.join(__dirname, 'logging.js'));
 
 // reference to server needs to be kept to avoid garbage collecting
 let server;
@@ -14,36 +15,43 @@ let server;
  * @param wwwRootDir The directory that will be served via HTTP.
  * @returns {Promise<string | never>} A promise that resolves to the URL of the server (typically http://localhost:port).
  */
-function init(wwwRootDir) {
-    return portfinder.getPortPromise()
-        .then(port => {
-            // `port` is guaranteed to be a free port in this scope.
-            // -> start HTTP server on that port
+async function init(wwwRootDir) {
+  const port = await portfinder.getPortPromise();
+  // `port` is guaranteed to be a free port in this scope (or until next await).
 
-            // Serve up folder provided via CLI option
-            const serve = serveStatic(path.resolve(wwwRootDir), {'index': ['index.html', 'index.htm']});
+  // Serve up folder provided via CLI option
+  const serve = serveStatic(path.resolve(wwwRootDir), { 'index': ['index.html', 'index.htm'] });
 
-            // Create server
-            server = http.createServer(function onRequest(req, res) {
-                const errorHandler = err => logger.warn('HTTP %i, %s', err.statusCode, err.message);
-                serve(req, res, finalhandler(req, res, {onerror: errorHandler}));
-            });
+  // Create server
+  server = http.createServer(function onRequest(req, res) {
+    const errorHandler = err => logger.warn('HTTP %i, %s', err.statusCode, err.message);
+    serve(req, res, finalhandler(req, res, { onerror: errorHandler }));
+  });
 
-            // Do something about errors
-            server.on('error', err => {
-                throw err;
-            });
+  const host = 'localhost';
+  const urlPrefix = `http://${host}:${port}/`;
 
-            const host = 'localhost';
-            const urlPrefix = `http://${host}:${port}/`;
+  // Error handling is a bit convoluted because the server uses a mix of callbacks and event handlers
+  const listen = async (port, host) => {
+    await new Promise((resolve, reject) => {
+      const resolveWrapper = (...args) => {
+        server.off('error', reject);
+        return resolve(...args);
+      };
+      server.once('error', reject);
+      server.listen(port, host, resolveWrapper);
+    });
+  };
 
-            // Listen
-            server.listen(port, host);
+  // Listen
+  await listen(port, host);
 
-            logger.info('Serving %s at %s', wwwRootDir, urlPrefix);
+  // Do something about errors occurring after initialization
+  server.on('error', err => logger.error('Error in built-in HTTP server: %O', err));
 
-            return urlPrefix;
-        });
+  logger.info('Serving %s at %s', wwwRootDir, urlPrefix);
+
+  return urlPrefix;
 }
 
-module.exports = {init: init};
+module.exports = { init };

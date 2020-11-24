@@ -6,21 +6,22 @@
 
 // exit in case of unhandled exceptions or rejections
 function logAndExit(title, error) {
-    if (error instanceof SyntaxError) {
-        // do nothing since electron logs syntax errors to the console on its own
-    } else {
-        logger.error('%s: %O', title, error);
-    }
+  if (error instanceof SyntaxError) {
+    // do nothing since electron logs syntax errors to the console on its own
+  } else {
+    logger.error('%s: %O', title, error);
+  }
 
-    // unhandled exceptions should be considered fatal
-    app.exit(-1);
+  // unhandled exceptions should be considered fatal
+  app.exit(-1);
 }
 
-['uncaughtException', 'unhandledRejection'].forEach(e => process.on(e, error => logAndExit(e, error)));
+['uncaughtException', 'unhandledRejection'].forEach(e => process.on(e,
+  error => logAndExit(e, error)));
 
 global.shellStartTime = Date.now();
 
-const {app} = require('electron');
+const { app } = require('electron');
 require('@electron/remote/main').initialize();
 
 const path = require('path');
@@ -31,98 +32,119 @@ const settings = require(path.join(__dirname, "settings.js"));
 const convertToCmdLineFormat = require(path.join(__dirname, "settingsConverter.js"));
 const cmdLineOptions = require(path.join(__dirname, 'cmdLine.js'));
 const applyChromiumCmdLine = require(path.join(__dirname, 'applyChromiumCmdLine.js'));
-const {hasKioskProtocol, kioskSiteForKioskUrl} = require('./kiosk-sites.js');
+const { hasKioskProtocol, kioskSiteForKioskUrl } = require('./kiosk-sites.js');
 const httpServer = require(path.join(__dirname, 'httpServer.js'));
 const appReady = require(path.join(__dirname, 'appReady.js'));
 
 const yargsParserConfig = {
-    "short-option-groups": true,
-    "camel-case-expansion": false,
-    "dot-notation": true,
-    "parse-numbers": true,
+  "short-option-groups": true,
+  "camel-case-expansion": false,
+  "dot-notation": true,
+  "parse-numbers": true,
 };
 const yargs = require('yargs').parserConfiguration(yargsParserConfig);
 
 function onYargsFailure(msg, err) {
-    yargs.showHelp();
-    logger.error(msg);
-    throw(err ? err : new Error("CLI option parsing failed"));
+  yargs.showHelp();
+  logger.error(msg);
+  throw(err ? err : new Error("CLI option parsing failed"));
 }
 
 // TODO: describe positional argument
 const yargsOptions = yargs
-    .usage('Kiosk Web Browser\n    Usage: $0 [options] [url]')
-    .wrap(yargs.terminalWidth())
-    .help(false)
-    .version(false)
-    .strict()
-    .fail(onYargsFailure)
-    .options(cmdLineOptions.getOptions(convertToCmdLineFormat(settings)));
+  .usage('Kiosk Web Browser\n    Usage: $0 [options] [url]')
+  .wrap(yargs.terminalWidth())
+  .help(false)
+  .version(false)
+  .strict()
+  .fail(onYargsFailure)
+  .options(cmdLineOptions.getOptions(convertToCmdLineFormat(settings)));
 
-var args;
-try {
+async function main(args) {
+  logging.setLevelNumeric(args.verbose);
 
-    // running electron via npm/yarn adds an extra '.' cli argument after the exe path
-    // and we need to strip that away.
-    args = yargsOptions.parse(process.argv.slice(app.isPackaged ? 1 : 2));
-} catch (err) {
-    logger.error(err.msg);
-    app.exit(1);
+  // log parsed options
+  logger.debug(process.argv);
+  logger.debug('%o', args);
+
+  if (args.help) {
+    yargsOptions.showHelp();
+    app.quit();
     return;
-}
+  }
 
-logging.setLevelNumeric(args.verbose);
-
-// log parsed options
-logger.debug(process.argv);
-logger.debug('%o',args);
-
-if(args.help){ yargsOptions.showHelp(); app.quit(); return; };
-
-if(args.version){
-    if( args.verbose == 0 ) {
-        console.log(`v${app.getVersion()}`);
+  if (args.version) {
+    if (args.verbose == 0) {
+      console.log(`v${app.getVersion()}`);
     } else {
-        console.log(`Kiosk browser: v${app.getVersion()}`);
-        console.log(`Electron: v${process.versions.electron}`);
-        console.log(`Node: v${process.versions.node}`);
-        console.log(`Chromium: v${process.versions.chrome}`);
+      console.log(`Kiosk browser: v${app.getVersion()}`);
+      console.log(`Electron: v${process.versions.electron}`);
+      console.log(`Node: v${process.versions.node}`);
+      console.log(`Chromium: v${process.versions.chrome}`);
     }
     app.quit();
     return;
-};
+  }
 
-if (args.port)
-    args['append-chrome-switch'].push({key: 'remote-debugging-port', value: args.port});
+  if (args.port) {
+    args['append-chrome-switch'].push({ key: 'remote-debugging-port', value: args.port });
+  }
 
-if (args.localhost)
-    args['append-chrome-switch'].push({key: 'host-rules', value: 'MAP * 127.0.0.1'});
+  if (args.localhost) {
+    args['append-chrome-switch'].push({ key: 'host-rules', value: 'MAP * 127.0.0.1' });
+  }
 
-applyChromiumCmdLine(args['use-minimal-chrome-cli'],args['append-chrome-switch'],args['append-chrome-argument']);
+  applyChromiumCmdLine(args['use-minimal-chrome-cli'],
+    args['append-chrome-switch'],
+    args['append-chrome-argument']);
 
-// Quit when all windows are closed.
-app.on('window-all-closed', () => app.quit());
+  // Quit when all windows are closed.
+  app.on('window-all-closed', () => app.quit());
 
-// If there are no positional arguments, use one of the default URLs
-let url = (args._.length > 0) ? args._[0] : (args.serve ? 'index.html' : settings['home']);
+  // If there are no positional arguments, use one of the default URLs
+  let url = (args._.length > 0) ? args._[0] : (args.serve ? 'index.html' : settings['home']);
 
-// If a kiosk:// URL is given, resolve it to the actual URL
-if (hasKioskProtocol(url)) {
+  // If a kiosk:// URL is given, resolve it to the actual URL
+  if (hasKioskProtocol(url)) {
     url = kioskSiteForKioskUrl(url).html.href;
+  }
+
+  if (args.serve) {
+    try {
+      // Wait for initialization of the built-in HTTP server
+      // and adjust url with the http server prefix.
+      const serverPrefix = await httpServer.init(args.serve);
+      url = new URL(url, serverPrefix).href;
+    } catch (err) {
+      logger.error('Unable to start built-in HTTP server: %O', err);
+      app.exit(1);
+    }
+  }
+
+  // Set the computed url
+  args.url = args.l = url;
+
+  logger.info('URL after preprocessing: %s', url);
+
+  // Wait for initialization of electron
+  await app.whenReady();
+
+  // FIXME: For transparent windows, initialization it not ready yet (window is opaque).
+  //  A delayed start serves as a temporary workaround until the problem is fixed in electron upstream.
+  if (process.platform === 'linux' && args.transparent) {
+    await new Promise(r => setTimeout(r, 500));
+  }
+
+  appReady(args);
 }
 
-// Run the built-in server if requested and, if the current URL is without protocol, interpret it as a URL relative to
-// the server root
-let urlReady = (args.serve ? httpServer.init(args.serve) : Promise.resolve(''))
-    .then(prefix => !/^[A-Za-z]+:\/\//.test(url) ? prefix + url : url);
-
-// Delay further execution until electron and the built-in HTTP server are initialized
-app.whenReady().then(() =>
-    urlReady.then(url => {
-        args.url = args.l = url;
-        logger.info('URL after preprocessing: %s', url);
-        // FIXME: For transparent windows, initialization it not ready yet (window is opaque).
-        //  A delayed start serves as a temporary workaround until the problem is fixed in electron upstream.
-        setTimeout(() => appReady(args), process.platform === 'linux' && args.transparent ? 500 : 0);
-    })
-);
+try {
+  // running electron via npm/yarn adds an extra '.' cli argument after the exe path
+  // and we need to strip that away.
+  const args = yargsOptions.parse(process.argv.slice(app.isPackaged ? 1 : 2));
+  main(args).catch(err => logAndExit('Exception in main', err));
+} catch (err) {
+  logger.error(err.msg);
+  app.exit(1);
+  return;
+}
