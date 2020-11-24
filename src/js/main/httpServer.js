@@ -6,8 +6,7 @@ const serveStatic = require('serve-static');
 
 const { logger } = require(path.join(__dirname, 'logging.js'));
 
-// reference to server needs to be kept to avoid garbage collecting
-let server;
+const servers = [];
 
 /**
  * Initializes a HTTP server on an internally chosen port to serve wwwRootDir.
@@ -22,7 +21,7 @@ async function init(wwwRootDir) {
   const serve = serveStatic(path.resolve(wwwRootDir), { 'index': ['index.html', 'index.htm'] });
 
   // Create server
-  server = http.createServer(function onRequest(req, res) {
+  const server = http.createServer(function onRequest(req, res) {
     const errorHandler = err => logger.warn('HTTP %i, %s', err.statusCode, err.message);
     serve(req, res, finalhandler(req, res, { onerror: errorHandler }));
   });
@@ -44,6 +43,9 @@ async function init(wwwRootDir) {
 
   // Listen
   await listen(port, host);
+
+  // Keep reference to the server to avoid garbage collection
+  servers.push(server);
 
   // Do something about errors occurring after initialization
   server.on('error', err => logger.error('Error in built-in HTTP server: %O', err));
