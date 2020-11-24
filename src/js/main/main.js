@@ -21,6 +21,7 @@ function logAndExit(title, error) {
 global.shellStartTime = Date.now();
 
 const {app} = require('electron');
+require('@electron/remote/main').initialize();
 
 const path = require('path');
 const logging = require(path.join(__dirname, "logging.js"));

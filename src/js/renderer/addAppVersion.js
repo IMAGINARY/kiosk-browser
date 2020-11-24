@@ -1,5 +1,5 @@
 // Add the version of the kiosk browser to process.versions
-const { remote } = require('electron');
+const remote = require('@electron/remote');
 
 process.versions.app = remote.app.getVersion();
 const versions = process.versions;
