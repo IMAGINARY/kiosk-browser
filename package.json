@@ -29,7 +29,7 @@
   "dependencies": {
     "@electron/remote": "1.0.2",
     "finalhandler": "1.1.2",
-    "fs-extra": "8.1.0",
+    "fs-extra": "9.0.1",
     "hjson": "3.2.2",
     "os": "0.1.1",
     "portfinder": "1.0.28",
