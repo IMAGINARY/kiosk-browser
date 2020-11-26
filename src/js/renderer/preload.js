@@ -2,6 +2,9 @@
 const path = require('path');
 const remoteRequire = require('@electron/remote').require;
 const preloadModulesPaths = remoteRequire(path.join(__dirname, '../main/preloadModules.js'));
+
+const kioskBrowser = window.kioskBrowser = {};
+
 preloadModulesPaths.forEach(p => require(p));
 
 const { kioskSiteForHtmlUrl } = remoteRequire(path.join(__dirname, '../main/kiosk-sites.js'));
@@ -16,3 +19,5 @@ try {
 } catch (e) {
   // Has no matching preload script. NOOP.
 }
+
+delete window.kioskBrowser;

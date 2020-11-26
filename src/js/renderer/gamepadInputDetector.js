@@ -1,4 +1,18 @@
-if(!document.featurePolicy.allowsFeature('gamepad')) {
+const createList = require('../common/createList');
+
+const deviceFilters = [];
+
+window.kioskBrowser.idleDetector = window.kioskBrowser.idleDetector || {};
+Object.assign(
+  window.kioskBrowser.idleDetector,
+  {
+    gamepad: {
+      deviceFilters: createList(deviceFilters),
+    }
+  }
+);
+
+if (!document.featurePolicy.allowsFeature('gamepad')) {
   return;
 }
 
@@ -16,7 +30,9 @@ let timeoutId = 0;
 function loop() {
   clearTimeout(timeoutId);
 
-  const gamepads = [...navigator.getGamepads()].filter(gamepad => gamepad !== null);
+  const gamepads = [...navigator.getGamepads()]
+    .filter(gamepad => gamepad !== null)
+    .filter(gamepad => !deviceFilters.reduce((acc, cur) => acc || cur(gamepad), false));
   if (gamepads.length > 0) {
     const maxTimestampMs = gamepads
       .map(gp => gp.timestamp)

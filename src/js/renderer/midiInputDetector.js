@@ -1,4 +1,26 @@
-if(!document.featurePolicy.allowsFeature('midi')) {
+const createList = require('../common/createList');
+
+const midiPortFilters = [];
+const midiMessageEventFilters = [];
+
+const knownMessageEventFilters = {
+  'clock': (midiMessageEvent) => midiMessageEvent.data === 0xF0,
+  'activeSensing': (midiMessageEvent) => midiMessageEvent.data === 0xFE,
+};
+
+const idleDetector = window.kioskBrowser.idleDetector = window.kioskBrowser.idleDetector || {};
+Object.assign(
+  window.kioskBrowser.idleDetector,
+  {
+    midi: {
+      portFilters: createList(midiPortFilters),
+      messageEventFilters: createList(midiMessageEventFilters),
+      knownMessageEventFilters,
+    }
+  }
+);
+
+if (!document.featurePolicy.allowsFeature('midi')) {
   return;
 }
 
@@ -37,14 +59,22 @@ function requestResetIdleTime(lastEventTimestampMs) {
   }
 }
 
+function handleMIDIMessage(midiMessageEvent) {
+  const discard = midiMessageEventFilters
+    .reduce((acc, cur) => acc || cur(midiMessageEvent), false);
+  if (!discard) {
+    requestResetIdleTime(midiMessageEvent.timeStamp);
+  }
+}
+
 function handlePortStateChange(port) {
-  switch (port.state) {
-    case 'connected':
-      port.onmidimessage = (midiMessageEvent) => requestResetIdleTime(midiMessageEvent.timeStamp);
-      break;
-    case 'disconnected':
-      port.onmidimessage = undefined;
-      break;
+  if (port.state === 'connected' && port.connection === 'open') {
+    const discard = midiPortFilters.reduce((acc, cur) => acc || cur(port), false);
+    if (!discard) {
+      port.onmidimessage = handleMIDIMessage;
+    }
+  } else {
+    port.onmidimessage = undefined;
   }
 }
 
@@ -57,5 +87,8 @@ async function setupMIDIListeners() {
     console.warn(`Could not set up MIDI event listeners for idle monitoring`, err);
   }
 }
+
+idleDetector.midi.messageEventFilters.add(knownMessageEventFilters['clock']);
+idleDetector.midi.messageEventFilters.add(knownMessageEventFilters['activeSensing']);
 
 window.addEventListener('DOMContentLoaded', setupMIDIListeners);

@@ -40,6 +40,42 @@ or for all scripts processed by the kiosk-browser.
 It should be handled with extreme care and must never be applied to online resources.
 Think twice before enabling it for content you do not fully trust.** 
 
+#### Kiosk browser API
+
+A dedicated Kiosk browser API is available for preload scripts under the global variable `kiosk` browser:
+```
+{
+  idleDetector: {
+    gamepad: {
+      deviceFilters: {
+        add: (deviceFilter) => { ... },
+        remove: (deviceFilter) => { ... }
+        clear: () => { ... },
+      },
+    },
+    midi: {
+      portFilters: {
+        add: (portFilter) => { ... },
+        remove: (portFilter) => { ... }
+        clear: () => { ... },
+      },
+      messageEventFilters: {
+        add: (messageEventFilter) => { ... },
+        remove: (messageEventFilter) => { ... }
+        clear: () => { ... },
+      },
+      knownMessageEventFilters: {
+        'clock': (messageEventFilter) => { ... }, // MIDI clock
+        'activeSensing': (messageEventFilter) => { ... }, // MIDI active sensing
+      },
+    },
+  },
+}
+```
+Filters in the `idleDetector` are used to discard devices and events that should not be considered
+for idle detection, i.e. if there are devices that send periodic events but aren't controlled by the
+user. A filter must return `true` for such arguments.
+
 ## Built-in test application
 
 Pointing the kiosk-browser to `kiosk://testapp` will bring up a simple app for testing touch and mouse input
