@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- add idle detection for joysticks, gamepads and MIDI inputs
 - add `--reload-idle` cli option to auto-reload when idle
 - add `--disable-drag` cli option to disable drag & drop
 - add `--disable-selection` cli option to disable selection except for form fields
