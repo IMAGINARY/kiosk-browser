@@ -1,3 +1,7 @@
+if(!document.featurePolicy.allowsFeature('gamepad')) {
+  return;
+}
+
 const { ipcRenderer } = require('electron');
 const remoteRequire = require('@electron/remote').require;
 const path = require('path');
