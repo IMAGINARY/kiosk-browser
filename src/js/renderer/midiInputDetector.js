@@ -1,4 +1,5 @@
 const createList = require('../common/createList');
+const domReady = require('./domReady');
 
 const midiPortFilters = [];
 const midiMessageEventFilters = [];
@@ -8,7 +9,7 @@ const knownMessageEventFilters = {
   'activeSensing': (midiMessageEvent) => midiMessageEvent.data === 0xFE,
 };
 
-const idleDetector = window.kioskBrowser.idleDetector = window.kioskBrowser.idleDetector || {};
+const idleDetector = window.kioskBrowser.idleDetector ??= {};
 Object.assign(
   window.kioskBrowser.idleDetector,
   {
@@ -91,4 +92,4 @@ async function setupMIDIListeners() {
 idleDetector.midi.messageEventFilters.add(knownMessageEventFilters['clock']);
 idleDetector.midi.messageEventFilters.add(knownMessageEventFilters['activeSensing']);
 
-window.addEventListener('DOMContentLoaded', setupMIDIListeners);
+domReady.then(setupMIDIListeners);

@@ -1,8 +1,9 @@
 const createList = require('../common/createList');
+const domReady = require('./domReady');
 
 const deviceFilters = [];
 
-window.kioskBrowser.idleDetector = window.kioskBrowser.idleDetector || {};
+window.kioskBrowser.idleDetector ??= {};
 Object.assign(
   window.kioskBrowser.idleDetector,
   {
@@ -47,8 +48,8 @@ function loop() {
   }
 }
 
-window.addEventListener('DOMContentLoaded', () => {
+(async () => {
+  await domReady;
   window.addEventListener('gamepadconnected', loop);
   loop();
-});
-
+})();
