@@ -1,7 +1,7 @@
 const fsPromises = require('fs').promises;
 const {webFrame} = require('electron');
 
-const domReady = require('./domReady.js');
+const domReady = require('./domReady');
 
 async function fromString(css) {
     await domReady;

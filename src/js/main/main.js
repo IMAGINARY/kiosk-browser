@@ -24,17 +24,16 @@ global.shellStartTime = Date.now();
 const { app } = require('electron');
 require('@electron/remote/main').initialize();
 
-const path = require('path');
-const logging = require(path.join(__dirname, "logging.js"));
-const logger = logging.logger;
+const logging = require('./logging');
+const { logger } = logging;
 
-const settings = require(path.join(__dirname, "settings.js"));
-const convertToCmdLineFormat = require(path.join(__dirname, "settingsConverter.js"));
-const cmdLineOptions = require(path.join(__dirname, 'cmdLine.js'));
-const applyChromiumCmdLine = require(path.join(__dirname, 'applyChromiumCmdLine.js'));
-const { hasKioskProtocol, kioskSiteForKioskUrl } = require('./kiosk-sites.js');
-const httpServer = require(path.join(__dirname, 'httpServer.js'));
-const appReady = require(path.join(__dirname, 'appReady.js'));
+const settings = require('./settings');
+const convertToCmdLineFormat = require('./settingsConverter');
+const cmdLineOptions = require('./cmdLine');
+const applyChromiumCmdLine = require('./applyChromiumCmdLine');
+const { hasKioskProtocol, kioskSiteForKioskUrl } = require('./kiosk-sites');
+const httpServer = require('./httpServer');
+const appReady = require('./appReady');
 
 const yargsParserConfig = {
   "short-option-groups": true,

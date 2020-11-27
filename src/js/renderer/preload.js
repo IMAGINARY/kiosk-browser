@@ -1,6 +1,6 @@
 // Preload the modules by path supplied to the main process
 const remoteRequire = require('@electron/remote').require;
-const preloadModulesPaths = remoteRequire('./preloadModules.js');
+const preloadModulesPaths = remoteRequire('./preloadModules');
 
 const hasNodeIntegration = typeof window.require !== 'undefined';
 
@@ -8,7 +8,7 @@ const kioskBrowser = window.kioskBrowser = {};
 
 preloadModulesPaths.forEach(p => require(p));
 
-const { kioskSiteForHtmlUrl } = remoteRequire('./kiosk-sites.js');
+const { kioskSiteForHtmlUrl } = remoteRequire('./kiosk-sites');
 
 try {
   const site = kioskSiteForHtmlUrl(window.location.href);

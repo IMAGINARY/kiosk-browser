@@ -4,7 +4,7 @@ const fsExtra = require('fs-extra');
 const path = require('path');
 const hjson = require('hjson');
 
-const {logger} = require(path.join(__dirname, 'logging.js'));
+const { logger } = require('./logging');
 
 // read defaults.json
 const defaultsFileContents = fsExtra.readFileSync(path.join(__dirname, '../../json/defaults.json'), 'utf8');

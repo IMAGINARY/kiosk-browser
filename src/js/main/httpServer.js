@@ -4,7 +4,7 @@ const path = require('path');
 const portfinder = require('portfinder');
 const serveStatic = require('serve-static');
 
-const { logger } = require(path.join(__dirname, 'logging.js'));
+const { logger } = require('./logging');
 
 const servers = [];
 

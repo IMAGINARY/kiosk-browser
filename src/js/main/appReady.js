@@ -1,11 +1,10 @@
 const fs = require('fs');
 const path = require('path');
-const process = require('process');
 const {BrowserWindow, Menu, MenuItem} = require('electron');
 
-const {logger} = require(path.join(__dirname, 'logging.js'));
-const preloadModules = require(path.join(__dirname, 'preloadModules.js'));
-const IdleDetector = require('./idleDetector.js');
+const { logger } = require('./logging');
+const preloadModules = require('./preloadModules');
+const IdleDetector = require('./idleDetector');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.

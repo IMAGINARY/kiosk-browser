@@ -19,8 +19,7 @@ if (!document.featurePolicy.allowsFeature('gamepad')) {
 
 const { ipcRenderer } = require('electron');
 const remoteRequire = require('@electron/remote').require;
-const path = require('path');
-const RemoteIdleDetector = remoteRequire(path.join(__dirname, '../main/idleDetector.js'));
+const RemoteIdleDetector = remoteRequire('./idleDetector');
 
 const channel = RemoteIdleDetector.IPC_CHANNEL;
 const ipcIntervalMs = RemoteIdleDetector.IPC_INTERVAL_MS; // don't do IPCs to often
