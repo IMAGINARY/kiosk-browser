@@ -21,5 +21,5 @@ CMD git clone https://github.com/IMAGINARY/kiosk-browser \
         && cd kiosk-browser \
         && git checkout `git describe --abbrev=0` \
         && yarn install \
-        && yarn run dist \\
+        && yarn run dist \
         && cp ./dist/*.AppImage ./dist/*.deb ./dist/*.rpm /dist/
