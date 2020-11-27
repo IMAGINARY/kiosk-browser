@@ -6,10 +6,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- add idle detection for joysticks, gamepads and MIDI inputs
+- add kioskBrowser API for preload script and apps with node integration
+
+### Changed
+- upgrade to Electron v11.0.3, Node v12.18.3, Chromium v87.0.4280.67
+
+### Fixed
+- fix missing `process.versions`
+
+### Security
+- removed possibly fake and malicious npm packages `http` and `process`
+
 ## [0.13.0] 2020-07-20
 
 ### Added
-- add idle detection for joysticks, gamepads and MIDI inputs
 - add `--reload-idle` cli option to auto-reload when idle
 - add `--disable-drag` cli option to disable drag & drop
 - add `--disable-selection` cli option to disable selection except for form fields
