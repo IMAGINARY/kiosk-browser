@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - add idle detection for joysticks, gamepads and MIDI inputs
 - add kioskBrowser API for preload script and apps with node integration
+- add preload script examples to `/examples` directory
 
 ### Changed
 - upgrade to Electron v11.0.3, Node v12.18.3, Chromium v87.0.4280.67

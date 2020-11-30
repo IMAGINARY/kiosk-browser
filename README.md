@@ -81,6 +81,8 @@ Filters in the `idleDetector` are used to discard devices and events that should
 for idle detection, i.e. if there are devices that send periodic events but aren't controlled by the
 user. A filter must return `true` for such arguments.
 
+Please check the preload scripts in `/examples/preload/idleDetector` for examples on how to use the API.
+
 ## Built-in test application
 
 Pointing the kiosk-browser to `kiosk://testapp` will bring up a simple app for testing touch and mouse input
