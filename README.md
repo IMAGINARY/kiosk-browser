@@ -21,6 +21,84 @@ Just grab the binaries specific for your platform from the release section.
 
 ## Configuration
 
+## Command line
+
+```
+Kiosk Web Browser
+    Usage: Electron [options] [url]
+
+Options:
+  -T, --always-on-top           Enable or disable always-on-top mode
+                                                      [boolean] [default: false]
+      --append-chrome-argument  Append positional argument to internal Chrome
+                                browser argument          [string] [default: []]
+      --append-chrome-switch    Append switch to internal Chrome browser
+                                switches                  [string] [default: []]
+      --cover-displays          Let the browser window cover the displays
+                                provided by comma separated display numbers.
+                                Spanning multiple displays is not supported on
+                                all platforms.                          [string]
+  -d, --dev                     Run in development mod.
+                                                      [boolean] [default: false]
+      --disable-drag            Prevent dragging of draggable elements like
+                                images.               [boolean] [default: false]
+      --disable-selection       Disable selection for all elements except form
+                                fields.               [boolean] [default: false]
+      --fit                     Automatically adjust the zoom level to fit a
+                                given viewport of the page to the window size
+                                while preserving the viewports aspect ratio.
+                                Valid formats are wxh, wx_, _xh and _x_ (don't
+                                fit). The value supplied to --zoom acts as an
+                                additional multiplier. [string] [default: "_x_"]
+  -f, --fullscreen              Enable or disable fullscreen mode
+                                                      [boolean] [default: false]
+  -h, --help                    Print this usage message               [boolean]
+      --hide-scrollbars         Hide scroll bars without disabling scroll
+                                functionality via keyboard, mouse wheel or
+                                gestures.             [boolean] [default: false]
+  -i, --integration             Enable or disable node integration
+                                                      [boolean] [default: false]
+  -k, --kiosk                   Enable or disable kiosk mode
+                                                      [boolean] [default: false]
+      --localhost               Restrict network access to localhost
+                                                      [boolean] [default: false]
+  -m, --menu                    Enable or disable main menu
+                                                      [boolean] [default: false]
+      --overflow                Specify CSS overflow rules for top-level page.
+                                Use 'hidden' to hide the overflow and disable
+                                scroll bars. Separate rules for the x and y
+                                directions can be provided, e.g. 'hidden,'
+                                disables vertical scrolling but leaves the
+                                horizontal overflow rule untouched.
+                                                          [string] [default: ""]
+  -p, --port                    Specify remote debugging port           [number]
+      --preload                 Preload a JavaScript file into each website
+                                                                        [string]
+      --reload-idle             Reload the initially opened web page when the
+                                system is idle for the given number of seconds.
+                                                                        [number]
+      --reload-unresponsive     Reloads websites that are unresponsive for the
+                                given number of seconds.                [number]
+      --retry                   Retry after given number of seconds if loading
+                                the page failed (0 to disable)
+                                                          [number] [default: 15]
+  -s, --serve                   Open URL relative to this path served via
+                                built-in HTTP server.                   [string]
+  -t, --transparent             Make browser window background transparent.
+                                                      [boolean] [default: false]
+      --use-minimal-chrome-cli  Don't append anything to the internal Chrome
+                                command line by default
+                                                      [boolean] [default: false]
+  -v, --verbose                 Increase verbosity          [count] [default: 0]
+  -V, --version                 Print the version. Combine with -v to get more
+                                details                                [boolean]
+  -z, --zoom                    Set zoom factor            [number] [default: 1]
+```
+
+## Settings file
+
+***Disclaimer:*** Configuration via a settings file is incomplete and might or might not be removed in future versions.
+
 The kiosk-browser is configurable via command line and configuration file.
 Command line options always take precedence over settings in the config file
 which in turn take precedence over the kiosk-browser defaults. The config file paths are
