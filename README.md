@@ -52,6 +52,11 @@ A dedicated Kiosk browser API is available for preload scripts under the global 
         remove: (deviceFilter) => { ... }
         clear: () => { ... },
       },
+      stateFilterss: {
+        add: (stateFilter) => { ... },
+        remove: (stateFilter) => { ... }
+        clear: () => { ... },
+      },
     },
     midi: {
       portFilters: {

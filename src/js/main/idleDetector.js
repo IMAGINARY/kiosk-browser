@@ -85,7 +85,10 @@ class Timer {
   }
 
   static resetIdleTime(idleTimeMs = 0) {
-    Timer._lastEventTimestampMs = performance.now() - idleTimeMs;
+    Timer._lastEventTimestampMs = Math.max(
+      performance.now() - idleTimeMs,
+      Timer._lastEventTimestampMs,
+    );
   }
 
   static getIdleTime() {
