@@ -21,7 +21,7 @@ Just grab the binaries specific for your platform from the release section.
 
 ## Configuration
 
-## Command line
+### Command line
 
 ```
 Kiosk Web Browser
@@ -96,7 +96,7 @@ Options:
   -z, --zoom                    Set zoom factor            [number] [default: 1]
 ```
 
-## Settings file
+### Settings file
 
 ***Disclaimer:*** Configuration via a settings file is incomplete and might or might not be removed in future versions.
 
@@ -110,7 +110,20 @@ The list of supported command line options and defaults is obtained via `kiosk-b
 
 Possible settings in the config file are currently undocumented and are likely to change in future versions.
 
-### Preload scripts and nodejs integration
+### Caveats
+
+Some options inject JavaScript code into each loaded sites through preload scripts.
+Options such as `--disable-drag`, `--disable-selection` and `--hide-cursor` inject CSS code.
+
+While this works for most sites, it can sometimes break a website. This is especially true
+for sites with embedded ads that often actively work against external modifications.
+
+In such cases, you should open the site without specifying additional configuration options and try
+to figure out which option is breaking the site
+(and remove it in future runs or try to reimplement the missing functionality through your own
+custom preload script).
+
+## Preload scripts and nodejs integration
 
 The `--preload` and `--integration` options enable nodejs support for either just the preload script
 or for all scripts processed by the kiosk-browser.
