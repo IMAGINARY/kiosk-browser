@@ -249,6 +249,11 @@ const options = {
         description: 'Prevent dragging of draggable elements like images.',
         default: false,
     },
+    'hide-cursor': {
+        type: 'boolean',
+        description: 'Hide the mouse cursor.',
+        default: false,
+    },
 };
 
 function assignDefault(option, defaultValue) {

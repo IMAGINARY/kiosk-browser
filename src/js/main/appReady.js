@@ -207,6 +207,9 @@ function appReady(args) {
     if (args['disable-drag'])
         preloadModules.push(path.join(__dirname, '../renderer/disableDrag.js'));
 
+    if (args['hide-cursor'])
+        preloadModules.push(path.join(__dirname, '../renderer/hideCursor.js'));
+
     if (args.preload)
         preloadModules.push(path.resolve(args.preload));
 

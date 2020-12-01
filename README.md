@@ -53,6 +53,7 @@ Options:
   -f, --fullscreen              Enable or disable fullscreen mode
                                                       [boolean] [default: false]
   -h, --help                    Print this usage message               [boolean]
+      --hide-cursor             Hide the mouse cursor.[boolean] [default: false]
       --hide-scrollbars         Hide scroll bars without disabling scroll
                                 functionality via keyboard, mouse wheel or
                                 gestures.             [boolean] [default: false]

@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- add `--hide-cursor` cli option to hide the mouse cursor
 - add idle detection for joysticks, gamepads and MIDI inputs
 - add kioskBrowser API for preload script and apps with node integration
 - add preload script examples to `/examples` directory
