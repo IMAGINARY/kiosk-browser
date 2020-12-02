@@ -18,7 +18,8 @@ async function init(wwwRootDir) {
   // `port` is guaranteed to be a free port in this scope (or until next await).
 
   // Serve up folder provided via CLI option
-  const serve = serveStatic(path.resolve(wwwRootDir), { 'index': ['index.html', 'index.htm'] });
+  const absoluteWwwRootDir = path.resolve(process.cwd(), wwwRootDir);
+  const serve = serveStatic(absoluteWwwRootDir, { 'index': ['index.html', 'index.htm'] });
 
   // Create server
   const server = http.createServer(function onRequest(req, res) {
