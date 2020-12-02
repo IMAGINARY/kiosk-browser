@@ -220,7 +220,7 @@ function appReady(args) {
         titleBarStyle: 'hidden',
         fullscreenWindowTitle: true,
         fullscreenable: true,
-        resizable: !args.transparent,
+        resizable: args['resize'] && !args['cover-displays'],
         transparent: args.transparent,
         alwaysOnTop: args["always-on-top"],
         webPreferences: webprefs,
