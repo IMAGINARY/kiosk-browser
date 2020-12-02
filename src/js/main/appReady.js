@@ -216,11 +216,11 @@ function appReady(args) {
     const options = {
         backgroundColor: args.transparent ? '#0fff' : '#fff',
         show: false,
-        frame: !(args.transparent || args['cover-displays']),
+        frame: args.frame && !args['cover-displays'],
         titleBarStyle: 'hidden',
         fullscreenWindowTitle: true,
         fullscreenable: true,
-        resizable: !args.transparent,
+        resizable: args['resize'] && !args['cover-displays'],
         transparent: args.transparent,
         alwaysOnTop: args["always-on-top"],
         webPreferences: webprefs,

@@ -212,7 +212,7 @@ const options = {
         coerce: coerceFit
     },
     'cover-displays': {
-        description: 'Let the browser window cover the displays provided by comma separated display numbers. Spanning multiple displays is not supported on all platforms.',
+        description: 'Let the browser window cover the displays provided by comma separated display numbers. Implies --no-resize and --no-frame. Spanning multiple displays is not supported on all platforms.',
         requiresArg: true,
         type: 'string',
         coerce: coerceCoverDisplays,
@@ -253,6 +253,16 @@ const options = {
         type: 'boolean',
         description: 'Hide the mouse cursor.',
         default: false,
+    },
+    'frame': {
+        type: 'boolean',
+        description: 'Show the browser window frame.',
+        default: true,
+    },
+    'resize': {
+        type: 'boolean',
+        description: 'Allow resizing of the browser window.',
+        default: true,
     },
 };
 
