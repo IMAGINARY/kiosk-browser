@@ -15,11 +15,9 @@ RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
-RUN npm install -g yarn
-
 CMD git clone https://github.com/IMAGINARY/kiosk-browser \
         && cd kiosk-browser \
         && git checkout `git describe --abbrev=0` \
-        && yarn install \
-        && yarn run dist \
+        && npx yarn install \
+        && npx yarn run dist \
         && cp ./dist/*.AppImage ./dist/*.deb ./dist/*.rpm /dist/
