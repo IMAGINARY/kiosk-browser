@@ -93,6 +93,14 @@ async function main(args) {
     args['append-chrome-switch'].push({ key: 'host-rules', value: 'MAP * 127.0.0.1' });
   }
 
+  if (process.platform === 'linux' && args.transparent) {
+    // This is a workaround for
+    // https://github.com/electron/electron/blob/v11.0.0/docs/api/frameless-window.md#limitations
+    // TODO: Check regularly if the fix is still necessary
+    args['append-chrome-switch'].push({ key: '--enable-transparent-visuals', value: '' });
+    args['append-chrome-switch'].push({ key: '--disable-gpu', value: '' });
+  }
+
   applyChromiumCmdLine(args['use-minimal-chrome-cli'],
     args['append-chrome-switch'],
     args['append-chrome-argument']);
