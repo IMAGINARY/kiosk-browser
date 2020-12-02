@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fix missing `process.versions`
 
 ### Security
-- removed possibly fake and malicious npm packages `http` and `process`
+- remove possibly fake and malicious npm packages `http` and `process`
 
 ## [0.13.0] 2020-07-20
 
