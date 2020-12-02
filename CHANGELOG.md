@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.1] 2020-12-02
+
 ### Fixed
 - fix `--transparent` cli option on Linux
 
@@ -254,7 +256,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [library for sending heartbearts]: https://github.com/hilbert/hilbert-heartbeat
 
-[Unreleased]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.14.0...HEAD
+[Unreleased]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.14.1...HEAD
+[0.14.1]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.14.0...v0.14.1
 [0.14.0]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.13.0...v0.14.0
 [0.13.0]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.12.3...v0.13.0
 [0.12.3]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.12.2...v0.12.3
