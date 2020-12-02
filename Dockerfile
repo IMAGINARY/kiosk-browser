@@ -4,6 +4,8 @@
 # Run with
 # docker run --rm -ti -v /path/to/your/dist/folder:/dist kiosk-browser-builder
 # The distribution files will be copied to /path/to/your/dist/folder/
+# Normally, you would execute the following command in the project's root dir:
+# docker run --rm -ti -v "`pwd`/dist":/dist kiosk-browser-builder
 ###############################################################################
 FROM ubuntu:14.04.5
 
