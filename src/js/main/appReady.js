@@ -212,20 +212,9 @@ function appReady(args) {
 
     if (args.preload)
         preloadModules.push(path.resolve(args.preload));
- 
-    var backgroundColor = args.transparent ? args['background-color'].fade(1.0).hex() : args['background-color'].hex();
-    
-    // Color::hex seems to ignore the alpha component
-    if(args.transparent) 
-    {
-        if(backgroundColor.length == 7) // no alpha
-	{
-	    backgroundColor = backgroundColor.replace("#", "#00");
-	}
-    }
-    
+
     const options = {
-        backgroundColor: backgroundColor,
+        backgroundColor: args['background-color'][args.transparent ? 'argb' : 'rgb'],
         show: false,
         frame: args.frame && !args['cover-displays'],
         titleBarStyle: 'hidden',

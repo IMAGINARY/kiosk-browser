@@ -1,4 +1,5 @@
 const fs = require('fs');
+const Color = require('color');
 
 function coercePort(port, defaultPort) {
     if (port === undefined) {
@@ -93,19 +94,20 @@ function coerceOverflow(s) {
     };
 }
 
-function coerceBackgroundColor(s)
-{
+function coerceBackgroundColor(s) {
+    const byteToHex = (byte) => Number(byte).toString(16).toUpperCase().padStart(2, '0');
     try {
-        const Color = require('color');
-        const c = Color(s);
-        if (c !== null) { 
-	    return c; 
-	}
+        const colorRGBA = new Color(s).rgb();
+        const rgb = colorRGBA.color.map(byteToHex).join('');
+        const a = byteToHex(Math.round(colorRGBA.valpha * 255));
+        return {
+            rgb: `#${rgb}`,
+            rgba: `#${rgb}${a}`,
+            argb: `#${a}${rgb}`,
+        };
     } catch (error) {
-        throw new Error(`Invalid background color specification: ${s} (${error.message})`);
+        throw new Error(`Invalid background color specification: ${s}`);
     }
-    
-    throw new Error(`Invalid background color specification: ${s}`);
 }
 
 const options = {
@@ -276,7 +278,7 @@ const options = {
     },
     'background-color': {
         type: 'string',
-        description: 'Set background color for the main browser window before URL is loaded',
+        description: 'The background color to apply until it is overwritten by the loaded site.',
         requiresArg: true,
         default: "white",
         coerce: coerceBackgroundColor
