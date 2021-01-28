@@ -93,6 +93,21 @@ function coerceOverflow(s) {
     };
 }
 
+function coerceBackgroundColor(s)
+{
+    try {
+        const Color = require('color');
+        const c = Color(s);
+        if (c !== null) { 
+	    return c; 
+	}
+    } catch (error) {
+        throw new Error(`Invalid background color specification: ${s} (${error.message})`);
+    }
+    
+    throw new Error(`Invalid background color specification: ${s}`);
+}
+
 const options = {
     'help': {
         alias: 'h',
@@ -258,6 +273,13 @@ const options = {
         type: 'boolean',
         description: 'Show the browser window frame.',
         default: true,
+    },
+    'background-color': {
+        type: 'string',
+        description: 'Set background color for the main browser window before URL is loaded',
+        requiresArg: true,
+        default: "white",
+        coerce: coerceBackgroundColor
     },
     'resize': {
         type: 'boolean',
