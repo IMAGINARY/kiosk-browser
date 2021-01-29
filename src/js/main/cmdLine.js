@@ -280,7 +280,7 @@ const options = {
         type: 'string',
         description: 'The background color to apply until it is overwritten by the loaded site.',
         requiresArg: true,
-        default: "white",
+        default: "#FFF0",
         coerce: coerceBackgroundColor
     },
     'resize': {
