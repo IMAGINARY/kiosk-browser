@@ -184,7 +184,7 @@ const options = {
     'transparent': {
         alias: 't',
         type: 'boolean',
-        description: 'Make browser window background transparent.',
+        description: 'Make browser window background transparent. See --background-color as well.',
     },
     'retry': {
         type: 'number',
