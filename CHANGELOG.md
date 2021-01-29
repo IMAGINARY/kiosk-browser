@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - decouple `--transparent` from window frame display and window resizing
-- update to Electron v11.0.4
+- update to Electron v11.2.1
 
 ## [0.14.1] 2020-12-02
 
