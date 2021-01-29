@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - add support for relative paths to `--serve`
 - add `--resize`/`--no-resize` cli option to allow/prevent browser window resizing
 - add `--frame`/`--no-frame` cli option to show/hide browser window frame
+- add `--background-color` cli option for setting the window's background color that is used until overwritten by the loaded website 
 
 ### Changed
 - decouple `--transparent` from window frame display and window resizing
