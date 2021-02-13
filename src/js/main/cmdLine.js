@@ -1,4 +1,5 @@
 const fs = require('fs');
+const Color = require('color');
 
 function coercePort(port, defaultPort) {
     if (port === undefined) {
@@ -93,6 +94,22 @@ function coerceOverflow(s) {
     };
 }
 
+function coerceBackgroundColor(s) {
+    const byteToHex = (byte) => Number(byte).toString(16).toUpperCase().padStart(2, '0');
+    try {
+        const colorRGBA = new Color(s).rgb();
+        const rgb = colorRGBA.color.map(byteToHex).join('');
+        const a = byteToHex(Math.round(colorRGBA.valpha * 255));
+        return {
+            rgb: `#${rgb}`,
+            rgba: `#${rgb}${a}`,
+            argb: `#${a}${rgb}`,
+        };
+    } catch (error) {
+        throw new Error(`Invalid background color specification: ${s}`);
+    }
+}
+
 const options = {
     'help': {
         alias: 'h',
@@ -167,7 +184,7 @@ const options = {
     'transparent': {
         alias: 't',
         type: 'boolean',
-        description: 'Make browser window background transparent.',
+        description: 'Make browser window background transparent. See --background-color as well.',
     },
     'retry': {
         type: 'number',
@@ -258,6 +275,13 @@ const options = {
         type: 'boolean',
         description: 'Show the browser window frame.',
         default: true,
+    },
+    'background-color': {
+        type: 'string',
+        description: 'The background color to apply until it is overwritten by the loaded site.',
+        requiresArg: true,
+        default: "#FFF0",
+        coerce: coerceBackgroundColor
     },
     'resize': {
         type: 'boolean',
