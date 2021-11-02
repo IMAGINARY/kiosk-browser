@@ -250,6 +250,10 @@ function createMainWindow(args, options) {
     const mainWindow = new BrowserWindow(options);
     const webContents = mainWindow.webContents;
 
+    // This is necessary for electron >= 14.0.0 to enable
+    // the remote module in the renderer process.
+    require("@electron/remote/main").enable(webContents);
+
     const adjustWindowBounds = (() => {
         if (args['cover-displays']) {
             const displayCover = computeDisplayCover(args['cover-displays'], args.fullscreen);
