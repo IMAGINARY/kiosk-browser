@@ -198,6 +198,7 @@ function appReady(args) {
         zoomFactor: computeZoomFactor({width: 800, height: 600}, args.fit, args.zoom),
         nodeIntegration: args.integration,
         nodeIntegrationInSubFrames: true,
+        contextIsolation: false,
         preload: path.join(__dirname, '../renderer/preload.js')
     };
 
