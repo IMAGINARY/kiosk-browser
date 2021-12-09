@@ -68,7 +68,7 @@ function coerceFit(s) {
 }
 
 function coerceCoverDisplays(s) {
-    const stringNums = s.split(',');
+    const stringNums = typeof s !== 'undefined' ? s.split(',') : [];
     const nums = stringNums.map(s => Number.parseInt(s, 10));
     for (let i = 0; i < nums.length; ++i) {
         if (Number.isNaN(nums[i]) || nums[i] < 0) {

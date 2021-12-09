@@ -217,11 +217,11 @@ function appReady(args) {
     const options = {
         backgroundColor: args['background-color'][args.transparent ? 'argb' : 'rgb'],
         show: false,
-        frame: args.frame && !args['cover-displays'],
+        frame: args.frame && args['cover-displays'].length === 0,
         titleBarStyle: 'hidden',
         fullscreenWindowTitle: true,
         fullscreenable: true,
-        resizable: args['resize'] && !args['cover-displays'],
+        resizable: args['resize'] && args['cover-displays'].length === 0,
         transparent: args.transparent,
         alwaysOnTop: args["always-on-top"],
         webPreferences: webprefs,
@@ -256,7 +256,7 @@ function createMainWindow(args, options) {
     require("@electron/remote/main").enable(webContents);
 
     const adjustWindowBounds = (() => {
-        if (args['cover-displays']) {
+        if (args['cover-displays'].length > 0) {
             const displayCover = computeDisplayCover(args['cover-displays'], args.fullscreen);
             logger.debug('Trying to cover display area {}', displayCover);
             return () => fixWindowSize(mainWindow, displayCover);
