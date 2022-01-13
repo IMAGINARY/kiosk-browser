@@ -62,6 +62,8 @@ const yargsOptions = yargs
   .wrap(yargs.terminalWidth())
   .help(false)
   .version(false)
+  .detectLocale(false)
+  .locale('en')
   .strict()
   .fail(onYargsFailure)
   .options(cmdLineOptions.getOptions(convertToCmdLineFormat(settings)));
