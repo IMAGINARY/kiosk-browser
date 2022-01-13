@@ -51,7 +51,14 @@ function onYargsFailure(msg, err) {
 
 // TODO: describe positional argument
 const yargsOptions = yargs
-  .usage('Kiosk Web Browser\n    Usage: $0 [options] [url]')
+  .usage(
+      `$0 [url]`,
+      'A Chromium-based web browser with minimal UI targeting kiosk applications.',
+      (yargs) => yargs.positional('url', {
+            describe: 'The URL to open.',
+            type: 'string'
+          }
+      ))
   .wrap(yargs.terminalWidth())
   .help(false)
   .version(false)
@@ -109,7 +116,7 @@ async function main(args) {
   app.on('window-all-closed', () => app.quit());
 
   // If there are no positional arguments, use one of the default URLs
-  let url = (args._.length > 0) ? args._[0] : (args.serve ? 'index.html' : settings['home']);
+  let url = args.url ?? (args.serve ? 'index.html' : settings['home']);
 
   // If a kiosk:// URL is given, resolve it to the actual URL
   if (hasKioskProtocol(url)) {
