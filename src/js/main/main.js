@@ -21,7 +21,7 @@ function logAndExit(title, error) {
 
 global.shellStartTime = Date.now();
 
-const { app } = require('electron');
+const { app, session } = require('electron');
 require('@electron/remote/main').initialize();
 
 const logging = require('./logging');
@@ -144,6 +144,12 @@ async function main(args) {
 
   // Wait for initialization of electron
   await app.whenReady();
+
+  if (args['clear-cache']) {
+    logger.info('Clearing cache...');
+    await session.defaultSession.clearCache();
+    await session.defaultSession.clearHostResolverCache();
+  }
 
   // FIXME: For transparent windows, initialization it not ready yet (window is opaque).
   //  A delayed start serves as a temporary workaround until the problem is fixed in electron upstream.

@@ -168,6 +168,10 @@ const options = {
         type: 'boolean',
         description: 'Restrict network access to localhost',
     },
+    'clear-cache': {
+        type: 'boolean',
+        description: 'Clear the browser cache before opening the page',
+    },
     'zoom': {
         alias: 'z',
         type: 'number',
