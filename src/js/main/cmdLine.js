@@ -166,7 +166,7 @@ const options = {
     },
     'localhost': {
         type: 'boolean',
-        description: 'Restrict network access to localhost',
+        description: 'Restrict network access to localhost. Implies --clear-cache',
     },
     'clear-cache': {
         type: 'boolean',

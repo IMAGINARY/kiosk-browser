@@ -99,7 +99,12 @@ async function main(args) {
   }
 
   if (args.localhost) {
-    args['append-chrome-switch'].push({ key: 'host-rules', value: 'MAP * 127.0.0.1' });
+    const rules = 'MAP * ~NOTFOUND, EXCLUDE localhost, EXCLUDE 127.0.0.1, EXCLUDE ::1';
+    args['append-chrome-switch'].push(
+      { key: 'host-rules', value: rules },
+      { key: 'host-resolver-rules', value: rules },
+    );
+    args['clear-cache'] = true;
   }
 
   if (process.platform === 'linux' && args.transparent) {
