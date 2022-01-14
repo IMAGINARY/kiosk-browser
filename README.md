@@ -203,6 +203,25 @@ ssh -N -L 12345:localhost:9222 user@remote-host.local
 
 In a Chromium-based browser, open http://localhost:12345 to establish a connection to the remote debugger.
 
+## Hardware accelerated video decoding on Linux
+
+The kiosk-browser enables hardware accelerated video decoding via VA-API on Linux. Even though it is not officially
+supported by Chromium at the time of writing (Chromium 96), it works well on many platforms.
+Nevertheless, several things need to be considered:
+
+- `libva >= 1.10` needs to be installed on the system. This might require recent MESA as well, 
+  which might in turn require a recent kernel. For updating `libva` and MESA on Ubuntu,
+  the [kisak-mesa PPA](https://launchpad.net/~kisak/+archive/ubuntu/kisak-mesa) is recommended.
+- When running the kiosk-browser on X11, `--use-gl=desktop` needs to be added to the Chromium command line
+  (via `--append-chrome-switch=--use-gl=desktop`).
+- When running the kiosk-browser on Wayland, `--use-gl=egl` needs to be added to the Chromium command line
+  (via `--append-chrome-switch=--use-gl=egl`). 
+- Load a 1080p h.264 video file and open the `Media` panel in the Chromium developer tools to checker whether
+  hardware accelerated video decode is currently being used.
+- Check the logs for GPU crashes and other VA-API errors that may prevent accelerated video decoding.
+- Consult the [Arch Linux wiki](https://wiki.archlinux.org/title/Chromium#Hardware_video_acceleration)
+  for further insights on the subject.
+
 ## Building redistributable files
 You need to install NodeJS 12 and yarn. Then
 ```
