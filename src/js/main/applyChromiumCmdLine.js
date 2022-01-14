@@ -3,10 +3,11 @@
 const {app} = require('electron');
 const fs = require('fs');
 const path = require('path');
+const hjson = require('hjson');
 
 module.exports = function (ignoreDefaults, additionalChromiumSwitches, additionalChromiumArguments) {
     // load default command line switches and arguments
-    const appCmdLine = JSON.parse(fs.readFileSync(path.join(__dirname, "../../json/defaultAppCommandLine.json"), 'utf8'));
+    const appCmdLine = hjson.parse(fs.readFileSync(path.join(__dirname, "../../json/defaultAppCommandLine.json"), 'utf8'));
 
     // process switches
     const chromiumSwitches = ignoreDefaults ? additionalChromiumSwitches : appCmdLine.switches.concat(additionalChromiumSwitches);
