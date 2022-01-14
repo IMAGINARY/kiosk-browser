@@ -108,6 +108,10 @@ async function main(args) {
     args['clear-cache'] = true;
   }
 
+  if(args.persistent) {
+    args['append-chrome-switch'].push({"key": "incognito"});
+  }
+
   applyChromiumCmdLine(args['use-minimal-chrome-cli'],
     args['append-chrome-switch'],
     args['append-chrome-argument']);

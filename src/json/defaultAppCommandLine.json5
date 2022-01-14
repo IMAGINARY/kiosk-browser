@@ -7,7 +7,6 @@
     {"key": "disable-renderer-backgrounding"},
     {"key": "disable-background-timer-throttling"},
     {"key": "disable-backgrounding-occluded-windows"},
-    {"key": "incognito"},
     {"key": "autoplay-policy", "value": "no-user-gesture-required"}
   ],
   "arguments": [

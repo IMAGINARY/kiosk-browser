@@ -292,6 +292,11 @@ const options = {
         description: 'Allow resizing of the browser window.',
         default: true,
     },
+    'persistent': {
+        type: 'boolean',
+        description: 'Do not delete session storage in between runs.',
+        default: false,
+    },
 };
 
 function assignDefault(option, defaultValue) {
