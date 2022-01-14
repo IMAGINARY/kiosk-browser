@@ -1,7 +1,7 @@
 {
   "switches": [
     {"key": "--js-flags=--max_old_space_size=4096"},
-    {"key": "ignore-gpu-blacklist"},
+    {"key": "ignore-gpu-blocklist"},
     {"key": "disable-pinch"},
     {"key": "disable-renderer-backgrounding"},
     {"key": "disable-background-timer-throttling"},
