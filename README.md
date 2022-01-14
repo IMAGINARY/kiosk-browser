@@ -181,6 +181,28 @@ Pointing the kiosk-browser to `kiosk://testapp` will bring up a simple app for t
 as well as analyzing common problems with audio and video output such as flipped audio channels or screen tearing.
 Additionally, it displays basic network configuration and other system information.
 
+## Remote debugging
+
+By default, the kiosk-browser will open the port 9222 on localhost for remote debugging.
+The port can be changed via the `--remote-debugging-port` CLI option. However, it is not possible to set an
+address other than localhost. Truly remote debugging from another host can be achieved by forwarding the remote
+debugging port to the local machine via SSH:
+
+```
+ssh -N -L [bind_address:]port:localhost:remote_debugging_port [user@host]
+```
+
+The `-N` keeps SSH from opening a shell on the remote host.
+
+Assume the kiosk-browser is running on `remote-host.local` using 9222 as the remote debugging port. To forward this to
+you local host's loop-back interface on port 12345, execute:
+
+```
+ssh -N -L 12345:localhost:9222 user@remote-host.local
+```
+
+In a Chromium-based browser, open http://localhost:12345 to establish a connection to the remote debugger.
+
 ## Building redistributable files
 You need to install NodeJS 12 and yarn. Then
 ```
