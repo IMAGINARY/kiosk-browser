@@ -2,13 +2,13 @@ const {app} = require('electron');
 const settingsPath = app.getPath('userData');
 const fsExtra = require('fs-extra');
 const path = require('path');
-const hjson = require('hjson');
+const json5 = require('json5');
 
 const { logger } = require('./logging');
 
-// read defaults.json
-const defaultsFileContents = fsExtra.readFileSync(path.join(__dirname, '../../json/defaults.json'), 'utf8');
-const defaults = hjson.parse(defaultsFileContents);
+// read defaults.json5
+const defaultsFileContents = fsExtra.readFileSync(path.join(__dirname, '../../json/defaults.json5'), 'utf8');
+const defaults = json5.parse(defaultsFileContents);
 
 // ensure that the directory for the settings actually exists
 fsExtra.ensureDirSync(settingsPath);
@@ -29,7 +29,7 @@ const settingsFileContents = (() => {
 })();
 
 // parse the settings
-const settings = hjson.parse(settingsFileContents);
+const settings = json5.parse(settingsFileContents);
 
 // overwrite defaults
 const settingsWithDefault = Object.assign(defaults, settings);
