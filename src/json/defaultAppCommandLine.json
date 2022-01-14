@@ -3,7 +3,9 @@
     {"key": "--js-flags=--max_old_space_size=4096"},
     {"key": "ignore-gpu-blacklist"},
     {"key": "disable-pinch"},
+    {"key": "disable-renderer-backgrounding"},
     {"key": "disable-background-timer-throttling"},
+    {"key": "disable-backgrounding-occluded-windows"},
     {"key": "incognito"},
     {"key": "autoplay-policy", "value": "no-user-gesture-required"}
   ],
