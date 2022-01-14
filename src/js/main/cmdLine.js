@@ -131,12 +131,12 @@ const options = {
         type: 'boolean',
         description: 'Run in development mod.',
     },
-    'port': {
-        alias: 'p',
+    'remote-debugging-port': {
         type: 'number',
         description: 'Specify remote debugging port',
         coerceFunc: coercePort,
-        coerce: port => coercePort(port, 9222),
+        coerce: port => coercePort(port, this.default),
+        default: 9222,
         setDefault: (option, defaultValue) => option.coerce = value => option.coerceFunc(value, defaultValue),
     },
     'menu': {

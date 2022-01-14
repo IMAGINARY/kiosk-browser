@@ -94,8 +94,9 @@ async function main(args) {
     return;
   }
 
-  if (args.port) {
-    args['append-chrome-switch'].push({ key: 'remote-debugging-port', value: args.port });
+  if (args['remote-debugging-port']) {
+    const port = args['remote-debugging-port'];
+    args['append-chrome-switch'].push({ key: 'remote-debugging-port', value: port });
   }
 
   if (args.localhost) {

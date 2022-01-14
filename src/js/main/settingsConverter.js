@@ -2,7 +2,7 @@
 const settingsCmdLineMap = {
     'verbose': 'verbose',
     'devTools': 'dev',
-    'remoteDebuggingPort': 'port',
+    'remoteDebuggingPort': 'remote-debugging-port',
     'menu': 'menu',
     'kiosk': 'kiosk',
     'alwaysOnTop': 'always-on-top',
