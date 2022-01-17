@@ -24,8 +24,12 @@ Just grab the binaries specific for your platform from the release section.
 ### Command line
 
 ```
-Kiosk Web Browser
-    Usage: Electron [options] [url]
+kiosk-browser [url]
+
+A Chromium-based web browser with minimal UI targeting kiosk applications.
+
+Positionals:
+  url  The URL to open.                                                 [string]
 
 Options:
   -T, --always-on-top           Enable or disable always-on-top mode
@@ -34,10 +38,16 @@ Options:
                                 browser argument          [string] [default: []]
       --append-chrome-switch    Append switch to internal Chrome browser
                                 switches                  [string] [default: []]
+      --background-color        The background color to apply until it is
+                                overwritten by the loaded site.
+                                                     [string] [default: "#FFF0"]
+      --clear-cache             Clear the browser cache before opening the page
+                                                                       [boolean]
       --cover-displays          Let the browser window cover the displays
                                 provided by comma separated display numbers.
-                                Spanning multiple displays is not supported on
-                                all platforms.                          [string]
+                                Implies --no-resize and --no-frame. Spanning
+                                multiple displays is not supported on all
+                                platforms.                              [string]
   -d, --dev                     Run in development mod.
                                                       [boolean] [default: false]
       --disable-drag            Prevent dragging of draggable elements like
@@ -50,6 +60,8 @@ Options:
                                 Valid formats are wxh, wx_, _xh and _x_ (don't
                                 fit). The value supplied to --zoom acts as an
                                 additional multiplier. [string] [default: "_x_"]
+      --frame                   Show the browser window frame.
+                                                       [boolean] [default: true]
   -f, --fullscreen              Enable or disable fullscreen mode
                                                       [boolean] [default: false]
   -h, --help                    Print this usage message               [boolean]
@@ -61,8 +73,8 @@ Options:
                                                       [boolean] [default: false]
   -k, --kiosk                   Enable or disable kiosk mode
                                                       [boolean] [default: false]
-      --localhost               Restrict network access to localhost
-                                                      [boolean] [default: false]
+      --localhost               Restrict network access to localhost. Implies
+                                --clear-cache         [boolean] [default: false]
   -m, --menu                    Enable or disable main menu
                                                       [boolean] [default: false]
       --overflow                Specify CSS overflow rules for top-level page.
@@ -72,7 +84,8 @@ Options:
                                 disables vertical scrolling but leaves the
                                 horizontal overflow rule untouched.
                                                           [string] [default: ""]
-  -p, --port                    Specify remote debugging port           [number]
+      --persistent              Do not delete session storage in between runs.
+                                                      [boolean] [default: false]
       --preload                 Preload a JavaScript file into each website
                                                                         [string]
       --reload-idle             Reload the initially opened web page when the
@@ -80,12 +93,17 @@ Options:
                                                                         [number]
       --reload-unresponsive     Reloads websites that are unresponsive for the
                                 given number of seconds.                [number]
+      --remote-debugging-port   Specify remote debugging port
+                                                        [number] [default: 9222]
+      --resize                  Allow resizing of the browser window.
+                                                       [boolean] [default: true]
       --retry                   Retry after given number of seconds if loading
                                 the page failed (0 to disable)
                                                           [number] [default: 15]
   -s, --serve                   Open URL relative to this path served via
                                 built-in HTTP server.                   [string]
-  -t, --transparent             Make browser window background transparent.
+  -t, --transparent             Make browser window background transparent. See
+                                --background-color as well.
                                                       [boolean] [default: false]
       --use-minimal-chrome-cli  Don't append anything to the internal Chrome
                                 command line by default
