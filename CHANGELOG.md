@@ -8,23 +8,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - add support for relative paths to `--serve`
-- add `--resize`/`--no-resize` cli option to allow/prevent browser window resizing
-- add `--frame`/`--no-frame` cli option to show/hide browser window frame
-- add `--background-color` cli option for setting the window's background color that is used until overwritten by the loaded website 
+- add `--resize`/`--no-resize` CLI option to allow/prevent browser window resizing
+- add `--frame`/`--no-frame` CLI option to show/hide browser window frame
+- add `--background-color` CLI option for setting the window's background color that is used until overwritten by the loaded website 
+- add `--clear-cache`/`--no-clear-cache` CLI option to clear the browser's cache in startup
+- rename `--port` CLI option to `--remote-debugging-port`
+- add support for hardware accelerated video decode on Linux via VA-API
+- add `--incognito`/`--no-incognito` CLI option to enable/disable incognito mode
 
 ### Changed
 - decouple `--transparent` from window frame display and window resizing
-- update to Electron v11.3.0
+- update to Electron v16.0.7
+- occluding a browser window will not switch it into background mode anymore
+
+### Fixed
+- fix `--localhost` CLI option; this now implies `--clear-cache`
+- GPU block list
 
 ## [0.14.1] 2020-12-02
 
 ### Fixed
-- fix `--transparent` cli option on Linux
+- fix `--transparent` CLI option on Linux
 
 ## [0.14.0] 2020-12-01
 
 ### Added
-- add `--hide-cursor` cli option to hide the mouse cursor
+- add `--hide-cursor` CLI option to hide the mouse cursor
 - add idle detection for joysticks, gamepads and MIDI inputs
 - add kioskBrowser API for preload script and apps with node integration
 - add preload script examples to `/examples` directory
@@ -41,11 +50,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.13.0] 2020-07-20
 
 ### Added
-- add `--reload-idle` cli option to auto-reload when idle
-- add `--disable-drag` cli option to disable drag & drop
-- add `--disable-selection` cli option to disable selection except for form fields
-- add `--hide-scrollbars` cli option to hide scroll bars
-- add `--overflow` cli option to specify CSS overflow rules for top-level page
+- add `--reload-idle` CLI option to auto-reload when idle
+- add `--disable-drag` CLI option to disable drag & drop
+- add `--disable-selection` CLI option to disable selection except for form fields
+- add `--hide-scrollbars` CLI option to hide scroll bars
+- add `--overflow` CLI option to specify CSS overflow rules for top-level page
 - add Dockerfile for building Linux redistributables
 
 ### Changed
