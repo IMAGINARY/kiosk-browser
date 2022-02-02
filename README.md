@@ -241,19 +241,33 @@ Nevertheless, several things need to be considered:
   for further insights on the subject.
 
 ## Building redistributable files
-You need to install NodeJS 12 and yarn. Then
+You need to install a NodeJS version that comes with `npx`. Running
 ```
-yarn run dist
+npx yarn install
+npx yarn run dist
 ```
 will create the redistributable files for your current platform. Build results are placed in `dist`.
 
-For build the Linux redistributables, you can utilize the `Dockerfile` (requires `docker`):
+### Docker
+For building the Linux redistributables, you can utilize `docker` and the [electronuserland/builder] docker image:
+```shell
+docker run --rm -ti \
+ --env-file <(env | grep -iE 'DEBUG|NODE_|ELECTRON_|YARN_|NPM_|CI|CIRCLE|TRAVIS_TAG|TRAVIS|TRAVIS_REPO_|TRAVIS_BUILD_|TRAVIS_BRANCH|TRAVIS_PULL_REQUEST_|APPVEYOR_|CSC_|GH_|GITHUB_|BT_|AWS_|STRIP|BUILD_') \
+ --env ELECTRON_CACHE="/root/.cache/electron" \
+ --env ELECTRON_BUILDER_CACHE="/root/.cache/electron-builder" \
+ -v ${PWD}:/project \
+ -v ${PWD##*/}-node-modules:/project/node_modules \
+ -v ~/.cache/electron:/root/.cache/electron \
+ -v ~/.cache/electron-builder:/root/.cache/electron-builder \
+ electronuserland/builder
+ ```
+
+Inside the container, run
+```shell
+npx yarn install
+npx yarn run dist
 ```
-docker build -t kiosk-browser-builder .
-mkdir -p dist
-docker run --rm -ti -v `pwd`/dist:/dist kiosk-browser-builder
-```
-This builds a docker image named `kiosk-browser-builder` and runs it in a container. The build results are placed in the `dist` folder of the current directory (same directoy that `yarn run dist` uses).
+The build results are placed in the `dist` folder of the current directory (same directory that `yarn run dist` uses).
 
 ## License
 

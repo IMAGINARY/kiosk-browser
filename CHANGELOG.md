@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- drop `Dockerfile` for building redistributables via Docker. Use [electronuserland/builder] instead.
+
+[electronuserland/builder]: https://www.electron.build/multi-platform-build.html#build-electron-app-using-docker-on-a-local-machine
+
 ## [0.15.0] 2022-02-02
 
 ### Added
