@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - add `--resize`/`--no-resize` CLI option to allow/prevent browser window resizing
 - add `--frame`/`--no-frame` CLI option to show/hide browser window frame
 - add `--background-color` CLI option for setting the window's background color that is used until overwritten by the loaded website 
-- add `--clear-cache`/`--no-clear-cache` CLI option to clear the browser's cache in startup
+- add `--clear-cache`/`--no-clear-cache` CLI option to clear the browser's cache on startup
 - rename `--port` CLI option to `--remote-debugging-port`
 - add support for hardware accelerated video decode on Linux via VA-API
 - add `--incognito`/`--no-incognito` CLI option to enable/disable incognito mode
@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - decouple `--transparent` from window frame display and window resizing
 - upgrade to Electron v16.0.8, Node v16.9.1, Chromium v96.0.4664.110
-- occluding a browser window will not switch it into background mode anymore
+- occluding a browser window will no longer switch it into background mode
 
 ### Fixed
 - fix `--localhost` CLI option; this now implies `--clear-cache`
