@@ -241,10 +241,10 @@ Nevertheless, several things need to be considered:
   for further insights on the subject.
 
 ## Building redistributable files
-You need to install a NodeJS version that comes with `npx`. Running
+You need to install a NodeJS and `npm`. Running
 ```
-npx yarn install
-npx yarn run dist
+npm install
+npm run dist
 ```
 will create the redistributable files for your current platform. Build results are placed in `dist`.
 
@@ -264,10 +264,10 @@ docker run --rm -ti \
 
 Inside the container, run
 ```shell
-npx yarn install
-npx yarn run dist
+npm install
+npm run dist
 ```
-The build results are placed in the `dist` folder of the current directory (same directory that `yarn run dist` uses).
+The build results are placed in the `dist` folder of the current directory (same directory that `npm run dist` uses).
 
 ## License
 

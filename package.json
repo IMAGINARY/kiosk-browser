@@ -23,9 +23,7 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "electron": "16.0.8",
-    "electron-builder": "22.14.5",
-    "syncyarnlock": "1.0.19",
-    "yarn": "1.22.17"
+    "electron-builder": "22.14.5"
   },
   "dependencies": {
     "@electron/remote": "2.0.4",
@@ -38,11 +36,10 @@
     "yargs": "17.3.1"
   },
   "scripts": {
-    "postinstall": "electron-builder install-app-deps && syncyarnlock --save && yarn install --ignore-scripts",
+    "postinstall": "electron-builder install-app-deps",
     "start": "electron .",
     "pack": "electron-builder --x64 --dir",
-    "dist": "electron-builder --x64",
-    "syncyarnlock": "syncyarnlock --save"
+    "dist": "electron-builder --x64"
   },
   "build": {
     "appId": "org.imaginary.kiosk",

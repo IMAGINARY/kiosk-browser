@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - drop `Dockerfile` for building redistributables via Docker. Use [electronuserland/builder] instead.
+- switch from `yarn` to `npm` for package management 
 
 [electronuserland/builder]: https://www.electron.build/multi-platform-build.html#build-electron-app-using-docker-on-a-local-machine
 
