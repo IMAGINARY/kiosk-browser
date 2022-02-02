@@ -1,4 +1,6 @@
-*, *::after, *::before {
-    -webkit-user-drag: none;
-    user-drag: none;
+*,
+*::after,
+*::before {
+  -webkit-user-drag: none;
+  user-drag: none;
 }

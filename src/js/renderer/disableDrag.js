@@ -1,22 +1,26 @@
 const path = require('path');
 const insertCssIntoWebFrame = require('./insertCssIntoWebFrame');
 
-insertCssIntoWebFrame.fromFile(path.join(__dirname, '../../css/disable-drag.css'));
+insertCssIntoWebFrame.fromFile(
+  path.join(__dirname, '../../css/disable-drag.css')
+);
 
 function isSelectedElement(elem) {
-    return window.getSelection().containsNode(elem, true);
+  return window.getSelection().containsNode(elem, true);
 }
 
 function isSelectionInFormField(elem) {
-    console.log(window.getSelection())
-    return document.activeElement === elem
-        && (elem.tagName === "TEXTAREA" || elem.tagName === "INPUT")
-        && elem.selectionStart !== elem.selectionEnd;
+  console.log(window.getSelection());
+  return (
+    document.activeElement === elem &&
+    (elem.tagName === 'TEXTAREA' || elem.tagName === 'INPUT') &&
+    elem.selectionStart !== elem.selectionEnd
+  );
 }
 
 function preventDragOnSelection(event) {
-    if (isSelectedElement(event.target) || isSelectionInFormField(event.target))
-        event.preventDefault()
+  if (isSelectedElement(event.target) || isSelectionInFormField(event.target))
+    event.preventDefault();
 }
 
 document.addEventListener('dragstart', preventDragOnSelection, true);

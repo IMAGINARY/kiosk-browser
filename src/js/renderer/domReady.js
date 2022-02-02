@@ -1,8 +1,11 @@
-const domReady = new Promise(resolve => {
-  if (document.readyState === "complete" || document.readyState === "interactive") {
+const domReady = new Promise((resolve) => {
+  if (
+    document.readyState === 'complete' ||
+    document.readyState === 'interactive'
+  ) {
     resolve();
   } else {
-    window.addEventListener("DOMContentLoaded", () => resolve());
+    window.addEventListener('DOMContentLoaded', () => resolve());
   }
 });
 

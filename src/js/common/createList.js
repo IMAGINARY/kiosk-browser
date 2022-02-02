@@ -5,8 +5,8 @@ function createList(a) {
     if (i >= 0) {
       a.splice(i, 1);
     }
-  }
-  const clear = () => a.length = 0;
+  };
+  const clear = () => (a.length = 0);
 
   return { add, remove, clear };
 }

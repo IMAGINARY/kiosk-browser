@@ -4,9 +4,9 @@ const preloadModulesPaths = remoteRequire('./preloadModules');
 
 const hasNodeIntegration = typeof window.require !== 'undefined';
 
-const kioskBrowser = window.kioskBrowser = {};
+const kioskBrowser = (window.kioskBrowser = {});
 
-preloadModulesPaths.forEach(p => require(p));
+preloadModulesPaths.forEach((p) => require(p));
 
 const { kioskSiteForHtmlUrl } = remoteRequire('./kiosk-sites');
 
@@ -15,7 +15,10 @@ try {
   try {
     require(site.preload.pathname);
   } catch (e) {
-    console.error(`Error loading preload script for '${site.id}' kiosk app.`, e);
+    console.error(
+      `Error loading preload script for '${site.id}' kiosk app.`,
+      e
+    );
   }
 } catch (e) {
   // Has no matching preload script. NOOP.

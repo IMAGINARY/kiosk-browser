@@ -20,7 +20,8 @@ function filterRepeatedControlChange(messageEvent) {
   controlChangess[messageEvent.target.id] ??= [];
   const controlChanges = controlChangess[messageEvent.target.id];
   const data = messageEvent.data;
-  if (data[0] >> 4 === 0xB) { // this is a control change message
+  if (data[0] >> 4 === 0xb) {
+    // this is a control change message
     const controlId = (data[0] << 8) + data[1];
     const changed = controlChanges[controlId] !== data[2];
     controlChanges[controlId] = data[2];
@@ -29,7 +30,7 @@ function filterRepeatedControlChange(messageEvent) {
       return false;
     } else {
       console.log(
-        'Ignoring MIDI control change event because its value didn\'t change.',
+        "Ignoring MIDI control change event because its value didn't change.",
         messageEvent
       );
       return true;
@@ -38,4 +39,6 @@ function filterRepeatedControlChange(messageEvent) {
 }
 
 kioskBrowser.idleDetector.midi.messageEventFilters.add(filterNoteOff);
-kioskBrowser.idleDetector.midi.messageEventFilters.add(filterRepeatedControlChange);
+kioskBrowser.idleDetector.midi.messageEventFilters.add(
+  filterRepeatedControlChange
+);

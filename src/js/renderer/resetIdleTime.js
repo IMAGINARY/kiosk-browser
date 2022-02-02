@@ -13,7 +13,7 @@ function isTimestampOutdated(eventTimestampMs) {
 }
 
 function msUntilNextResetIdleTime(lastEventTimestampMs) {
-  return (lastIpcTimestampMs + ipcIntervalMs) - lastEventTimestampMs;
+  return lastIpcTimestampMs + ipcIntervalMs - lastEventTimestampMs;
 }
 
 function resetIdleTime(lastEventTimestampMs = performance.now()) {
@@ -33,7 +33,10 @@ function requestResetIdleTime(lastEventTimestampMs = performance.now()) {
       resetIdleTime(lastEventTimestampMs);
     } else {
       // reset after waiting time
-      timeoutId = setTimeout(() => resetIdleTime(lastEventTimestampMs), waitingPeriodMs);
+      timeoutId = setTimeout(
+        () => resetIdleTime(lastEventTimestampMs),
+        waitingPeriodMs
+      );
     }
   }
 }

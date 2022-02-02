@@ -16,8 +16,9 @@ function logAndExit(title, error) {
   app.exit(-1);
 }
 
-['uncaughtException', 'unhandledRejection'].forEach(e => process.on(e,
-  error => logAndExit(e, error)));
+['uncaughtException', 'unhandledRejection'].forEach((e) =>
+  process.on(e, (error) => logAndExit(e, error))
+);
 
 global.shellStartTime = Date.now();
 
@@ -36,29 +37,30 @@ const httpServer = require('./httpServer');
 const appReady = require('./appReady');
 
 const yargsParserConfig = {
-  "short-option-groups": true,
-  "camel-case-expansion": false,
-  "dot-notation": true,
-  "parse-numbers": true,
+  'short-option-groups': true,
+  'camel-case-expansion': false,
+  'dot-notation': true,
+  'parse-numbers': true,
 };
 const yargs = require('yargs').parserConfiguration(yargsParserConfig);
 
 function onYargsFailure(msg, err) {
   yargs.showHelp();
   logger.error(msg);
-  throw(err ? err : new Error("CLI option parsing failed"));
+  throw err ? err : new Error('CLI option parsing failed');
 }
 
 // TODO: describe positional argument
 const yargsOptions = yargs
   .usage(
-      `$0 [url]`,
-      'A Chromium-based web browser with minimal UI targeting kiosk applications.',
-      (yargs) => yargs.positional('url', {
-            describe: 'The URL to open.',
-            type: 'string'
-          }
-      ))
+    `$0 [url]`,
+    'A Chromium-based web browser with minimal UI targeting kiosk applications.',
+    (yargs) =>
+      yargs.positional('url', {
+        describe: 'The URL to open.',
+        type: 'string',
+      })
+  )
   .wrap(yargs.terminalWidth())
   .help(false)
   .version(false)
@@ -96,25 +98,31 @@ async function main(args) {
 
   if (args['remote-debugging-port']) {
     const port = args['remote-debugging-port'];
-    args['append-chrome-switch'].push({ key: 'remote-debugging-port', value: port });
+    args['append-chrome-switch'].push({
+      key: 'remote-debugging-port',
+      value: port,
+    });
   }
 
   if (args.localhost) {
-    const rules = 'MAP * ~NOTFOUND, EXCLUDE localhost, EXCLUDE 127.0.0.1, EXCLUDE ::1';
+    const rules =
+      'MAP * ~NOTFOUND, EXCLUDE localhost, EXCLUDE 127.0.0.1, EXCLUDE ::1';
     args['append-chrome-switch'].push(
       { key: 'host-rules', value: rules },
-      { key: 'host-resolver-rules', value: rules },
+      { key: 'host-resolver-rules', value: rules }
     );
     args['clear-cache'] = true;
   }
 
-  if(args.persistent) {
-    args['append-chrome-switch'].push({"key": "incognito"});
+  if (args.persistent) {
+    args['append-chrome-switch'].push({ key: 'incognito' });
   }
 
-  applyChromiumCmdLine(args['use-minimal-chrome-cli'],
+  applyChromiumCmdLine(
+    args['use-minimal-chrome-cli'],
     args['append-chrome-switch'],
-    args['append-chrome-argument']);
+    args['append-chrome-argument']
+  );
 
   // Quit when all windows are closed.
   app.on('window-all-closed', () => app.quit());
@@ -156,7 +164,7 @@ async function main(args) {
   // FIXME: For transparent windows, initialization it not ready yet (window is opaque).
   //  A delayed start serves as a temporary workaround until the problem is fixed in electron upstream.
   if (process.platform === 'linux' && args.transparent) {
-    await new Promise(r => setTimeout(r, 500));
+    await new Promise((r) => setTimeout(r, 500));
   }
 
   appReady(args);
@@ -166,7 +174,7 @@ try {
   // running electron via npm/yarn adds an extra '.' cli argument after the exe path
   // and we need to strip that away.
   const args = yargsOptions.parse(process.argv.slice(app.isPackaged ? 1 : 2));
-  main(args).catch(err => logAndExit('Exception in main', err));
+  main(args).catch((err) => logAndExit('Exception in main', err));
 } catch (err) {
   logger.error(err.msg);
   app.exit(1);

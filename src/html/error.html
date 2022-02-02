@@ -1,44 +1,56 @@
-<!doctype html>
+<!DOCTYPE html>
 
 <html lang="en">
-<head>
-    <meta charset="utf-8">
+  <head>
+    <meta charset="utf-8" />
 
     <title>Kiosk browser error page</title>
-    <meta name="description" content="Error page to be displayed on failed page loads">
-    <meta name="author" content="IMAGINARY">
+    <meta
+      name="description"
+      content="Error page to be displayed on failed page loads"
+    />
+    <meta name="author" content="IMAGINARY" />
 
     <style type="text/css">
-        .hidden {
-            display: none;
-        }
+      .hidden {
+        display: none;
+      }
     </style>
+  </head>
 
-</head>
+  <body>
+    <div
+      style="
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        color: white;
+        background-color: black;
+      "
+    >
+      Error <span id="errorCode"></span>: <span id="errorDescription"></span
+      ><br />
+      URL: <span id="validatedUrl"></span><br />
+      <div id="retryWrapper" class="hidden">
+        Reloading in <span id="retry"></span>s
+      </div>
+    </div>
+    <script>
+      const searchParams = new URL(document.location).searchParams;
 
-<body>
-
-<div style="position:absolute;top:0;left:0;width: 100%;color: white;background-color: black;">
-    Error <span id="errorCode"></span>: <span id="errorDescription"></span><br/>
-    URL: <span id="validatedUrl"></span><br/>
-    <div id="retryWrapper" class="hidden">Reloading in <span id="retry"></span>s</div>
-</div>
-<script>
-    const searchParams = (new URL(document.location)).searchParams;
-
-    // fill values into HTML templates
-    for( let [key,value] of searchParams) {
+      // fill values into HTML templates
+      for (let [key, value] of searchParams) {
         document.getElementById(key).innerText = value;
-    }
+      }
 
-    // reload the page that triggered the error if requested
-    const retry = searchParams.get('retry');
-    const validatedUrl = searchParams.get('validatedUrl');
-    if (retry > 0) {
+      // reload the page that triggered the error if requested
+      const retry = searchParams.get('retry');
+      const validatedUrl = searchParams.get('validatedUrl');
+      if (retry > 0) {
         document.getElementById('retryWrapper').classList.remove('hidden');
         setTimeout(() => window.location.replace(validatedUrl), retry * 1000);
-    }
-</script>
-
-</body>
+      }
+    </script>
+  </body>
 </html>

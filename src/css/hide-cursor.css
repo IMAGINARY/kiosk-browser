@@ -1,3 +1,5 @@
-:root, *, *[style] {
+:root,
+*,
+*[style] {
   cursor: none !important;
 }

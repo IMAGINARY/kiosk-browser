@@ -1,4 +1,4 @@
-const { powerMonitor, ipcMain } = require("electron");
+const { powerMonitor, ipcMain } = require('electron');
 const { performance } = require('perf_hooks');
 
 class IdleDetector {
@@ -21,17 +21,16 @@ class IdleDetector {
 
   clearTimeout(id) {
     const timer = this.timers.get(id);
-    if (typeof timer !== undefined)
-      timer.clear();
+    if (typeof timer !== undefined) timer.clear();
     this.timers.delete(id);
   }
 
   reset() {
-    this.timers.forEach(timer => timer.reset());
+    this.timers.forEach((timer) => timer.reset());
   }
 
   clear() {
-    this.timers.forEach(timer => timer.clear());
+    this.timers.forEach((timer) => timer.clear());
     this.timers.clear();
   }
 
@@ -75,8 +74,7 @@ class Timer {
   _testTimeout() {
     const systemIdleTime = Timer.getIdleTime();
     if (systemIdleTime >= this.timeoutDelay) {
-      if (this.repeat)
-        this.reset();
+      if (this.repeat) this.reset();
       this.func(...this.args);
     } else {
       const idleTimeRemaining = this.timeoutDelay - systemIdleTime;
@@ -87,7 +85,7 @@ class Timer {
   static resetIdleTime(idleTimeMs = 0) {
     Timer._lastEventTimestampMs = Math.max(
       performance.now() - idleTimeMs,
-      Timer._lastEventTimestampMs,
+      Timer._lastEventTimestampMs
     );
   }
 
@@ -104,6 +102,8 @@ class Timer {
   static IPC_INTERVAL_MS = 500;
 }
 
-ipcMain.on(Timer.IPC_CHANNEL, (event, idleTimeMs) => Timer.resetIdleTime(idleTimeMs));
+ipcMain.on(Timer.IPC_CHANNEL, (event, idleTimeMs) =>
+  Timer.resetIdleTime(idleTimeMs)
+);
 
 module.exports = new IdleDetector();

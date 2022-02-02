@@ -7,12 +7,14 @@ const kioskSites = ['home', 'testapp'].map(siteData);
 
 function siteData(id) {
   const html = pathToFileURL(path.join(__dirname, '../../html/', `${id}.html`));
-  const preload = pathToFileURL(path.join(__dirname, '../renderer/kiosk-sites/', `${id}.js`));
+  const preload = pathToFileURL(
+    path.join(__dirname, '../renderer/kiosk-sites/', `${id}.js`)
+  );
   return {
     id,
     html,
     preload,
-  }
+  };
 }
 
 function hasKioskProtocol(url) {
@@ -28,7 +30,7 @@ function kioskSiteForKioskUrl(kioskUrl) {
   kioskUrl = new URL(kioskUrl);
   if (hasKioskProtocol(kioskUrl)) {
     const id = kioskUrl.hostname;
-    const index = kioskSites.findIndex(site => site.id === id);
+    const index = kioskSites.findIndex((site) => site.id === id);
     if (index !== -1) {
       return kioskSites[index];
     } else {
@@ -41,7 +43,7 @@ function kioskSiteForKioskUrl(kioskUrl) {
 
 function kioskSiteForHtmlUrl(htmlUrl) {
   htmlUrl = new URL(htmlUrl);
-  const index = kioskSites.findIndex(site => site.html.href === htmlUrl.href);
+  const index = kioskSites.findIndex((site) => site.html.href === htmlUrl.href);
   if (index !== -1) {
     return kioskSites[index];
   } else {
@@ -49,4 +51,8 @@ function kioskSiteForHtmlUrl(htmlUrl) {
   }
 }
 
-module.exports = { hasKioskProtocol, kioskSiteForKioskUrl, kioskSiteForHtmlUrl };
+module.exports = {
+  hasKioskProtocol,
+  kioskSiteForKioskUrl,
+  kioskSiteForHtmlUrl,
+};

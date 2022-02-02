@@ -7,14 +7,14 @@ A kiosk-enabled web content renderer for use in exhibitions and digital signage 
 - render the web app, otherwise stay out of the way
 - allow configuration via command line options or configuration files
 - cover use cases common in exhibitions with interactive web content
-    + run one web site, full-screen
-    + built-in nodejs for super-powered web apps
-    + built-in web server for serving local content
-    + built-in facilities for testing input (touch, mouse) and output (audio, video) features
-    + preload-scripts for injecting additional functionality into web sites
-    + span across several displays
-    + rescale over-/undersized content
-    
+  - run one web site, full-screen
+  - built-in nodejs for super-powered web apps
+  - built-in web server for serving local content
+  - built-in facilities for testing input (touch, mouse) and output (audio, video) features
+  - preload-scripts for injecting additional functionality into web sites
+  - span across several displays
+  - rescale over-/undersized content
+
 ## Installation
 
 Just grab the binaries specific for your platform from the release section.
@@ -116,13 +116,14 @@ Options:
 
 ### Settings file
 
-***Disclaimer:*** Configuration via a settings file is incomplete and might or might not be removed in future versions.
+**_Disclaimer:_** Configuration via a settings file is incomplete and might or might not be removed in future versions.
 
 The kiosk-browser is configurable via command line and configuration file.
 Command line options always take precedence over settings in the config file
 which in turn take precedence over the kiosk-browser defaults. The config file paths are
- - Linux: `~/.config/kiosk-browser/Settings`
- - macOS: `~/Library/Application\ Support/kiosk-browser/Settings`
+
+- Linux: `~/.config/kiosk-browser/Settings`
+- macOS: `~/Library/Application\ Support/kiosk-browser/Settings`
 
 The list of supported command line options and defaults is obtained via `kiosk-browser --help`.
 
@@ -148,11 +149,12 @@ or for all scripts processed by the kiosk-browser.
 
 **DANGER: Nodejs integrations allows access to the local file system and other system resources.
 It should be handled with extreme care and must never be applied to online resources.
-Think twice before enabling it for content you do not fully trust.** 
+Think twice before enabling it for content you do not fully trust.**
 
 #### Kiosk browser API
 
 A dedicated Kiosk browser API is available for preload scripts under the global variable `kiosk` browser:
+
 ```
 {
   idleDetector: {
@@ -187,6 +189,7 @@ A dedicated Kiosk browser API is available for preload scripts under the global 
   },
 }
 ```
+
 Filters in the `idleDetector` are used to discard devices and events that should not be considered
 for idle detection, i.e. if there are devices that send periodic events but aren't controlled by the
 user. A filter must return `true` for such arguments.
@@ -227,13 +230,13 @@ The kiosk-browser enables hardware accelerated video decoding via VA-API on Linu
 supported by Chromium at the time of writing (Chromium 96), it works well on many platforms.
 Nevertheless, several things need to be considered:
 
-- `libva >= 1.10` needs to be installed on the system. This might require recent MESA as well, 
+- `libva >= 1.10` needs to be installed on the system. This might require recent MESA as well,
   which might in turn require a recent kernel. For updating `libva` and MESA on Ubuntu,
   the [kisak-mesa PPA](https://launchpad.net/~kisak/+archive/ubuntu/kisak-mesa) is recommended.
 - When running the kiosk-browser on X11, `--use-gl=desktop` needs to be added to the Chromium command line
   (via `--append-chrome-switch=--use-gl=desktop`).
 - When running the kiosk-browser on Wayland, `--use-gl=egl` needs to be added to the Chromium command line
-  (via `--append-chrome-switch=--use-gl=egl`). 
+  (via `--append-chrome-switch=--use-gl=egl`).
 - Load a 1080p h.264 video file and open the `Media` panel in the Chromium developer tools to checker whether
   hardware accelerated video decode is currently being used.
 - Check the logs for GPU crashes and other VA-API errors that may prevent accelerated video decoding.
@@ -241,15 +244,20 @@ Nevertheless, several things need to be considered:
   for further insights on the subject.
 
 ## Building redistributable files
+
 You need to install a NodeJS and `npm`. Running
+
 ```
 npm install
 npm run dist
 ```
+
 will create the redistributable files for your current platform. Build results are placed in `dist`.
 
 ### Docker
+
 For building the Linux redistributables, you can utilize `docker` and the [electronuserland/builder] docker image:
+
 ```shell
 docker run --rm -ti \
  --env-file <(env | grep -iE 'DEBUG|NODE_|ELECTRON_|YARN_|NPM_|CI|CIRCLE|TRAVIS_TAG|TRAVIS|TRAVIS_REPO_|TRAVIS_BUILD_|TRAVIS_BRANCH|TRAVIS_PULL_REQUEST_|APPVEYOR_|CSC_|GH_|GITHUB_|BT_|AWS_|STRIP|BUILD_') \
@@ -260,13 +268,15 @@ docker run --rm -ti \
  -v ~/.cache/electron:/root/.cache/electron \
  -v ~/.cache/electron-builder:/root/.cache/electron-builder \
  electronuserland/builder
- ```
+```
 
 Inside the container, run
+
 ```shell
 npm install
 npm run dist
 ```
+
 The build results are placed in the `dist` folder of the current directory (same directory that `npm run dist` uses).
 
 ## License

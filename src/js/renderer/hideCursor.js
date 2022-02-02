@@ -1,4 +1,6 @@
 const path = require('path');
 const insertCssIntoWebFrame = require('./insertCssIntoWebFrame');
 
-insertCssIntoWebFrame.fromFile(path.join(__dirname, '../../css/hide-cursor.css'));
+insertCssIntoWebFrame.fromFile(
+  path.join(__dirname, '../../css/hide-cursor.css')
+);

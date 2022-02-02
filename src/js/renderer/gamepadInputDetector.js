@@ -5,15 +5,12 @@ const deviceFilters = [];
 const stateFilters = [];
 
 window.kioskBrowser.idleDetector ??= {};
-Object.assign(
-  window.kioskBrowser.idleDetector,
-  {
-    gamepad: {
-      deviceFilters: createList(deviceFilters),
-      stateFilters: createList(stateFilters),
-    }
-  }
-);
+Object.assign(window.kioskBrowser.idleDetector, {
+  gamepad: {
+    deviceFilters: createList(deviceFilters),
+    stateFilters: createList(stateFilters),
+  },
+});
 
 if (!document.featurePolicy.allowsFeature('gamepad')) {
   return;
@@ -33,24 +30,32 @@ function loop() {
   cancelAnimationFrame(animationFrameRequestId);
 
   // Discard disconnected gamepads
-  const gamepads = [...navigator.getGamepads()]
-    .filter(gamepad => gamepad !== null);
+  const gamepads = [...navigator.getGamepads()].filter(
+    (gamepad) => gamepad !== null
+  );
 
   // Discard gamepads via device filter
-  const deviceFilteredGamepads = gamepads.filter(gamepad => gamepadIndices.has(gamepad.index));
+  const deviceFilteredGamepads = gamepads.filter((gamepad) =>
+    gamepadIndices.has(gamepad.index)
+  );
 
   if (gamepads.length > 0) {
     // Discard gamepads through state filter
     const stateFilteredGamepads = deviceFilteredGamepads
-      .filter(gamepad => lastEventTimestampMs < gamepad.timestamp)
-      .filter(gamepad => !stateFilters.reduce((acc, cur) => acc || cur(gamepad), false));
+      .filter((gamepad) => lastEventTimestampMs < gamepad.timestamp)
+      .filter(
+        (gamepad) =>
+          !stateFilters.reduce((acc, cur) => acc || cur(gamepad), false)
+      );
 
     // Keep timestamp to avoid processing the same state twice (important for state filters)
-    lastEventTimestampMs = Math.max(...gamepads.map(gp => gp.timestamp));
+    lastEventTimestampMs = Math.max(...gamepads.map((gp) => gp.timestamp));
 
     // If there are gamepads left -> request idle time reset
     if (stateFilteredGamepads.length > 0) {
-      const maxTimestampMs = Math.max(...stateFilteredGamepads.map(gp => gp.timestamp));
+      const maxTimestampMs = Math.max(
+        ...stateFilteredGamepads.map((gp) => gp.timestamp)
+      );
       requestResetIdleTime(maxTimestampMs);
     }
 
@@ -66,7 +71,10 @@ function loop() {
 
 function handleGamepadConnected(gamepadEvent) {
   const gamepad = gamepadEvent.gamepad;
-  const discard = deviceFilters.reduce((acc, cur) => acc || cur(gamepad), false);
+  const discard = deviceFilters.reduce(
+    (acc, cur) => acc || cur(gamepad),
+    false
+  );
   if (!discard) {
     gamepadIndices.add(gamepad.index);
     loop();
