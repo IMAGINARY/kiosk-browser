@@ -23,7 +23,8 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "electron": "16.0.8",
-    "electron-builder": "22.14.5"
+    "electron-builder": "22.14.5",
+    "prettier": "^2.5.1"
   },
   "dependencies": {
     "@electron/remote": "2.0.4",
@@ -39,7 +40,8 @@
     "postinstall": "electron-builder install-app-deps",
     "start": "electron .",
     "pack": "electron-builder --x64 --dir",
-    "dist": "electron-builder --x64"
+    "dist": "electron-builder --x64",
+    "prettier": "prettier --write ."
   },
   "build": {
     "appId": "org.imaginary.kiosk",
