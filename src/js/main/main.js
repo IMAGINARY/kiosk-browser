@@ -21,7 +21,7 @@ function logAndExit(title, error) {
 
 global.shellStartTime = Date.now();
 
-const { app } = require('electron');
+const { app, session } = require('electron');
 require('@electron/remote/main').initialize();
 
 const logging = require('./logging');
@@ -51,10 +51,19 @@ function onYargsFailure(msg, err) {
 
 // TODO: describe positional argument
 const yargsOptions = yargs
-  .usage('Kiosk Web Browser\n    Usage: $0 [options] [url]')
+  .usage(
+      `$0 [url]`,
+      'A Chromium-based web browser with minimal UI targeting kiosk applications.',
+      (yargs) => yargs.positional('url', {
+            describe: 'The URL to open.',
+            type: 'string'
+          }
+      ))
   .wrap(yargs.terminalWidth())
   .help(false)
   .version(false)
+  .detectLocale(false)
+  .locale('en')
   .strict()
   .fail(onYargsFailure)
   .options(cmdLineOptions.getOptions(convertToCmdLineFormat(settings)));
@@ -85,20 +94,22 @@ async function main(args) {
     return;
   }
 
-  if (args.port) {
-    args['append-chrome-switch'].push({ key: 'remote-debugging-port', value: args.port });
+  if (args['remote-debugging-port']) {
+    const port = args['remote-debugging-port'];
+    args['append-chrome-switch'].push({ key: 'remote-debugging-port', value: port });
   }
 
   if (args.localhost) {
-    args['append-chrome-switch'].push({ key: 'host-rules', value: 'MAP * 127.0.0.1' });
+    const rules = 'MAP * ~NOTFOUND, EXCLUDE localhost, EXCLUDE 127.0.0.1, EXCLUDE ::1';
+    args['append-chrome-switch'].push(
+      { key: 'host-rules', value: rules },
+      { key: 'host-resolver-rules', value: rules },
+    );
+    args['clear-cache'] = true;
   }
 
-  if (process.platform === 'linux' && args.transparent) {
-    // This is a workaround for
-    // https://github.com/electron/electron/blob/v11.0.0/docs/api/frameless-window.md#limitations
-    // TODO: Check regularly if the fix is still necessary
-    args['append-chrome-switch'].push({ key: '--enable-transparent-visuals', value: '' });
-    args['append-chrome-switch'].push({ key: '--disable-gpu', value: '' });
+  if(args.persistent) {
+    args['append-chrome-switch'].push({"key": "incognito"});
   }
 
   applyChromiumCmdLine(args['use-minimal-chrome-cli'],
@@ -109,7 +120,7 @@ async function main(args) {
   app.on('window-all-closed', () => app.quit());
 
   // If there are no positional arguments, use one of the default URLs
-  let url = (args._.length > 0) ? args._[0] : (args.serve ? 'index.html' : settings['home']);
+  let url = args.url ?? (args.serve ? 'index.html' : settings['home']);
 
   // If a kiosk:// URL is given, resolve it to the actual URL
   if (hasKioskProtocol(url)) {
@@ -135,6 +146,12 @@ async function main(args) {
 
   // Wait for initialization of electron
   await app.whenReady();
+
+  if (args['clear-cache']) {
+    logger.info('Clearing cache...');
+    await session.defaultSession.clearCache();
+    await session.defaultSession.clearHostResolverCache();
+  }
 
   // FIXME: For transparent windows, initialization it not ready yet (window is opaque).
   //  A delayed start serves as a temporary workaround until the problem is fixed in electron upstream.

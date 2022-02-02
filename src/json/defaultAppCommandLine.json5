@@ -1,10 +1,12 @@
 {
   "switches": [
     {"key": "--js-flags=--max_old_space_size=4096"},
-    {"key": "ignore-gpu-blacklist"},
+    {"key": "ignore-gpu-blocklist"},
+    {"key": "enable-features", "value": "VaapiVideoDecoder" }, // may only be valid for Chrome 96
     {"key": "disable-pinch"},
+    {"key": "disable-renderer-backgrounding"},
     {"key": "disable-background-timer-throttling"},
-    {"key": "incognito"},
+    {"key": "disable-backgrounding-occluded-windows"},
     {"key": "autoplay-policy", "value": "no-user-gesture-required"}
   ],
   "arguments": [

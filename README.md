@@ -24,8 +24,12 @@ Just grab the binaries specific for your platform from the release section.
 ### Command line
 
 ```
-Kiosk Web Browser
-    Usage: Electron [options] [url]
+kiosk-browser [url]
+
+A Chromium-based web browser with minimal UI targeting kiosk applications.
+
+Positionals:
+  url  The URL to open.                                                 [string]
 
 Options:
   -T, --always-on-top           Enable or disable always-on-top mode
@@ -34,10 +38,16 @@ Options:
                                 browser argument          [string] [default: []]
       --append-chrome-switch    Append switch to internal Chrome browser
                                 switches                  [string] [default: []]
+      --background-color        The background color to apply until it is
+                                overwritten by the loaded site.
+                                                     [string] [default: "#FFF0"]
+      --clear-cache             Clear the browser cache before opening the page
+                                                                       [boolean]
       --cover-displays          Let the browser window cover the displays
                                 provided by comma separated display numbers.
-                                Spanning multiple displays is not supported on
-                                all platforms.                          [string]
+                                Implies --no-resize and --no-frame. Spanning
+                                multiple displays is not supported on all
+                                platforms.                              [string]
   -d, --dev                     Run in development mod.
                                                       [boolean] [default: false]
       --disable-drag            Prevent dragging of draggable elements like
@@ -50,6 +60,8 @@ Options:
                                 Valid formats are wxh, wx_, _xh and _x_ (don't
                                 fit). The value supplied to --zoom acts as an
                                 additional multiplier. [string] [default: "_x_"]
+      --frame                   Show the browser window frame.
+                                                       [boolean] [default: true]
   -f, --fullscreen              Enable or disable fullscreen mode
                                                       [boolean] [default: false]
   -h, --help                    Print this usage message               [boolean]
@@ -61,8 +73,8 @@ Options:
                                                       [boolean] [default: false]
   -k, --kiosk                   Enable or disable kiosk mode
                                                       [boolean] [default: false]
-      --localhost               Restrict network access to localhost
-                                                      [boolean] [default: false]
+      --localhost               Restrict network access to localhost. Implies
+                                --clear-cache         [boolean] [default: false]
   -m, --menu                    Enable or disable main menu
                                                       [boolean] [default: false]
       --overflow                Specify CSS overflow rules for top-level page.
@@ -72,7 +84,8 @@ Options:
                                 disables vertical scrolling but leaves the
                                 horizontal overflow rule untouched.
                                                           [string] [default: ""]
-  -p, --port                    Specify remote debugging port           [number]
+      --persistent              Do not delete session storage in between runs.
+                                                      [boolean] [default: false]
       --preload                 Preload a JavaScript file into each website
                                                                         [string]
       --reload-idle             Reload the initially opened web page when the
@@ -80,12 +93,17 @@ Options:
                                                                         [number]
       --reload-unresponsive     Reloads websites that are unresponsive for the
                                 given number of seconds.                [number]
+      --remote-debugging-port   Specify remote debugging port
+                                                        [number] [default: 9222]
+      --resize                  Allow resizing of the browser window.
+                                                       [boolean] [default: true]
       --retry                   Retry after given number of seconds if loading
                                 the page failed (0 to disable)
                                                           [number] [default: 15]
   -s, --serve                   Open URL relative to this path served via
                                 built-in HTTP server.                   [string]
-  -t, --transparent             Make browser window background transparent.
+  -t, --transparent             Make browser window background transparent. See
+                                --background-color as well.
                                                       [boolean] [default: false]
       --use-minimal-chrome-cli  Don't append anything to the internal Chrome
                                 command line by default
@@ -180,6 +198,47 @@ Please check the preload scripts in `/examples/preload/idleDetector` for example
 Pointing the kiosk-browser to `kiosk://testapp` will bring up a simple app for testing touch and mouse input
 as well as analyzing common problems with audio and video output such as flipped audio channels or screen tearing.
 Additionally, it displays basic network configuration and other system information.
+
+## Remote debugging
+
+By default, the kiosk-browser will open the port 9222 on localhost for remote debugging.
+The port can be changed via the `--remote-debugging-port` CLI option. However, it is not possible to set an
+address other than localhost. Truly remote debugging from another host can be achieved by forwarding the remote
+debugging port to the local machine via SSH:
+
+```
+ssh -N -L [bind_address:]port:localhost:remote_debugging_port [user@host]
+```
+
+The `-N` keeps SSH from opening a shell on the remote host.
+
+Assume the kiosk-browser is running on `remote-host.local` using 9222 as the remote debugging port. To forward this to
+you local host's loop-back interface on port 12345, execute:
+
+```
+ssh -N -L 12345:localhost:9222 user@remote-host.local
+```
+
+In a Chromium-based browser, open http://localhost:12345 to establish a connection to the remote debugger.
+
+## Hardware accelerated video decoding on Linux
+
+The kiosk-browser enables hardware accelerated video decoding via VA-API on Linux. Even though it is not officially
+supported by Chromium at the time of writing (Chromium 96), it works well on many platforms.
+Nevertheless, several things need to be considered:
+
+- `libva >= 1.10` needs to be installed on the system. This might require recent MESA as well, 
+  which might in turn require a recent kernel. For updating `libva` and MESA on Ubuntu,
+  the [kisak-mesa PPA](https://launchpad.net/~kisak/+archive/ubuntu/kisak-mesa) is recommended.
+- When running the kiosk-browser on X11, `--use-gl=desktop` needs to be added to the Chromium command line
+  (via `--append-chrome-switch=--use-gl=desktop`).
+- When running the kiosk-browser on Wayland, `--use-gl=egl` needs to be added to the Chromium command line
+  (via `--append-chrome-switch=--use-gl=egl`). 
+- Load a 1080p h.264 video file and open the `Media` panel in the Chromium developer tools to checker whether
+  hardware accelerated video decode is currently being used.
+- Check the logs for GPU crashes and other VA-API errors that may prevent accelerated video decoding.
+- Consult the [Arch Linux wiki](https://wiki.archlinux.org/title/Chromium#Hardware_video_acceleration)
+  for further insights on the subject.
 
 ## Building redistributable files
 You need to install NodeJS 12 and yarn. Then

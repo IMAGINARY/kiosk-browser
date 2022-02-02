@@ -198,6 +198,7 @@ function appReady(args) {
         zoomFactor: computeZoomFactor({width: 800, height: 600}, args.fit, args.zoom),
         nodeIntegration: args.integration,
         nodeIntegrationInSubFrames: true,
+        contextIsolation: false,
         preload: path.join(__dirname, '../renderer/preload.js')
     };
 
@@ -216,11 +217,11 @@ function appReady(args) {
     const options = {
         backgroundColor: args['background-color'][args.transparent ? 'argb' : 'rgb'],
         show: false,
-        frame: args.frame && !args['cover-displays'],
+        frame: args.frame && args['cover-displays'].length === 0,
         titleBarStyle: 'hidden',
         fullscreenWindowTitle: true,
         fullscreenable: true,
-        resizable: args['resize'] && !args['cover-displays'],
+        resizable: args['resize'] && args['cover-displays'].length === 0,
         transparent: args.transparent,
         alwaysOnTop: args["always-on-top"],
         webPreferences: webprefs,
@@ -250,8 +251,12 @@ function createMainWindow(args, options) {
     const mainWindow = new BrowserWindow(options);
     const webContents = mainWindow.webContents;
 
+    // This is necessary for electron >= 14.0.0 to enable
+    // the remote module in the renderer process.
+    require("@electron/remote/main").enable(webContents);
+
     const adjustWindowBounds = (() => {
-        if (args['cover-displays']) {
+        if (args['cover-displays'].length > 0) {
             const displayCover = computeDisplayCover(args['cover-displays'], args.fullscreen);
             logger.debug('Trying to cover display area {}', displayCover);
             return () => fixWindowSize(mainWindow, displayCover);

@@ -68,7 +68,7 @@ function coerceFit(s) {
 }
 
 function coerceCoverDisplays(s) {
-    const stringNums = s.split(',');
+    const stringNums = typeof s !== 'undefined' ? s.split(',') : [];
     const nums = stringNums.map(s => Number.parseInt(s, 10));
     for (let i = 0; i < nums.length; ++i) {
         if (Number.isNaN(nums[i]) || nums[i] < 0) {
@@ -131,12 +131,12 @@ const options = {
         type: 'boolean',
         description: 'Run in development mod.',
     },
-    'port': {
-        alias: 'p',
+    'remote-debugging-port': {
         type: 'number',
         description: 'Specify remote debugging port',
         coerceFunc: coercePort,
-        coerce: port => coercePort(port, 9222),
+        coerce: port => coercePort(port, this.default),
+        default: 9222,
         setDefault: (option, defaultValue) => option.coerce = value => option.coerceFunc(value, defaultValue),
     },
     'menu': {
@@ -166,7 +166,11 @@ const options = {
     },
     'localhost': {
         type: 'boolean',
-        description: 'Restrict network access to localhost',
+        description: 'Restrict network access to localhost. Implies --clear-cache',
+    },
+    'clear-cache': {
+        type: 'boolean',
+        description: 'Clear the browser cache before opening the page',
     },
     'zoom': {
         alias: 'z',
@@ -287,6 +291,11 @@ const options = {
         type: 'boolean',
         description: 'Allow resizing of the browser window.',
         default: true,
+    },
+    'persistent': {
+        type: 'boolean',
+        description: 'Do not delete session storage in between runs.',
+        default: false,
     },
 };
 

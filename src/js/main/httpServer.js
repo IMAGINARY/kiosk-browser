@@ -1,11 +1,11 @@
 const finalhandler = require('finalhandler');
 const http = require('http');
 const path = require('path');
-const portfinder = require('portfinder');
 const serveStatic = require('serve-static');
 
-const { logger } = require('./logging');
+const {logger} = require('./logging');
 
+const minPort = 8000;
 const servers = [];
 
 /**
@@ -14,46 +14,52 @@ const servers = [];
  * @returns {Promise<string | never>} A promise that resolves to the URL of the server (typically http://localhost:port).
  */
 async function init(wwwRootDir) {
-  const port = await portfinder.getPortPromise();
-  // `port` is guaranteed to be a free port in this scope (or until next await).
+    // Serve up folder provided via CLI option
+    const absoluteWwwRootDir = path.resolve(process.cwd(), wwwRootDir);
+    const serve = serveStatic(absoluteWwwRootDir, {'index': ['index.html', 'index.htm']});
 
-  // Serve up folder provided via CLI option
-  const absoluteWwwRootDir = path.resolve(process.cwd(), wwwRootDir);
-  const serve = serveStatic(absoluteWwwRootDir, { 'index': ['index.html', 'index.htm'] });
+    // Create server
+    const server = http.createServer(function onRequest(req, res) {
+        const errorHandler = err => logger.warn('HTTP %i, %s', err.statusCode, err.message);
+        serve(req, res, finalhandler(req, res, {onerror: errorHandler}));
+    });
 
-  // Create server
-  const server = http.createServer(function onRequest(req, res) {
-    const errorHandler = err => logger.warn('HTTP %i, %s', err.statusCode, err.message);
-    serve(req, res, finalhandler(req, res, { onerror: errorHandler }));
-  });
+    const connect = async (server, port, host) => {
+        return await new Promise((resolve, reject) => {
+            server.once('error', reject);
+            server.listen(port, host, () => {
+                server.off('error', reject);
+                resolve(server);
+            });
+        })
+    };
 
   const host = 'localhost';
-  const urlPrefix = `http://${host}:${port}/`;
+  let port = minPort;
+  while (!server.listening) {
+        try {
+            await connect(server, port, host);
+        } catch (err) {
+            if (err.code === 'EADDRINUSE') {
+                logger.debug(`Address in use ${host}:${port}, incrementing port...`);
+                await new Promise(resolve => server.close(resolve));
+                port += 1;
+            } else {
+                throw err;
+            }
+        }
+    }
 
-  // Error handling is a bit convoluted because the server uses a mix of callbacks and event handlers
-  const listen = async (port, host) => {
-    await new Promise((resolve, reject) => {
-      const resolveWrapper = (...args) => {
-        server.off('error', reject);
-        return resolve(...args);
-      };
-      server.once('error', reject);
-      server.listen(port, host, resolveWrapper);
-    });
-  };
+    // Keep reference to the server to avoid garbage collection
+    servers.push(server);
 
-  // Listen
-  await listen(port, host);
+    // Do something about errors occurring after initialization
+    server.on('error', err => logger.error('Error in built-in HTTP server: %O', err));
 
-  // Keep reference to the server to avoid garbage collection
-  servers.push(server);
+    const urlPrefix = `http://${host}:${port}/`;
+    logger.info('Serving %s at %s', wwwRootDir, urlPrefix);
 
-  // Do something about errors occurring after initialization
-  server.on('error', err => logger.error('Error in built-in HTTP server: %O', err));
-
-  logger.info('Serving %s at %s', wwwRootDir, urlPrefix);
-
-  return urlPrefix;
+    return urlPrefix;
 }
 
-module.exports = { init };
+module.exports = {init};
