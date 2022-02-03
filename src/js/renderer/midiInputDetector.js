@@ -9,18 +9,15 @@ const knownMessageEventFilters = {
   activeSensing: (midiMessageEvent) => midiMessageEvent.data === 0xfe,
 };
 
-const idleDetector = (window.kioskBrowser.idleDetector ??= {});
-Object.assign(window.kioskBrowser.idleDetector, {
+window.kioskBrowser.idleDetector ??= {};
+const { idleDetector } = window.kioskBrowser;
+Object.assign(idleDetector, {
   midi: {
     portFilters: createList(midiPortFilters),
     messageEventFilters: createList(midiMessageEventFilters),
     knownMessageEventFilters,
   },
 });
-
-if (!document.featurePolicy.allowsFeature('midi')) {
-  return;
-}
 
 const { requestResetIdleTime } = require('./resetIdleTime');
 
@@ -41,10 +38,10 @@ function handlePortStateChange(port) {
       false
     );
     if (!discard) {
-      port.onmidimessage = handleMIDIMessage;
+      port.addEventListener('midimessage', handleMIDIMessage);
     }
   } else {
-    port.onmidimessage = undefined;
+    port.removeEventListener('midimessage', handleMIDIMessage);
   }
 }
 
@@ -52,8 +49,9 @@ async function setupMIDIListeners() {
   try {
     const midiAccess = await navigator.requestMIDIAccess();
     midiAccess.inputs.forEach(handlePortStateChange);
-    midiAccess.onstatechange = (stateChangeEvent) =>
-      handlePortStateChange(stateChangeEvent.port);
+    midiAccess.addEventListener('statechange', (stateChangeEvent) =>
+      handlePortStateChange(stateChangeEvent.port)
+    );
   } catch (err) {
     console.warn(
       `Could not set up MIDI event listeners for idle monitoring`,
@@ -62,9 +60,10 @@ async function setupMIDIListeners() {
   }
 }
 
-idleDetector.midi.messageEventFilters.add(knownMessageEventFilters['clock']);
-idleDetector.midi.messageEventFilters.add(
-  knownMessageEventFilters['activeSensing']
-);
+if (document.featurePolicy.allowsFeature('midi')) {
+  ['clock', 'activeSensing']
+    .map((name) => knownMessageEventFilters[name])
+    .forEach((filter) => idleDetector.midi.messageEventFilters.add(filter));
 
-domReady.then(setupMIDIListeners);
+  domReady.then(setupMIDIListeners);
+}
