@@ -1,11 +1,14 @@
 // Preload the modules by path supplied to the main process
 const remoteRequire = require('@electron/remote').require;
+
 const preloadModulesPaths = remoteRequire('./preloadModules');
 
 const hasNodeIntegration = typeof window.require !== 'undefined';
 
-const kioskBrowser = (window.kioskBrowser = {});
+const kioskBrowser = {};
+window.kioskBrowser = kioskBrowser;
 
+// eslint-disable-next-line global-require,import/no-dynamic-require
 preloadModulesPaths.forEach((p) => require(p));
 
 const { kioskSiteForHtmlUrl } = remoteRequire('./kiosk-sites');
@@ -13,6 +16,7 @@ const { kioskSiteForHtmlUrl } = remoteRequire('./kiosk-sites');
 try {
   const site = kioskSiteForHtmlUrl(window.location.href);
   try {
+    // eslint-disable-next-line global-require,import/no-dynamic-require
     require(site.preload.pathname);
   } catch (e) {
     console.error(

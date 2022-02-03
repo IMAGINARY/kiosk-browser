@@ -1,5 +1,6 @@
 const { ipcRenderer } = require('electron');
 const remoteRequire = require('@electron/remote').require;
+
 const RemoteIdleDetector = remoteRequire('./idleDetector');
 
 const channel = RemoteIdleDetector.IPC_CHANNEL;

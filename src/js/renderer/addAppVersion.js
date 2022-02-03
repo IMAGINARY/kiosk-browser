@@ -2,7 +2,7 @@
 const remote = require('@electron/remote');
 
 process.versions.app = remote.app.getVersion();
-const versions = process.versions;
+const { versions } = process;
 
 function isUndefined(v) {
   return typeof v === 'undefined';

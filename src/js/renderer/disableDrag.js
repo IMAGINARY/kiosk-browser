@@ -10,7 +10,6 @@ function isSelectedElement(elem) {
 }
 
 function isSelectionInFormField(elem) {
-  console.log(window.getSelection());
   return (
     document.activeElement === elem &&
     (elem.tagName === 'TEXTAREA' || elem.tagName === 'INPUT') &&

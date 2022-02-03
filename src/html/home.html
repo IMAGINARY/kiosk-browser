@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <title>Hello (Kiosk-)World :)</title>
     <meta charset="utf-8" />
-    <style type="text/css" media="screen">
+    <style>
       html {
         height: 100%;
         width: 100%;
@@ -16,58 +16,72 @@
       }
     </style>
 
-    <script language="JavaScript">
+    <script>
       function jsGO() {
         window.location.href = document.goto_form.target.value;
       }
+
+      function fillTemplates() {
+        const templates = {
+          'app-version': process.versions.app,
+          'node-version': process.versions.node,
+          'chrome-version': process.versions.chrome,
+          'electron-version': process.versions.electron,
+          'v8-version': process.versions.v8,
+          'navigator-language': navigator.language,
+          'navigator-languages': navigator.languages.join(', '),
+        };
+
+        Object.entries(templates).forEach(([key, value]) => {
+          const element = document.getElementById(key);
+          if (element) {
+            element.innerText = String(value);
+          }
+        });
+      }
+
+      function init() {
+        document.querySelector('#go-button').addEventListener('click', jsGO);
+        fillTemplates();
+      }
+
+      document.addEventListener('DOMContentLoaded', init);
     </script>
   </head>
   <body>
     <h2>Kiosk Browser Software Versions:</h2>
     <!-- All of the Node.js APIs are available in this renderer process. -->
-    We are using Kiosk browser
-    <script>
-      document.write(' (<tt>' + process.versions.app + '</tt>)');
-    </script>
-    based on Node.JS
-    <script>
-      document.write(' (<tt>' + process.versions.node + '</tt>)');
-    </script>
-    , Chromium
-    <script>
-      document.write(' (<tt>' + process.versions.chrome + '</tt>)');
-    </script>
-    , Electron
-    <script>
-      document.write(' (<tt>' + process.versions.electron + '</tt>)');
-    </script>
-    and V8
-    <script>
-      document.write(' (<tt>' + process.versions.v8 + '</tt>)');
-    </script>
-    .
+    We are using Kiosk browser <span id="app-version"></span> based on Node.JS
+    <span id="node-version"></span>, Chromium <span id="chrome-version"></span>,
+    Electron <span id="electron-version"></span> and V8
+    <span id="v8-version"></span>.
 
     <h2>Navigator Language(s):</h2>
 
-    Current <tt>navigator.language</tt> is "
-    <script>
-      document.write(navigator.language);
-    </script>
-    ", current <tt>navigator.languages</tt> is "
-    <script>
-      window.document.write(navigator.languages);
-    </script>
-    ".
+    Current <code>navigator.language</code> is "<span
+      id="navigator-language"
+    ></span
+    >", current <code>navigator.languages</code> is "<span
+      id="navigator-languages"
+    ></span
+    >".
 
     <h2>Redirections:</h2>
 
     <a href="testapp.html">Test application (MT + Network)</a> <br />
 
-    <a href="http://www.google.com/">OK Google?!</a> <br />
+    <a href="https://www.google.com/">OK Google?!</a> <br />
 
     <form name="goto_form">
-      <input type="text" name="target" id="target" size="50" value="http://" />
-      <input type="button" onclick="jsGO();" value="GO!" />
+      <label for="target"></label
+      ><input
+        type="text"
+        name="target"
+        id="target"
+        size="50"
+        value="https://"
+      />
+      <input id="go-button" type="button" value="GO!" />
     </form>
 
     <h2>Local Content</h2>
@@ -78,231 +92,235 @@
 
     <h2>General Browser testing + HTML5:</h2>
 
-    <a href="http://html5test.com/">HTML5 Browser test </a> <br />
-    <a href="http://acid2.acidtests.org/#top">Acid2 Test </a> <br />
-    <a href="http://rng.io/">ringmark </a> <br />
-    <a href="http://developer.mozilla.org/en-US/demos/tag/tech%3Ahtml5"
+    <a href="https://html5test.com/">HTML5 Browser test </a> <br />
+    <a href="https://acid2.acidtests.org/#top">Acid2 Test </a> <br />
+    <a href="https://rng.io/">ringmark </a> <br />
+    <a href="https://developer.mozilla.org/en-US/demos/tag/tech%3Ahtml5"
       >Mozilla HTML5 Demos
     </a>
     <br />
-    <a href="http://mudcu.be/journal/category/html5/">CODE & DESIGN: HTML5 </a>
+    <a href="https://mudcu.be/journal/category/html5/">CODE & DESIGN: HTML5 </a>
     <br />
 
     <h2>Video:</h2>
 
-    <a href="http://www.quirksmode.org/html5/tests/video.html">
+    <a href="https://www.quirksmode.org/html5/tests/video.html">
       HTML5 tests - video
     </a>
     <br />
-    <a href="http://base-n.de/webm/VP9%20Sample.html">
+    <a href="https://base-n.de/webm/VP9%20Sample.html">
       VP9 codec demo clip in WebM format
     </a>
     <br />
-    <a href="http://www.youtube.com/">YouTube</a> <br />
+    <a href="https://www.youtube.com/">YouTube</a> <br />
 
     <h2>Sound/Audio:</h2>
 
-    <a href="http://hpr.dogphilosophy.net/test/"
+    <a href="https://hpr.dogphilosophy.net/test/"
       >Test support of different Audio File Formats
     </a>
     <br />
-    <a href="http://www.audiocheck.net/audiotests_stereo.php"
+    <a href="https://www.audiocheck.net/audiotests_stereo.php"
       >Stereo Audio Check
     </a>
     <br />
 
     <h2>WebGL (and related):</h2>
 
-    <a href="http://webglreport.com/">Check for Web GL 1 and 2</a> <br />
-    <a href="http://get.webgl.org/">Check for Web GL</a> <br />
-    <a href="http://caniuse.com/webgl"> Web GL availability over browsers</a>
+    <a href="https://webglreport.com/">Check for Web GL 1 and 2</a> <br />
+    <a href="https://get.webgl.org/">Check for Web GL</a> <br />
+    <a href="https://caniuse.com/webgl"> Web GL availability over browsers</a>
     <br />
 
-    <a href="http://vcg.isti.cnr.it/~tarini/spinnableworldmaps/"
+    <a href="https://vcg.isti.cnr.it/~tarini/spinnableworldmaps/"
       >SpinnableWorldMaps with Web GL</a
     >
     <br />
-    <a href="http://www.yuichiroharai.com/wgl/14_aiueo/"
+    <a href="https://www.yuichiroharai.com/wgl/14_aiueo/"
       >Failing WebGL 2? app (A-I-U-E-O) :(</a
     >
     <br />
-    <a href="http://luic.github.io/WebGL-Performance-Benchmark/"
+    <a href="https://luic.github.io/WebGL-Performance-Benchmark/"
       >WebGL Performance Benchmark</a
     >
     <br />
 
-    <a href="http://developer.mozilla.org/en-US/demos/tag/tech%3Awebgl"
+    <a href="https://developer.mozilla.org/en-US/demos/tag/tech%3Awebgl"
       >Mozilla WebGL Demos
     </a>
     <br />
-    <a href="http://www.chromeexperiments.com/webgl"> WebGL Experiments </a>
+    <a href="https://www.chromeexperiments.com/webgl"> WebGL Experiments </a>
     <br />
-    <a href="http://dev.modern.ie/testdrive/tags/webgl/"> MS Edge DEV WebGl </a>
+    <a href="https://dev.modern.ie/testdrive/tags/webgl/">
+      MS Edge DEV WebGl
+    </a>
     <br />
 
-    <a href="http://alteredqualia.com/"> AlteredQualia </a> <br />
-    <a href="http://www.ibiblio.org/e-notes/webgl/gpu/contents.htm">
+    <a href="https://alteredqualia.com/"> AlteredQualia </a> <br />
+    <a href="https://www.ibiblio.org/e-notes/webgl/gpu/contents.htm">
       WebGL and simulations on GPU.
     </a>
     <br />
 
-    <a href="http://threejs.org"> three.js </a> <br />
-    <a href="http://soulwire.github.io/sketch.js"> sketch.js </a> <br />
-    <a href="http://github.com/pixijs/pixi.js"> pixi.js </a> <br />
+    <a href="https://threejs.org"> three.js </a> <br />
+    <a href="https://soulwire.github.io/sketch.js"> sketch.js </a> <br />
+    <a href="https://github.com/pixijs/pixi.js"> pixi.js </a> <br />
 
     <h2>Multi-Touch:</h2>
 
-    <a href="http://www.repaa.net/draw.html">Simple MT Drawing</a> <br />
-    <a href="http://scripty2.com/demos/touch/simple/"
+    <a href="https://www.repaa.net/draw.html">Simple MT Drawing</a> <br />
+    <a href="https://scripty2.com/demos/touch/simple/"
       >Simple Drag/Scale/Rotate</a
     >
     <br />
-    <a href="http://scripty2.com/demos/touch/testbed/">Testbed</a> <br />
-    <a href="http://scripty2.com/demos/touch/touchspector/">Touchspector</a>
+    <a href="https://scripty2.com/demos/touch/testbed/">Testbed</a> <br />
+    <a href="https://scripty2.com/demos/touch/touchspector/">Touchspector</a>
     <br />
 
     <a
-      href="http://mdn.mozillademos.org/en-US/docs/Web/API/Touch_events$samples/Example?revision=927745"
+      href="https://mdn.mozillademos.org/en-US/docs/Web/API/Touch_events$samples/Example?revision=927745"
       >Sample Logger</a
     >
     <br />
-    <a href="http://www.paulirish.com/demo/multi"
+    <a href="https://www.paulirish.com/demo/multi"
       >Multitouch Canvas Fingerpaint Demo</a
     >
     <br />
-    <a href="http://www.mgalli.com/development/drawing/"
+    <a href="https://www.mgalli.com/development/drawing/"
       >Multitouch simple draw demo</a
     >
     <br />
 
-    <a href="http://scripty2.com/demos/touch/photofun/"> Photo fun </a> <br />
+    <a href="https://scripty2.com/demos/touch/photofun/"> Photo fun </a> <br />
 
-    <a href="http://soulwire.github.io/sketch.js/examples/drawing.html"
+    <a href="https://soulwire.github.io/sketch.js/examples/drawing.html"
       >MT Drawing with sketch.js
     </a>
     <br />
-    <a href="http://alteredqualia.com/touchtoy/"> MT toy </a> <br />
+    <a href="https://alteredqualia.com/touchtoy/"> MT toy </a> <br />
 
-    <a href="http://www.addyosmani.com/resources/canvasphoto/">
+    <a href="https://www.addyosmani.com/resources/canvasphoto/">
       Canvas (Multi-?) (Single!?) Touch Demo (desktop with photos)
     </a>
     <br />
-    <a href="http://sta.sh/muro/">Tabblet Drawing?</a> <br />
+    <a href="https://sta.sh/muro/">Tabblet Drawing?</a> <br />
 
-    <a href="http://developer.mozilla.org/en-US/demos/tag/tech%3Amultitouch">
+    <a href="https://developer.mozilla.org/en-US/demos/tag/tech%3Amultitouch">
       Mozilla MT Demos
     </a>
     <br />
     <a
-      href="http://developer.mozilla.org/en-US/demos/detail/pong-mobile/launch"
+      href="https://developer.mozilla.org/en-US/demos/detail/pong-mobile/launch"
     >
       Pong mobile
     </a>
     <br />
     <a
-      href="http://hyperandroid.github.io/CAAT/documentation/demos/demo22/multitouch.html"
+      href="https://hyperandroid.github.io/CAAT/documentation/demos/demo22/multitouch.html"
     >
       Multitouch
     </a>
     <br />
-    <a href="http://www.accdemos.com/sxsw/index.html">
+    <a href="https://www.accdemos.com/sxsw/index.html">
       Simple fun mobile WebGL demos: Some awesome multi-touch experiments made
       with WebGL (WebGL + MultiTouch Input 4 Android?)
     </a>
     <br />
 
-    <a href="http://wiki.ubuntu.com/Multitouch"> Ubuntu: Multitouch </a> <br />
-    <a href="http://wiki.ubuntu.com/Multitouch/Testing/CheckingMTDevice">
+    <a href="https://wiki.ubuntu.com/Multitouch"> Ubuntu: Multitouch </a> <br />
+    <a href="https://wiki.ubuntu.com/Multitouch/Testing/CheckingMTDevice">
       Ubuntu: CheckingMTDevice
     </a>
     <br />
-    <a href="http://kivy.org/docs/api-kivy.input.providers.probesysfs.html">
+    <a href="https://kivy.org/docs/api-kivy.input.providers.probesysfs.html">
       Auto Create Input Provider Config Entry for Available MT Hardware
     </a>
     <br />
-    <a href="http://www.chalk-elec.com/?p=2028"
+    <a href="https://www.chalk-elec.com/?p=2028"
       >How to get multi-touch working (Linux & Android)
     </a>
     <br />
     <a
-      href="http://www.kernel.org/doc/Documentation/input/multi-touch-protocol.txt"
+      href="https://www.kernel.org/doc/Documentation/input/multi-touch-protocol.txt"
       >Linux Kernel Multi-touch (MT) Protocol
     </a>
     <br />
-    <a href="http://developer.mozilla.org/en-US/docs/Web/API/Touch_events"
+    <a href="https://developer.mozilla.org/en-US/docs/Web/API/Touch_events"
       >Web APIs : Touch events
     </a>
     <br />
 
-    <a href="http://wiki.archlinux.org/index.php/Wacom_Tablet">
+    <a href="https://wiki.archlinux.org/index.php/Wacom_Tablet">
       Wacom Tablet
     </a>
     <br />
-    <a href="http://www.wacomeng.com/web/WebPluginTouchAPI.htm">
+    <a href="https://www.wacomeng.com/web/WebPluginTouchAPI.htm">
       Wacom WebPlugin Feel Multi-Touch API
     </a>
     <br />
 
     <h2>Imaginary (and related):</h2>
 
-    <a href="http://imaginary.org/programs">Imaginary :: Programs</a> <br />
+    <a href="https://imaginary.org/programs">Imaginary :: Programs</a> <br />
     <a
-      href="http://dl.dropboxusercontent.com/u/7678198/imaginary-film-gallery/index.html"
+      href="https://dl.dropboxusercontent.com/u/7678198/imaginary-film-gallery/index.html"
     >
       Online Imaginary Film gallery
     </a>
     <br />
-    <a href="http://www.mathematik.uni-kl.de/~motsak/media/">
+    <a href="https://www.mathematik.uni-kl.de/~motsak/media/">
       My local / changed galleries and other media content
     </a>
     <br />
     <a
-      href="http://dl.dropboxusercontent.com/u/7678198/imaginary-film-gallery/mp4/Braids_576.mp4"
+      href="https://dl.dropboxusercontent.com/u/7678198/imaginary-film-gallery/mp4/Braids_576.mp4"
       >Braids_576.mp4</a
     >
     <br />
 
     <h2>Java Applets / JVM:</h2>
 
-    <a href="http://www.w3.org/People/mimasa/test/object/java/clock"
+    <a href="https://www.w3.org/People/mimasa/test/object/java/clock"
       >Simple Java Applet Test</a
     >
     <br />
-    <a href="http://www.java.com/en/download/help/testvm.xml">Test/Check JVM</a>
+    <a href="https://www.java.com/en/download/help/testvm.xml"
+      >Test/Check JVM</a
+    >
     <br />
 
     <h2>WebSockets:</h2>
 
-    <a href="http://www.websocket.org/echo.html">Echo Test</a>
-    <a href="http://jsfiddle.net/EAVvQ/24/">Echo Test (Fiddle)</a> <br />
+    <a href="https://www.websocket.org/echo.html">Echo Test</a>
+    <a href="https://jsfiddle.net/EAVvQ/24/">Echo Test (Fiddle)</a> <br />
     <a href="https://websocketstest.com/"
       >REAL-TIME WEB TEST – DOES HTML5 WEBSOCKETS WORK FOR YOU?</a
     >
     <br />
-    <a href="http://kaazing.org/demos/echo/">
+    <a href="https://kaazing.org/demos/echo/">
       Kaazing WebSocket JavaScript Echo Demo
     </a>
     <br />
 
     <h2>Configuring Browsers (Firefox / Chrome / Chromium):</h2>
 
-    <a href="http://peter.sh/experiments/chromium-command-line-switches/"
+    <a href="https://peter.sh/experiments/chromium-command-line-switches/"
       >List of Chromium Command Line Switches</a
     >
     <br />
 
     <a
-      href="http://superuser.com/questions/836832/how-can-i-enable-webgl-in-my-browser"
+      href="https://superuser.com/questions/836832/how-can-i-enable-webgl-in-my-browser"
       >Enabling WebGL
     </a>
     <br />
 
     <a
-      href="http://www.instructables.com/id/Customizing-multitouch-gestures-in-Firefox/?ALLSTEPS"
+      href="https://www.instructables.com/id/Customizing-multitouch-gestures-in-Firefox/?ALLSTEPS"
       >Customizing multitouch gestures in Firefox</a
     >,
     <a
-      href="http://blog.gnu-designs.com/solved-correctly-working-pinchzoom-and-multitouch-gestures-in-firefox-on-mac-os-x/"
+      href="https://blog.gnu-designs.com/solved-correctly-working-pinchzoom-and-multitouch-gestures-in-firefox-on-mac-os-x/"
       >Correctly working pinch/zoom and multitouch gestures in Firefox on Mac OS
       X</a
     >

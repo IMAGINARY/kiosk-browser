@@ -5,15 +5,12 @@ const domReady = require('./domReady');
 
 async function fromString(css) {
   await domReady;
-  return webFrame.insertCSS(css, { cssOrigin: 'user' });
+  return webFrame.insertCSS(css);
 }
 
 async function fromFile(path) {
   const css = await fsPromises.readFile(path, 'utf8');
-  return await fromString(css);
+  return fromString(css);
 }
 
-module.exports = {
-  fromFile: fromFile,
-  fromString: fromString,
-};
+module.exports = { fromFile, fromString };

@@ -12,10 +12,6 @@ Object.assign(window.kioskBrowser.idleDetector, {
   },
 });
 
-if (!document.featurePolicy.allowsFeature('gamepad')) {
-  return;
-}
-
 // FIXME
 const { ipcIntervalMs, requestResetIdleTime } = require('./resetIdleTime');
 
@@ -70,7 +66,7 @@ function loop() {
 }
 
 function handleGamepadConnected(gamepadEvent) {
-  const gamepad = gamepadEvent.gamepad;
+  const { gamepad } = gamepadEvent;
   const discard = deviceFilters.reduce(
     (acc, cur) => acc || cur(gamepad),
     false
@@ -82,13 +78,15 @@ function handleGamepadConnected(gamepadEvent) {
 }
 
 function handleGamepadDisconnected(gamepadEvent) {
-  const gamepad = gamepadEvent.gamepad;
+  const { gamepad } = gamepadEvent;
   gamepadIndices.delete(gamepad.index);
 }
 
-(async () => {
-  await domReady;
-  window.addEventListener('gamepadconnected', handleGamepadConnected);
-  window.addEventListener('gamepaddisconnected', handleGamepadDisconnected);
-  loop();
-})();
+if (document.featurePolicy.allowsFeature('gamepad')) {
+  (async () => {
+    await domReady;
+    window.addEventListener('gamepadconnected', handleGamepadConnected);
+    window.addEventListener('gamepaddisconnected', handleGamepadDisconnected);
+    loop();
+  })();
+}

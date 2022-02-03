@@ -1,8 +1,21 @@
-#!/usr/bin/env electron
-// -*- mode: js -*-
-// vim: set filetype=javascript :
+global.shellStartTime = Date.now();
 
-'use strict';
+const { app, session } = require('electron');
+const remote = require('@electron/remote/main');
+const yargs = require('yargs');
+
+const logging = require('./logging');
+const settings = require('./settings');
+const convertToCmdLineFormat = require('./settingsConverter');
+const cmdLineOptions = require('./cmdLine');
+const applyChromiumCmdLine = require('./applyChromiumCmdLine');
+const { hasKioskProtocol, kioskSiteForKioskUrl } = require('./kiosk-sites');
+const httpServer = require('./httpServer');
+const appReady = require('./appReady');
+
+remote.initialize();
+
+const { logger } = logging;
 
 // exit in case of unhandled exceptions or rejections
 function logAndExit(title, error) {
@@ -20,34 +33,18 @@ function logAndExit(title, error) {
   process.on(e, (error) => logAndExit(e, error))
 );
 
-global.shellStartTime = Date.now();
-
-const { app, session } = require('electron');
-require('@electron/remote/main').initialize();
-
-const logging = require('./logging');
-const { logger } = logging;
-
-const settings = require('./settings');
-const convertToCmdLineFormat = require('./settingsConverter');
-const cmdLineOptions = require('./cmdLine');
-const applyChromiumCmdLine = require('./applyChromiumCmdLine');
-const { hasKioskProtocol, kioskSiteForKioskUrl } = require('./kiosk-sites');
-const httpServer = require('./httpServer');
-const appReady = require('./appReady');
-
 const yargsParserConfig = {
   'short-option-groups': true,
   'camel-case-expansion': false,
   'dot-notation': true,
   'parse-numbers': true,
 };
-const yargs = require('yargs').parserConfiguration(yargsParserConfig);
+yargs.parserConfiguration(yargsParserConfig);
 
 function onYargsFailure(msg, err) {
   yargs.showHelp();
   logger.error(msg);
-  throw err ? err : new Error('CLI option parsing failed');
+  throw err || new Error('CLI option parsing failed');
 }
 
 // TODO: describe positional argument
@@ -55,7 +52,7 @@ const yargsOptions = yargs
   .usage(
     `$0 [url]`,
     'A Chromium-based web browser with minimal UI targeting kiosk applications.',
-    (yargs) =>
+    () =>
       yargs.positional('url', {
         describe: 'The URL to open.',
         type: 'string',
@@ -70,7 +67,9 @@ const yargsOptions = yargs
   .fail(onYargsFailure)
   .options(cmdLineOptions.getOptions(convertToCmdLineFormat(settings)));
 
-async function main(args) {
+async function main(rawArgs) {
+  const args = { ...rawArgs };
+
   logging.setLevelNumeric(args.verbose);
 
   // log parsed options
@@ -84,7 +83,7 @@ async function main(args) {
   }
 
   if (args.version) {
-    if (args.verbose == 0) {
+    if (args.verbose === 0) {
       console.log(`v${app.getVersion()}`);
     } else {
       console.log(`Kiosk browser: v${app.getVersion()}`);
@@ -128,7 +127,7 @@ async function main(args) {
   app.on('window-all-closed', () => app.quit());
 
   // If there are no positional arguments, use one of the default URLs
-  let url = args.url ?? (args.serve ? 'index.html' : settings['home']);
+  let url = args.url ?? (args.serve ? 'index.html' : settings.home);
 
   // If a kiosk:// URL is given, resolve it to the actual URL
   if (hasKioskProtocol(url)) {
@@ -148,7 +147,7 @@ async function main(args) {
   }
 
   // Set the computed url
-  args.url = args.l = url;
+  Object.assign(args, { url, l: url });
 
   logger.info('URL after preprocessing: %s', url);
 
@@ -164,7 +163,9 @@ async function main(args) {
   // FIXME: For transparent windows, initialization it not ready yet (window is opaque).
   //  A delayed start serves as a temporary workaround until the problem is fixed in electron upstream.
   if (process.platform === 'linux' && args.transparent) {
-    await new Promise((r) => setTimeout(r, 500));
+    await new Promise((r) => {
+      setTimeout(r, 500);
+    });
   }
 
   appReady(args);
@@ -178,5 +179,4 @@ try {
 } catch (err) {
   logger.error(err.msg);
   app.exit(1);
-  return;
 }
