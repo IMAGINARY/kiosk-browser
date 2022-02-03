@@ -11,7 +11,7 @@
     />
     <meta name="author" content="IMAGINARY" />
 
-    <style type="text/css">
+    <style>
       .hidden {
         display: none;
       }
@@ -37,10 +37,10 @@
       </div>
     </div>
     <script>
-      const searchParams = new URL(document.location).searchParams;
+      const { searchParams } = new URL(document.location);
 
       // fill values into HTML templates
-      for (let [key, value] of searchParams) {
+      for (const [key, value] of searchParams) {
         document.getElementById(key).innerText = value;
       }
 

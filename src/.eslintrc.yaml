@@ -8,6 +8,8 @@ parserOptions:
 extends:
   - airbnb
   - prettier
+plugins:
+  - html
 settings:
   import/core-modules: [electron]
 rules:
