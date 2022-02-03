@@ -21,31 +21,34 @@ async function init(wwwRootDir) {
   });
 
   // Create server
-  const server = http.createServer(function onRequest(req, res) {
+  const server = http.createServer((req, res) => {
     const errorHandler = (err) =>
       logger.warn('HTTP %i, %s', err.statusCode, err.message);
     serve(req, res, finalhandler(req, res, { onerror: errorHandler }));
   });
 
-  const connect = async (server, port, host) => {
-    return await new Promise((resolve, reject) => {
+  const connect = async (_, port, host) =>
+    new Promise((resolve, reject) => {
       server.once('error', reject);
       server.listen(port, host, () => {
         server.off('error', reject);
         resolve(server);
       });
     });
-  };
 
   const host = 'localhost';
   let port = minPort;
   while (!server.listening) {
     try {
+      // eslint-disable-next-line no-await-in-loop
       await connect(server, port, host);
     } catch (err) {
       if (err.code === 'EADDRINUSE') {
         logger.debug(`Address in use ${host}:${port}, incrementing port...`);
-        await new Promise((resolve) => server.close(resolve));
+        // eslint-disable-next-line no-await-in-loop
+        await new Promise((resolve) => {
+          server.close(resolve);
+        });
         port += 1;
       } else {
         throw err;

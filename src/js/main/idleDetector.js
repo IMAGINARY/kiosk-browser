@@ -1,109 +1,58 @@
-const { powerMonitor, ipcMain } = require('electron');
-const { performance } = require('perf_hooks');
+const Timeout = require('./idleTimeout');
 
 class IdleDetector {
   constructor() {
     this.lastId = 0;
-    this.timers = new Map();
+    this.timeouts = new Map();
   }
 
   setTimeout(func, timeoutDelay, ...args) {
-    const id = ++this.lastId;
-    this.timers.set(id, new Timer(true, func, timeoutDelay, ...args));
+    this.lastId += 1;
+    const id = this.lastId;
+    this.timeouts.set(id, new Timeout(true, func, timeoutDelay, ...args));
     return id;
   }
 
   setTimeoutOnce(func, timeoutDelay, ...args) {
-    const id = ++this.lastId;
-    this.timers.set(id, new Timer(false, func, timeoutDelay, ...args));
+    this.lastId += 1;
+    const id = this.lastId;
+    this.timeouts.set(id, new Timeout(false, func, timeoutDelay, ...args));
     return id;
   }
 
   clearTimeout(id) {
-    const timer = this.timers.get(id);
-    if (typeof timer !== undefined) timer.clear();
-    this.timers.delete(id);
+    const timer = this.timeouts.get(id);
+    if (typeof timer !== 'undefined') timer.clear();
+    this.timeouts.delete(id);
   }
 
   reset() {
-    this.timers.forEach((timer) => timer.reset());
+    this.timeouts.forEach((timer) => timer.reset());
   }
 
   clear() {
-    this.timers.forEach((timer) => timer.clear());
-    this.timers.clear();
+    this.timeouts.forEach((timer) => timer.clear());
+    this.timeouts.clear();
   }
 
-  /***
+  /**
    * Return the time in ms since the last interruption of the idle state.
    * @returns {number}
    */
+  // eslint-disable-next-line class-methods-use-this
   getIdleTime() {
-    return Timer.getIdleTime();
+    return Timeout.getIdleTime();
   }
 
+  // eslint-disable-next-line class-methods-use-this
   get IPC_CHANNEL() {
-    return Timer.IPC_CHANNEL;
+    return Timeout.IPC_CHANNEL;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   get IPC_INTERVAL_MS() {
-    return Timer.IPC_INTERVAL_MS;
+    return Timeout.IPC_INTERVAL_MS;
   }
 }
-
-class Timer {
-  constructor(repeat, func, timeoutDelay, ...args) {
-    this.repeat = repeat;
-    this.func = func;
-    this.timeoutDelay = timeoutDelay;
-    this.args = args;
-    this.timeoutId = 0;
-    this.testTimeoutCb = () => this._testTimeout();
-    this.reset();
-  }
-
-  reset() {
-    clearTimeout(this.timeoutId);
-    this.timeoutId = setTimeout(this.testTimeoutCb, this.timeoutDelay);
-  }
-
-  clear() {
-    clearTimeout(this.timeoutId);
-  }
-
-  _testTimeout() {
-    const systemIdleTime = Timer.getIdleTime();
-    if (systemIdleTime >= this.timeoutDelay) {
-      if (this.repeat) this.reset();
-      this.func(...this.args);
-    } else {
-      const idleTimeRemaining = this.timeoutDelay - systemIdleTime;
-      this.timeoutId = setTimeout(this.testTimeoutCb, idleTimeRemaining);
-    }
-  }
-
-  static resetIdleTime(idleTimeMs = 0) {
-    Timer._lastEventTimestampMs = Math.max(
-      performance.now() - idleTimeMs,
-      Timer._lastEventTimestampMs
-    );
-  }
-
-  static getIdleTime() {
-    return Math.min(
-      performance.now() - Timer._lastEventTimestampMs,
-      powerMonitor.getSystemIdleTime() * 1000
-    );
-  }
-
-  static _lastEventTimestampMs = performance.now();
-
-  static IPC_CHANNEL = 'kiosk-browser-idle-detector-set-idle-time';
-  static IPC_INTERVAL_MS = 500;
-}
-
-ipcMain.on(Timer.IPC_CHANNEL, (event, idleTimeMs) =>
-  Timer.resetIdleTime(idleTimeMs)
-);
 
 module.exports = new IdleDetector();

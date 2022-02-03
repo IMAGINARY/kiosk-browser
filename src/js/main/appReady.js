@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
-const { BrowserWindow, Menu, MenuItem } = require('electron');
+const { BrowserWindow, Menu, MenuItem, screen } = require('electron');
+const remote = require('@electron/remote/main');
 
 const { logger } = require('./logging');
 const preloadModules = require('./preloadModules');
@@ -40,7 +41,7 @@ function joinRectangles(rectangles) {
   let t = Number.POSITIVE_INFINITY;
   let r = Number.NEGATIVE_INFINITY;
   let b = Number.NEGATIVE_INFINITY;
-  for (let rect of rectangles) {
+  for (const rect of rectangles) {
     l = Math.min(l, rect.x);
     t = Math.min(t, rect.y);
     r = Math.max(r, rect.x + rect.width);
@@ -59,19 +60,20 @@ function compareRectangles(r1, r2) {
 }
 
 function computeDisplayCover(displayNums, fullscreen) {
-  const { screen } = require('electron');
   const allDisplays = screen.getAllDisplays();
 
-  if (!Array.isArray(displayNums) || displayNums.length === 0) {
-    displayNums = [0];
-  } else {
-    // keep only display nums that are not out of range
-    displayNums = displayNums.map((n) => Math.min(n, allDisplays.length - 1));
-  }
+  const displayNumsArray =
+    !Array.isArray(displayNums) || displayNums.length === 0 ? [0] : displayNums;
 
-  if (displayNums.length > 1) {
-    for (let n = 0; n < displayNums.length; ++n) {
-      const { bounds, workArea } = allDisplays[displayNums[n]];
+  // keep only display nums that are not out of range
+  const validDisplayNums = displayNumsArray.map((n) =>
+    Math.min(n, allDisplays.length - 1)
+  );
+
+  const displays = validDisplayNums.map((n) => allDisplays[n]);
+
+  if (validDisplayNums.length > 1) {
+    displays.forEach(({ bounds, workArea }, n) => {
       if (!compareRectangles(bounds, workArea))
         logger.warn(
           'Work area of display %i differs from bounds. Expect incomplete display coverage. (%o vs. %o)',
@@ -79,26 +81,23 @@ function computeDisplayCover(displayNums, fullscreen) {
           workArea,
           bounds
         );
-    }
+    });
   }
-  return joinRectangles(
-    displayNums.map((n) =>
-      fullscreen ? allDisplays[n].bounds : allDisplays[n].workArea
-    )
-  );
+
+  const rects = displays.map((d) => (fullscreen ? d.bounds : d.workArea));
+  return joinRectangles(rects);
 }
 
-/***
+/**
  * Computes the bounds the window will have when it goes to fullscreen on the current display.
  * @param window The window to compute the fullscreen bounds for.
  * @returns {Electron.Rectangle} The bounds the window would have in full screen mode.
  */
 function computeFullscreenBounds(window) {
-  const { screen } = require('electron');
   return screen.getDisplayMatching(window.getBounds()).bounds;
 }
 
-/***
+/**
  * Fixed the windows min, max and content size to the specified bounds.
  * This works around a bug in Chrome that causes the window size being 1px off in certain situations, e.g.
  * when no X11 window manager is present on Linux.
@@ -153,7 +152,7 @@ function handleFailedLoad(
   const ignoredErrorCodes = [-3, 0];
   if (!ignoredErrorCodes.includes(errorCode)) {
     const errorPageUrl = new URL(
-      'file://' + path.join(__dirname, '/../..', 'html/error.html')
+      `file://${path.join(__dirname, '/../..', 'html/error.html')}`
     );
     errorPageUrl.searchParams.set('errorCode', errorCode);
     errorPageUrl.searchParams.set('errorDescription', errorDescription);
@@ -165,7 +164,7 @@ function handleFailedLoad(
       errorCode,
       errorDescription
     );
-    mainWindow.loadURL(errorPageUrl.href);
+    mainWindow.loadURL(errorPageUrl.href).then();
   }
 }
 
@@ -179,14 +178,13 @@ function computeZoomFactor(newBounds, fit, zoom) {
       zoomFactor = Math.min(zoomFactor, newBounds.height / fit.height);
     }
     return zoomFactor * zoom;
-  } else {
-    return zoom;
   }
+  return zoom;
 }
 
 function setZoomFactor(webContents, zoomFactor) {
-  zoomFactor = Math.max(0.25, Math.min(zoomFactor, 5.0));
-  webContents.zoomFactor = zoomFactor;
+  // eslint-disable-next-line no-param-reassign
+  webContents.zoomFactor = Math.max(0.25, Math.min(zoomFactor, 5.0));
   if (process.platform === 'darwin') {
     const jsCode = `document.documentElement.style.setProperty('--kiosk-zoom', ${zoomFactor});`;
     webContents.executeJavaScript(jsCode);
@@ -237,6 +235,133 @@ function hideScrollBars(webContents) {
   );
 }
 
+function createMainWindow(args, options) {
+  const mainWindow = new BrowserWindow(options);
+  const { webContents } = mainWindow;
+
+  // This is necessary for electron >= 14.0.0 to enable
+  // the remote module in the renderer process.
+  remote.enable(webContents);
+
+  const adjustWindowBounds = (() => {
+    if (args['cover-displays'].length > 0) {
+      const displayCover = computeDisplayCover(
+        args['cover-displays'],
+        args.fullscreen
+      );
+      logger.debug('Trying to cover display area {}', displayCover);
+      return () => fixWindowSize(mainWindow, displayCover);
+    }
+    if (args.fullscreen) {
+      const fullscreenBounds = computeFullscreenBounds(mainWindow);
+      return () => fixWindowSize(mainWindow, fullscreenBounds);
+    }
+    return () => undefined; // NOOP
+  })();
+
+  adjustWindowBounds();
+
+  // open the developer tools now if requested
+  if (args.dev) mainWindow.openDevTools();
+
+  webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
+
+  webContents.session.on('will-download', (event, item) => {
+    logger.info(
+      'Preventing download of %s (%s, %i Bytes)',
+      item.getURL(),
+      item.getMimeType(),
+      item.getTotalBytes()
+    );
+    event.preventDefault();
+  });
+
+  mainWindow.once('ready-to-show', () => {
+    if (args.kiosk) mainWindow.setKiosk(args.kiosk);
+
+    if (args.fullscreen) {
+      // setting this to false will also disable the fullscreen button on macOS, so better don't call it at all
+      // if args.fullscreen is false
+      mainWindow.setFullScreen(true);
+    }
+
+    adjustWindowBounds();
+
+    // also adjust the zoom of the draggable area
+    setZoomFactor(webContents, webContents.zoomFactor);
+    mainWindow.show();
+  });
+
+  if (args.fit.forceZoomFactor)
+    mainWindow.on('resize', () =>
+      setZoomFactor(
+        webContents,
+        computeZoomFactor(mainWindow.getContentBounds(), args.fit, args.zoom)
+      )
+    );
+
+  setOverflowRules(webContents, args.overflow);
+  if (args['hide-scrollbars']) hideScrollBars(webContents);
+
+  /**
+   * Add a handle for dragging windows on macOS due to hidden title bar.
+   */
+  if (process.platform === 'darwin') {
+    const appRegionOverlayCss = fs.readFileSync(
+      path.join(__dirname, '../../css/app-region-overlay.css'),
+      'utf8'
+    );
+    webContents.on('dom-ready', async () => {
+      await webContents.insertCSS(appRegionOverlayCss, { cssOrigin: 'user' });
+      setOverlayVisible(webContents, !mainWindow.isFullScreen());
+    });
+
+    /**
+     * Hide handle in fullscreen mode.
+     */
+    mainWindow.on('enter-full-screen', () =>
+      setOverlayVisible(webContents, !mainWindow.isFullScreen())
+    );
+    mainWindow.on('leave-full-screen', () =>
+      setOverlayVisible(webContents, !mainWindow.isFullScreen())
+    );
+  }
+
+  /**
+   * Work around a Chrome bug that caches previously used zoom factors on a per page basis
+   * @see https://github.com/electron/electron/issues/10572
+   */
+  webContents.on('dom-ready', () =>
+    setZoomFactor(
+      webContents,
+      computeZoomFactor(mainWindow.getContentBounds(), args.fit, args.zoom)
+    )
+  );
+
+  /**
+   * Display error on failed page loads and reload the page after a certain delay if requested.
+   */
+  webContents.on('did-fail-load', (e, code, desc, url) =>
+    handleFailedLoad(mainWindow, code, desc, url, args.retry)
+  );
+
+  /**
+   * Load the initial page again when the system is idle for the given number of seconds.
+   */
+  if (args['reload-idle'])
+    IdleDetector.setTimeout(
+      () => mainWindow.loadURL(args.url),
+      args['reload-idle'] * 1000
+    );
+
+  /**
+   * Load the page into the main window
+   */
+  mainWindow.loadURL(args.url).then();
+
+  return mainWindow;
+}
+
 function appReady(args) {
   // either disable default menu (noop on macOS) or set custom menu (based on default)
   Menu.setApplicationMenu(
@@ -281,7 +406,7 @@ function appReady(args) {
     titleBarStyle: 'hidden',
     fullscreenWindowTitle: true,
     fullscreenable: true,
-    resizable: args['resize'] && args['cover-displays'].length === 0,
+    resizable: args.resize && args['cover-displays'].length === 0,
     transparent: args.transparent,
     alwaysOnTop: args['always-on-top'],
     webPreferences: webprefs,
@@ -310,133 +435,6 @@ function appReady(args) {
   // toggle developer tools on SIGUSR1
   logger.info('Send SIGUSR1 to PID %i to open developer Tools', process.pid);
   process.on('SIGUSR1', () => global.mainWindow.webContents.toggleDevTools());
-}
-
-function createMainWindow(args, options) {
-  const mainWindow = new BrowserWindow(options);
-  const webContents = mainWindow.webContents;
-
-  // This is necessary for electron >= 14.0.0 to enable
-  // the remote module in the renderer process.
-  require('@electron/remote/main').enable(webContents);
-
-  const adjustWindowBounds = (() => {
-    if (args['cover-displays'].length > 0) {
-      const displayCover = computeDisplayCover(
-        args['cover-displays'],
-        args.fullscreen
-      );
-      logger.debug('Trying to cover display area {}', displayCover);
-      return () => fixWindowSize(mainWindow, displayCover);
-    } else if (args.fullscreen) {
-      const fullscreenBounds = computeFullscreenBounds(mainWindow);
-      return () => fixWindowSize(mainWindow, fullscreenBounds);
-    } else {
-      return () => undefined; // NOOP
-    }
-  })();
-
-  adjustWindowBounds();
-
-  // open the developer tools now if requested
-  if (args.dev) mainWindow.openDevTools();
-
-  webContents.on('new-window', (event) => event.preventDefault());
-
-  webContents.session.on('will-download', (event, item) => {
-    logger.info(
-      'Preventing download of %s (%s, %i Bytes)',
-      item.getURL(),
-      item.getMimeType(),
-      item.getTotalBytes()
-    );
-    event.preventDefault();
-  });
-
-  mainWindow.once('ready-to-show', () => {
-    if (args.kiosk) mainWindow.setKiosk(args.kiosk);
-
-    if (args.fullscreen) {
-      // setting this to false will also disable the fullscreen button on macOS, so better don't call it at all
-      // if args.fullscreen is false
-      mainWindow.setFullScreen(true);
-    }
-
-    adjustWindowBounds();
-
-    // also adjust the zoom of the draggable area
-    setZoomFactor(webContents, webContents.zoomFactor);
-    mainWindow.show();
-  });
-
-  if (args.fit.forceZoomFactor)
-    mainWindow.on('resize', () =>
-      setZoomFactor(
-        webContents,
-        computeZoomFactor(mainWindow.getContentBounds(), args.fit, args.zoom)
-      )
-    );
-
-  setOverflowRules(webContents, args.overflow);
-  if (args['hide-scrollbars']) hideScrollBars(webContents);
-
-  /***
-   * Add a handle for dragging windows on macOS due to hidden title bar.
-   */
-  if (process.platform === 'darwin') {
-    const appRegionOverlayCss = fs.readFileSync(
-      path.join(__dirname, '../../css/app-region-overlay.css'),
-      'utf8'
-    );
-    webContents.on('dom-ready', () => {
-      webContents.insertCSS(appRegionOverlayCss, { cssOrigin: 'user' });
-      setOverlayVisible(webContents, !mainWindow.isFullScreen());
-    });
-
-    /***
-     * Hide handle in fullscreen mode.
-     */
-    mainWindow.on('enter-full-screen', () =>
-      setOverlayVisible(webContents, !mainWindow.isFullScreen())
-    );
-    mainWindow.on('leave-full-screen', () =>
-      setOverlayVisible(webContents, !mainWindow.isFullScreen())
-    );
-  }
-
-  /***
-   * Work around a Chrome bug that caches previously used zoom factors on a per page basis
-   * @see https://github.com/electron/electron/issues/10572
-   */
-  webContents.on('dom-ready', () =>
-    setZoomFactor(
-      webContents,
-      computeZoomFactor(mainWindow.getContentBounds(), args.fit, args.zoom)
-    )
-  );
-
-  /***
-   * Display error on failed page loads and reload the page after a certain delay if requested.
-   */
-  webContents.on('did-fail-load', (e, code, desc, url) =>
-    handleFailedLoad(mainWindow, code, desc, url, args.retry)
-  );
-
-  /***
-   * Load the initial page again when the system is idle for the given number of seconds.
-   */
-  if (args['reload-idle'])
-    IdleDetector.setTimeout(
-      () => mainWindow.loadURL(args.url),
-      args['reload-idle'] * 1000
-    );
-
-  /***
-   * Load the page into the main window
-   */
-  mainWindow.loadURL(args.url);
-
-  return mainWindow;
 }
 
 module.exports = appReady;

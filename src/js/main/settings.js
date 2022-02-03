@@ -1,10 +1,9 @@
 const { app } = require('electron');
-const settingsPath = app.getPath('userData');
 const fsExtra = require('fs-extra');
 const path = require('path');
 const json5 = require('json5');
 
-const { logger } = require('./logging');
+const settingsPath = app.getPath('userData');
 
 // read defaults.json5
 const defaultsFileContents = fsExtra.readFileSync(
@@ -22,20 +21,15 @@ const settingsFileContents = (() => {
   if (fsExtra.existsSync(settingsFilePath)) {
     // just read the settings file
     return fsExtra.readFileSync(settingsFilePath, 'utf8');
-  } else {
-    // create a new settings file with just comments based on the default settings
-    const regex = /^(\s*)([^{}])/gm;
-    const settingsDefaultFileContents = defaultsFileContents.replace(
-      regex,
-      '$1// $2'
-    );
-    fsExtra.writeFileSync(
-      settingsFilePath,
-      settingsDefaultFileContents,
-      'utf8'
-    );
-    return settingsDefaultFileContents;
   }
+  // create a new settings file with just comments based on the default settings
+  const regex = /^(\s*)([^{}])/gm;
+  const settingsDefaultFileContents = defaultsFileContents.replace(
+    regex,
+    '$1// $2'
+  );
+  fsExtra.writeFileSync(settingsFilePath, settingsDefaultFileContents, 'utf8');
+  return settingsDefaultFileContents;
 })();
 
 // parse the settings

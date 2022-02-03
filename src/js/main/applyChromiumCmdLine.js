@@ -1,11 +1,9 @@
-'use strict';
-
 const { app } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const json5 = require('json5');
 
-module.exports = function (
+function applyChromiumCmdLine(
   ignoreDefaults,
   additionalChromiumSwitches,
   additionalChromiumArguments
@@ -23,7 +21,7 @@ module.exports = function (
     ? additionalChromiumSwitches
     : appCmdLine.switches.concat(additionalChromiumSwitches);
   chromiumSwitches.forEach((s) =>
-    s.hasOwnProperty('value')
+    'value' in s
       ? app.commandLine.appendSwitch(s.key, s.value)
       : app.commandLine.appendSwitch(s.key)
   );
@@ -33,4 +31,6 @@ module.exports = function (
     ? additionalChromiumArguments
     : appCmdLine.arguments.concat(additionalChromiumArguments);
   chromiumArguments.forEach((a) => app.commandLine.appendArgument(a));
-};
+}
+
+module.exports = applyChromiumCmdLine;

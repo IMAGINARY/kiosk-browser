@@ -6,7 +6,10 @@ function createList(a) {
       a.splice(i, 1);
     }
   };
-  const clear = () => (a.length = 0);
+  const clear = () => {
+    // eslint-disable-next-line no-param-reassign
+    a.length = 0;
+  };
 
   return { add, remove, clear };
 }

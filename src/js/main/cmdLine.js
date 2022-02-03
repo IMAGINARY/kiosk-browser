@@ -4,31 +4,27 @@ const Color = require('color');
 function coercePort(port, defaultPort) {
   if (port === undefined) {
     return defaultPort;
-  } else {
-    const pInt = Number.parseInt(port);
-    if (/[0-9]+/.test(port) && pInt >= 0 && pInt <= 65535) {
-      return pInt;
-    } else {
-      throw new Error(`Invalid remote debugging port: ${port}`);
-    }
   }
+  const pInt = Number.parseInt(port, 10);
+  if (/[0-9]+/.test(port) && pInt >= 0 && pInt <= 65535) {
+    return pInt;
+  }
+  throw new Error(`Invalid remote debugging port: ${port}`);
 }
 
 function coerceServe(path, defaultPath) {
-  if (path === undefined) path = defaultPath;
-
-  let isDir;
+  const pathToServe = path ?? defaultPath;
   try {
-    isDir = fs.statSync(path).isDirectory();
+    const dir = fs.opendirSync(pathToServe);
+    dir.closeSync();
   } catch (err) {
-    // handle statSync error
-    isDir = false;
+    throw new Error(
+      `Directory does not exist or is inaccessible: ${pathToServe}`
+    );
   }
-  if (isDir) return path;
-  else throw new Error(`Directory does not exist or is inaccessible: ${path}`);
 }
 
-function coerceAppendChromeSwitch(xs) {
+function coerceAppendChromeSwitch(sOrXs) {
   function processSwitch(s) {
     if (s.length === 0) throw new Error('Empty Chrome CLI switch');
 
@@ -41,12 +37,12 @@ function coerceAppendChromeSwitch(xs) {
       : { key: parts[0], value: parts[1] };
   }
 
-  xs = typeof xs == 'string' ? [xs] : xs;
+  const xs = typeof sOrXs === 'string' ? [sOrXs] : sOrXs;
   return xs.map(processSwitch);
 }
 
 function coerceAppendChromeArgument(xs) {
-  return typeof xs == 'string' ? [xs] : xs;
+  return typeof xs === 'string' ? [xs] : xs;
 }
 
 function coerceFit(s) {
@@ -56,8 +52,8 @@ function coerceFit(s) {
     throw new Error(`Invalid viewport size: ${s}`);
   } else {
     return {
-      width: match[1] === '_' ? '_' : parseInt(match[1]),
-      height: match[2] === '_' ? '_' : parseInt(match[2]),
+      width: match[1] === '_' ? '_' : parseInt(match[1], 10),
+      height: match[2] === '_' ? '_' : parseInt(match[2], 10),
       get forceZoomFactor() {
         return match[1] !== '_' || match[2] !== '_';
       },
@@ -67,8 +63,8 @@ function coerceFit(s) {
 
 function coerceCoverDisplays(s) {
   const stringNums = typeof s !== 'undefined' ? s.split(',') : [];
-  const nums = stringNums.map((s) => Number.parseInt(s, 10));
-  for (let i = 0; i < nums.length; ++i) {
+  const nums = stringNums.map((sn) => Number.parseInt(sn, 10));
+  for (let i = 0; i < nums.length; i += 1) {
     if (Number.isNaN(nums[i]) || nums[i] < 0) {
       throw new Error(`Invalid display number: ${stringNums[i]}`);
     }
@@ -148,8 +144,10 @@ const options = {
     coerceFunc: coercePort,
     coerce: (port) => coercePort(port, this.default),
     default: 9222,
-    setDefault: (option, defaultValue) =>
-      (option.coerce = (value) => option.coerceFunc(value, defaultValue)),
+    setDefault: (option, defaultValue) => {
+      const coerce = (value) => option.coerceFunc(value, defaultValue);
+      Object.assign(option, { coerce });
+    },
   },
   'menu': {
     alias: 'm',
@@ -196,8 +194,10 @@ const options = {
       'Open URL relative to this path served via built-in HTTP server.',
     requiresArg: true,
     coerceFunc: coerceServe,
-    setDefault: (option, defaultValue) =>
-      (option.coerce = (value) => option.coerceFunc(value, defaultValue)),
+    setDefault: (option, defaultValue) => {
+      const coerce = (value) => option.coerceFunc(value, defaultValue);
+      Object.assign(option, { coerce });
+    },
   },
   'transparent': {
     alias: 't',
@@ -327,15 +327,14 @@ const options = {
 };
 
 function assignDefault(option, defaultValue) {
-  if (option.hasOwnProperty('setDefault'))
-    option.setDefault(option, defaultValue);
-  else option.default = defaultValue;
+  if ('setDefault' in option) option.setDefault(option, defaultValue);
+  else Object.assign(option, { default: defaultValue });
 }
 
 function getOptions(defaults) {
-  const optionsWithDefaults = Object.assign({}, options);
+  const optionsWithDefaults = { ...options };
   Object.getOwnPropertyNames(defaults)
-    .filter((optionName) => optionsWithDefaults.hasOwnProperty(optionName))
+    .filter((optionName) => optionName in optionsWithDefaults)
     .forEach((optionName) =>
       assignDefault(optionsWithDefaults[optionName], defaults[optionName])
     );
@@ -346,4 +345,4 @@ function getOptions(defaults) {
   return sortedOptionsWithDefaults;
 }
 
-module.exports = { getOptions: getOptions };
+module.exports = { getOptions };
