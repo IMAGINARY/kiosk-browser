@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- upgrade to Electron v17.0.0, Node v16.13.0, Chromium v98.0.4758.74
 - drop `Dockerfile` for building redistributables via Docker. Use [electronuserland/builder] instead.
 - switch from `yarn` to `npm` for package management
 
