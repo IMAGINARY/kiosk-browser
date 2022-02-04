@@ -404,7 +404,6 @@ function appReady(args) {
     show: false,
     frame: args.frame && args['cover-displays'].length === 0,
     titleBarStyle: 'hidden',
-    fullscreenWindowTitle: true,
     fullscreenable: true,
     resizable: args.resize && args['cover-displays'].length === 0,
     transparent: args.transparent,
