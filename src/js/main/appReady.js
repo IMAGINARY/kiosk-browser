@@ -385,7 +385,8 @@ async function appReady(args) {
     ),
     nodeIntegration: args.integration,
     nodeIntegrationInSubFrames: true,
-    contextIsolation: false,
+    contextIsolation: false, // FIXME: use context isolation for increased security
+    sandbox: false, // FIXME: use sandbox for increased security
     preload: path.join(__dirname, '../renderer/preload.js'),
   };
 
