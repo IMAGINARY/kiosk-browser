@@ -142,7 +142,7 @@ function setOverlayVisible(webContents, visible) {
   webContents.executeJavaScript(jsCode);
 }
 
-function handleFailedLoad(
+async function handleFailedLoad(
   mainWindow,
   errorCode,
   errorDescription,
@@ -164,7 +164,7 @@ function handleFailedLoad(
       errorCode,
       errorDescription
     );
-    mainWindow.loadURL(errorPageUrl.href).then();
+    await mainWindow.loadURL(errorPageUrl.href);
   }
 }
 
@@ -235,7 +235,7 @@ function hideScrollBars(webContents) {
   );
 }
 
-function createMainWindow(args, options) {
+async function createMainWindow(args, options) {
   const mainWindow = new BrowserWindow(options);
   const { webContents } = mainWindow;
 
@@ -357,12 +357,16 @@ function createMainWindow(args, options) {
   /**
    * Load the page into the main window
    */
-  mainWindow.loadURL(args.url).then();
+  try {
+    await mainWindow.loadURL(args.url);
+  } catch (err) {
+    // ignore the error because it is already handled via did-fail-load
+  }
 
   return mainWindow;
 }
 
-function appReady(args) {
+async function appReady(args) {
   // either disable default menu (noop on macOS) or set custom menu (based on default)
   Menu.setApplicationMenu(
     args.menu && !args.kiosk ? extendMenu(Menu.getApplicationMenu()) : null

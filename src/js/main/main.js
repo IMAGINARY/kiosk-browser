@@ -168,7 +168,7 @@ async function main(rawArgs) {
     });
   }
 
-  appReady(args);
+  await appReady(args);
 }
 
 try {
