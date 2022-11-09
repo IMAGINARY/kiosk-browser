@@ -9,7 +9,7 @@ const IdleDetector = require('./idleDetector');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-global.mainWindow = null;
+let mainWindowSingleton = null;
 
 function extendMenu(menu) {
   // add some entries to the supplied menu
@@ -197,25 +197,25 @@ function enableReloadingWhenUnresponsive(
   timeoutMs
 ) {
   logger.debug('Will reload pages that are unresponsive for %ims', timeoutMs);
-  const timeoutNs = BigInt(timeoutMs) * 1000n * 1000n;
-  let lastResponseNs = process.hrtime.bigint();
+  let responsivenessCheckInProgress = false;
   setInterval(async () => {
-    const currentNs = process.hrtime.bigint();
-    if (currentNs - lastResponseNs > timeoutNs) {
-      logger.debug('Page unresponsive. Reloading.');
-      // reload the page
-      lastResponseNs = currentNs;
-      reloadCallback();
-    } else {
-      // apply responsiveness check
-      try {
-        await responsivenessCheck();
-        logger.debug('Page responsiveness test succeeded.');
-        lastResponseNs = process.hrtime.bigint();
-      } catch (err) {
-        // Ignore silently
-      }
+    // apply responsiveness check
+    if (responsivenessCheckInProgress) return;
+
+    responsivenessCheckInProgress = true;
+    const reloadTimeout = setTimeout(async () => {
+      logger.warn('Page unresponsive. Reloading.');
+      await reloadCallback();
+      responsivenessCheckInProgress = false;
+    }, timeoutMs);
+    try {
+      await responsivenessCheck();
+      logger.debug('Page responsiveness test succeeded.');
+    } catch (err) {
+      // Ignore silently
     }
+    clearTimeout(reloadTimeout);
+    responsivenessCheckInProgress = false;
   }, 500);
 }
 
@@ -349,18 +349,27 @@ async function createMainWindow(args, options) {
    * Load the initial page again when the system is idle for the given number of seconds.
    */
   if (args['reload-idle'])
-    IdleDetector.setTimeout(
-      () => mainWindow.loadURL(args.url),
-      args['reload-idle'] * 1000
-    );
+    IdleDetector.setTimeout(() => {
+      logger.info('Reloading due to idle timeout.');
+      mainWindow.loadURL(args.url);
+    }, args['reload-idle'] * 1000);
 
   /**
-   * Load the page into the main window
+   * Load the initial page again when the renderer process is unresponsive for
+   * the given number of seconds.
    */
-  try {
-    await mainWindow.loadURL(args.url);
-  } catch (err) {
-    // ignore the error because it is already handled via did-fail-load
+  const responsivenessCheck = async () =>
+    webContents.executeJavaScript('true;');
+  const reloadCallback = async () => {
+    webContents.forcefullyCrashRenderer();
+    webContents.reload();
+  };
+  if (args['reload-unresponsive']) {
+    enableReloadingWhenUnresponsive(
+      responsivenessCheck,
+      reloadCallback,
+      args['reload-unresponsive'] * 1000
+    );
   }
 
   return mainWindow;
@@ -420,21 +429,12 @@ async function appReady(args) {
   if (process.platform === 'linux')
     options.icon = path.resolve(__dirname, '../../../build/fallbackicon.png');
 
-  global.mainWindow = createMainWindow(args, options);
-  const responsivenessCheck = () =>
-    global.mainWindow.webContents.executeJavaScript('true;');
-  const reloadCallback = () => {
-    // create new window before the old one is destroyed to avoid window-all-closed event from being triggered
-    const newWindow = createMainWindow(args, options);
-    global.mainWindow.destroy();
-    global.mainWindow = newWindow;
-  };
-  if (args['reload-unresponsive'])
-    enableReloadingWhenUnresponsive(
-      responsivenessCheck,
-      reloadCallback,
-      args['reload-unresponsive'] * 1000
-    );
+  mainWindowSingleton = await createMainWindow(args, options);
+
+  /**
+   * Load the page into the main window
+   */
+  mainWindowSingleton.loadURL(args.url).then();
 
   // toggle developer tools on SIGUSR1
   logger.info('Send SIGUSR1 to PID %i to open developer Tools', process.pid);
