@@ -117,6 +117,15 @@ function coerceBackgroundColor(s) {
   }
 }
 
+function coerceAppNameSuffix(s) {
+  if (/^[A-Za-z0-9][\w-]*$/.test(s)) {
+    return s;
+  }
+  throw new Error(
+    `Invalid app name suffix (must match /^[A-Za-z0-9][\\w-]*$/): ${s}`
+  );
+}
+
 const options = {
   'help': {
     alias: 'h',
@@ -323,6 +332,13 @@ const options = {
     type: 'boolean',
     description: 'Do not delete session storage in between runs.',
     default: false,
+  },
+  'app-name-suffix': {
+    type: 'string',
+    description:
+      'Append the argument to the app name. This also affects where user data is stored. Two different instances of the kiosk-browser must use different app names to avoid resource access conflicts. The argument must match /^[A-Za-z0-9][\\w-]*$/.',
+    requiresArg: true,
+    coerce: coerceAppNameSuffix,
   },
 };
 

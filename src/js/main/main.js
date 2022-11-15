@@ -1,5 +1,6 @@
 global.shellStartTime = Date.now();
 
+const path = require('path');
 const { app, session } = require('electron');
 const remote = require('@electron/remote/main');
 const yargs = require('yargs');
@@ -93,6 +94,19 @@ async function main(rawArgs) {
     }
     app.quit();
     return;
+  }
+
+  if (args['app-name-suffix']) {
+    const s = args['app-name-suffix'];
+    const newAppName = `${app.getName()}-${s}`;
+    const newUserDataPath = `${app.getPath('userData')}-${s}`;
+    const newSessionDataPath = `${app.getPath('sessionData')}-${s}`;
+    app.setName(newAppName);
+    app.setPath('userData', newUserDataPath);
+    app.setPath('sessionData', newSessionDataPath);
+    logger.info('Setting app name to %s', app.getName());
+    logger.info('Setting userData path to %s', app.getPath('userData'));
+    logger.info('Setting sessionData path to %s', app.getPath('sessionData'));
   }
 
   if (args['remote-debugging-port']) {
