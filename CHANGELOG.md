@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.17.0] 2022-11-15
+
 ### Added
 
 - add `--app-name-suffix` CLI option allow appending something to the app name
@@ -352,7 +354,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Basic kiosk browser functionality
 
 [library for sending heartbearts]: https://github.com/hilbert/hilbert-heartbeat
-[unreleased]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.16.1...HEAD
+[unreleased]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.17.0...HEAD
+[0.17.0]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.16.1...v0.17.0
 [0.16.1]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.16.0...v0.16.1
 [0.16.0]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.15.0...v0.16.0
 [0.15.0]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.14.1...v0.15.0
