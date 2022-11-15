@@ -109,6 +109,17 @@ async function main(rawArgs) {
     logger.info('Setting sessionData path to %s', app.getPath('sessionData'));
   }
 
+  const isFirstInstance = app.requestSingleInstanceLock();
+  if (isFirstInstance) {
+    logger.debug("This is the first instance of app '%s'", app.getName());
+  } else {
+    logger.error(
+      "Detected another instance of '%s'. Please supply a different --app-name-suffix for each instance. Exiting.",
+      app.getName()
+    );
+    app.exit(-1);
+  }
+
   if (args['remote-debugging-port']) {
     const port = args['remote-debugging-port'];
     args['append-chrome-switch'].push({
