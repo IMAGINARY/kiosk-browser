@@ -32,6 +32,7 @@
     "eslint-plugin-jsx-a11y": "^6.5.1",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
+    "npm-check-updates": "^16.14.20",
     "prettier": "^2.5.1"
   },
   "dependencies": {
@@ -45,6 +46,7 @@
     "yargs": "17.3.1"
   },
   "scripts": {
+    "check-updates": "npm-check-updates",
     "postinstall": "electron-builder install-app-deps",
     "start": "electron .",
     "pack": "electron-builder --x64 --dir",
