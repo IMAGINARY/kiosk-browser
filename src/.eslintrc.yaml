@@ -6,7 +6,7 @@ parserOptions:
   ecmaVersion: 2022
   ecmaFeatures: {}
 extends:
-  - airbnb
+  - airbnb-base
   - prettier
 plugins:
   - html
