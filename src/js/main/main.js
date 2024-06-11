@@ -1,6 +1,5 @@
 global.shellStartTime = Date.now();
 
-const path = require('path');
 const { app, session } = require('electron');
 const remote = require('@electron/remote/main');
 const yargs = require('yargs');
