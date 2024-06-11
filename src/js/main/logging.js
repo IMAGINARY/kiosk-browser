@@ -12,7 +12,7 @@ const transportConfig = {
   format: format.combine(
     winston.format.splat(),
     winston.format.colorize(),
-    winston.format.simple()
+    winston.format.simple(),
   ),
 };
 const consoleTransport = new winston.transports.Console(transportConfig);

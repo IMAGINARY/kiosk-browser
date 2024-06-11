@@ -8,7 +8,7 @@ const settingsPath = app.getPath('userData');
 // read defaults.json5
 const defaultsFileContents = fsExtra.readFileSync(
   path.join(__dirname, '../../json/defaults.json5'),
-  'utf8'
+  'utf8',
 );
 const defaults = json5.parse(defaultsFileContents);
 
@@ -26,7 +26,7 @@ const settingsFileContents = (() => {
   const regex = /^(\s*)([^{}])/gm;
   const settingsDefaultFileContents = defaultsFileContents.replace(
     regex,
-    '$1// $2'
+    '$1// $2',
   );
   fsExtra.writeFileSync(settingsFilePath, settingsDefaultFileContents, 'utf8');
   return settingsDefaultFileContents;

@@ -23,7 +23,9 @@
         border: #f00 1px solid;
         padding: 0;
         margin: 0;
-        font: 12px/15px Consolas, Verdana;
+        font:
+          12px/15px Consolas,
+          Verdana;
         background: #333;
         color: #fff;
         height: 100%;
@@ -247,7 +249,7 @@
         var display_data = document.getElementById('display_data');
         var network_data = document.getElementById('active_network_data');
         var passive_network_data = document.getElementById(
-          'passive_network_data'
+          'passive_network_data',
         );
 
         function getHostName() {
@@ -380,7 +382,7 @@
                   cmd +
                   ']. Output: [' +
                   raw +
-                  '].'
+                  '].',
               );
             } else {
               var list = raw.split(EOL); // if (list.length === 0 || list === ['']) {  return (); }
@@ -511,7 +513,7 @@
           indicator = $('indicator'),
           mouse,
           colors = $w(
-            '#0f0 #f00 #00f #f0f #ff0 #0ff #8f8 #f88 #88f #f8f #0f0 #f00 #00f #f0f #ff0 #0ff #8f8 #f88 #88f #f8f'
+            '#0f0 #f00 #00f #f0f #ff0 #0ff #8f8 #f88 #88f #f8f #0f0 #f00 #00f #f0f #ff0 #0ff #8f8 #f88 #88f #f8f',
           ),
           touchcounter = 0,
           transformactioncounter = 0,
@@ -549,7 +551,7 @@
                   'px 0 0 -' +
                   (event.rectWidth / 2).round() +
                   'px'
-                : '')
+                : ''),
           );
 
           //if('panSpeedX' in event){
@@ -608,7 +610,7 @@
             info += infoForTouch(touch, index);
             setPos(
               touchfingers[touch.identifier].removeClassName('off'),
-              touch
+              touch,
             );
           });
 
@@ -685,13 +687,13 @@
             'rotate(' + event.rotate + 'rad) scale(' + event.scale + ')';
           $('transformaction').show().innerHTML = infoForTransformactionEvent(
             event,
-            'update'
+            'update',
           );
         }
         function transformactionEnd(event) {
           $('transformaction').show().innerHTML = infoForTransformactionEvent(
             event,
-            'end'
+            'end',
           );
           $('transformaction').addClassName('inactive');
           setPos(indicator, event);

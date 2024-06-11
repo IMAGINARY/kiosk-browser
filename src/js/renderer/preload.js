@@ -21,7 +21,7 @@ try {
   } catch (e) {
     console.error(
       `Error loading preload script for '${site.id}' kiosk app.`,
-      e
+      e,
     );
   }
 } catch (e) {

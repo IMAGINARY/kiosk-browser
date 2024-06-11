@@ -18,7 +18,7 @@ function convert(settings) {
   return Object.assign(
     ...Object.entries(settings).map(([k, v]) => ({
       [k in settingsCmdLineMap ? settingsCmdLineMap[k] : k]: v,
-    }))
+    })),
   );
 }
 

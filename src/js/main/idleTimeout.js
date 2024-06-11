@@ -35,14 +35,14 @@ class Timeout {
   static resetIdleTime(idleTimeMs = 0) {
     Timeout.#LAST_EVENT_TIMESTAMP_MS = Math.max(
       performance.now() - idleTimeMs,
-      Timeout.#LAST_EVENT_TIMESTAMP_MS
+      Timeout.#LAST_EVENT_TIMESTAMP_MS,
     );
   }
 
   static getIdleTime() {
     return Math.min(
       performance.now() - Timeout.#LAST_EVENT_TIMESTAMP_MS,
-      powerMonitor.getSystemIdleTime() * 1000
+      powerMonitor.getSystemIdleTime() * 1000,
     );
   }
 
@@ -54,7 +54,7 @@ class Timeout {
 }
 
 ipcMain.on(Timeout.IPC_CHANNEL, (event, idleTimeMs) =>
-  Timeout.resetIdleTime(idleTimeMs)
+  Timeout.resetIdleTime(idleTimeMs),
 );
 
 module.exports = Timeout;

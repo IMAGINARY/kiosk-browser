@@ -6,7 +6,7 @@ const kioskProtocol = 'kiosk:';
 function siteData(id) {
   const html = pathToFileURL(path.join(__dirname, '../../html/', `${id}.html`));
   const preload = pathToFileURL(
-    path.join(__dirname, '../renderer/kiosk-sites/', `${id}.js`)
+    path.join(__dirname, '../renderer/kiosk-sites/', `${id}.js`),
   );
   return {
     id,

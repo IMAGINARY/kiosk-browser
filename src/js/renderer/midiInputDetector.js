@@ -24,7 +24,7 @@ const { requestResetIdleTime } = require('./resetIdleTime');
 function handleMIDIMessage(midiMessageEvent) {
   const discard = midiMessageEventFilters.reduce(
     (acc, cur) => acc || cur(midiMessageEvent),
-    false
+    false,
   );
   if (!discard) {
     requestResetIdleTime(midiMessageEvent.timeStamp);
@@ -35,7 +35,7 @@ function handlePortStateChange(port) {
   if (port.state === 'connected' && port.connection === 'open') {
     const discard = midiPortFilters.reduce(
       (acc, cur) => acc || cur(port),
-      false
+      false,
     );
     if (!discard) {
       port.addEventListener('midimessage', handleMIDIMessage);
@@ -50,12 +50,12 @@ async function setupMIDIListeners() {
     const midiAccess = await navigator.requestMIDIAccess();
     midiAccess.inputs.forEach(handlePortStateChange);
     midiAccess.addEventListener('statechange', (stateChangeEvent) =>
-      handlePortStateChange(stateChangeEvent.port)
+      handlePortStateChange(stateChangeEvent.port),
     );
   } catch (err) {
     console.warn(
       `Could not set up MIDI event listeners for idle monitoring`,
-      err
+      err,
     );
   }
 }

@@ -61,7 +61,7 @@ async function init(wwwRootDir) {
 
   // Do something about errors occurring after initialization
   server.on('error', (err) =>
-    logger.error('Error in built-in HTTP server: %O', err)
+    logger.error('Error in built-in HTTP server: %O', err),
   );
 
   const urlPrefix = `http://${host}:${port}/`;

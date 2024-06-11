@@ -27,12 +27,12 @@ function loop() {
 
   // Discard disconnected gamepads
   const gamepads = [...navigator.getGamepads()].filter(
-    (gamepad) => gamepad !== null
+    (gamepad) => gamepad !== null,
   );
 
   // Discard gamepads via device filter
   const deviceFilteredGamepads = gamepads.filter((gamepad) =>
-    gamepadIndices.has(gamepad.index)
+    gamepadIndices.has(gamepad.index),
   );
 
   if (gamepads.length > 0) {
@@ -41,7 +41,7 @@ function loop() {
       .filter((gamepad) => lastEventTimestampMs < gamepad.timestamp)
       .filter(
         (gamepad) =>
-          !stateFilters.reduce((acc, cur) => acc || cur(gamepad), false)
+          !stateFilters.reduce((acc, cur) => acc || cur(gamepad), false),
       );
 
     // Keep timestamp to avoid processing the same state twice (important for state filters)
@@ -50,7 +50,7 @@ function loop() {
     // If there are gamepads left -> request idle time reset
     if (stateFilteredGamepads.length > 0) {
       const maxTimestampMs = Math.max(
-        ...stateFilteredGamepads.map((gp) => gp.timestamp)
+        ...stateFilteredGamepads.map((gp) => gp.timestamp),
       );
       requestResetIdleTime(maxTimestampMs);
     }
@@ -69,7 +69,7 @@ function handleGamepadConnected(gamepadEvent) {
   const { gamepad } = gamepadEvent;
   const discard = deviceFilters.reduce(
     (acc, cur) => acc || cur(gamepad),
-    false
+    false,
   );
   if (!discard) {
     gamepadIndices.add(gamepad.index);

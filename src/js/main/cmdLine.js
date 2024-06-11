@@ -19,7 +19,7 @@ function coerceServe(path, defaultPath) {
     dir.closeSync();
   } catch (err) {
     throw new Error(
-      `Directory does not exist or is inaccessible: ${pathToServe}`
+      `Directory does not exist or is inaccessible: ${pathToServe}`,
     );
   }
 }
@@ -89,7 +89,7 @@ function coerceOverflow(s) {
     .slice(0, 2)
     .map((r) => r.trim());
   const invalidRules = overflowRules.filter(
-    (r) => possibleRules.indexOf(r) === -1
+    (r) => possibleRules.indexOf(r) === -1,
   );
   if (invalidRules.length > 0)
     throw new Error(`Invalid overflow rule: ${invalidRules[0]}`);
@@ -122,7 +122,7 @@ function coerceAppNameSuffix(s) {
     return s;
   }
   throw new Error(
-    `Invalid app name suffix (must match /^[A-Za-z0-9][\\w-]*$/): ${s}`
+    `Invalid app name suffix (must match /^[A-Za-z0-9][\\w-]*$/): ${s}`,
   );
 }
 
@@ -352,11 +352,11 @@ function getOptions(defaults) {
   Object.getOwnPropertyNames(defaults)
     .filter((optionName) => optionName in optionsWithDefaults)
     .forEach((optionName) =>
-      assignDefault(optionsWithDefaults[optionName], defaults[optionName])
+      assignDefault(optionsWithDefaults[optionName], defaults[optionName]),
     );
   const compare = (a, b) => a[0].localeCompare(b[0]);
   const sortedOptionsWithDefaults = Object.fromEntries(
-    Object.entries(optionsWithDefaults).sort(compare)
+    Object.entries(optionsWithDefaults).sort(compare),
   );
   return sortedOptionsWithDefaults;
 }

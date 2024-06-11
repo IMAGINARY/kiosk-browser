@@ -24,14 +24,14 @@ function extendMenu(menu) {
     new MenuItem({
       label: 'Go forward one page',
       click: (menuItem, window) => window.webContents.goForward(),
-    })
+    }),
   );
   windowSubmenu.insert(
     0,
     new MenuItem({
       label: 'Go back one page',
       click: (menuItem, window) => window.webContents.goBack(),
-    })
+    }),
   );
   return menu;
 }
@@ -67,7 +67,7 @@ function computeDisplayCover(displayNums, fullscreen) {
 
   // keep only display nums that are not out of range
   const validDisplayNums = displayNumsArray.map((n) =>
-    Math.min(n, allDisplays.length - 1)
+    Math.min(n, allDisplays.length - 1),
   );
 
   const displays = validDisplayNums.map((n) => allDisplays[n]);
@@ -79,7 +79,7 @@ function computeDisplayCover(displayNums, fullscreen) {
           'Work area of display %i differs from bounds. Expect incomplete display coverage. (%o vs. %o)',
           n,
           workArea,
-          bounds
+          bounds,
         );
     });
   }
@@ -109,7 +109,7 @@ function fixWindowSize(window, bounds) {
   logger.debug(
     'Initial (content) bounds: (%o) %o',
     window.getBounds(),
-    window.getContentBounds()
+    window.getContentBounds(),
   );
 
   const oldMin = window.getMinimumSize();
@@ -132,7 +132,7 @@ function fixWindowSize(window, bounds) {
   logger.debug(
     'Fixed (content) bounds:  (%o) %o',
     window.getBounds(),
-    window.getContentBounds()
+    window.getContentBounds(),
   );
 }
 
@@ -147,12 +147,12 @@ async function handleFailedLoad(
   errorCode,
   errorDescription,
   validatedUrl,
-  retry
+  retry,
 ) {
   const ignoredErrorCodes = [-3, 0];
   if (!ignoredErrorCodes.includes(errorCode)) {
     const errorPageUrl = new URL(
-      `file://${path.join(__dirname, '/../..', 'html/error.html')}`
+      `file://${path.join(__dirname, '/../..', 'html/error.html')}`,
     );
     errorPageUrl.searchParams.set('errorCode', errorCode);
     errorPageUrl.searchParams.set('errorDescription', errorDescription);
@@ -162,7 +162,7 @@ async function handleFailedLoad(
       'Unable to load %s (Error %i: %s)',
       validatedUrl,
       errorCode,
-      errorDescription
+      errorDescription,
     );
     await mainWindow.loadURL(errorPageUrl.href);
   }
@@ -194,7 +194,7 @@ function setZoomFactor(webContents, zoomFactor) {
 function enableReloadingWhenUnresponsive(
   responsivenessCheck,
   reloadCallback,
-  timeoutMs
+  timeoutMs,
 ) {
   logger.debug('Will reload pages that are unresponsive for %ims', timeoutMs);
   let responsivenessCheckInProgress = false;
@@ -224,14 +224,14 @@ function setOverflowRules(webContents, rules) {
     rules[dir] === '' ? '' : `overflow-${dir}: ${rules[dir]};`;
   const overflowCss = `body { ${createCssRule('x')} ${createCssRule('y')} };`;
   webContents.on('dom-ready', () =>
-    webContents.insertCSS(overflowCss, { cssOrigin: 'user' })
+    webContents.insertCSS(overflowCss, { cssOrigin: 'user' }),
   );
 }
 
 function hideScrollBars(webContents) {
   const cssRule = 'body::-webkit-scrollbar { display: none; }';
   webContents.on('dom-ready', () =>
-    webContents.insertCSS(cssRule, { cssOrigin: 'user' })
+    webContents.insertCSS(cssRule, { cssOrigin: 'user' }),
   );
 }
 
@@ -247,7 +247,7 @@ async function createMainWindow(args, options) {
     if (args['cover-displays'].length > 0) {
       const displayCover = computeDisplayCover(
         args['cover-displays'],
-        args.fullscreen
+        args.fullscreen,
       );
       logger.debug('Trying to cover display area {}', displayCover);
       return () => fixWindowSize(mainWindow, displayCover);
@@ -271,7 +271,7 @@ async function createMainWindow(args, options) {
       'Preventing download of %s (%s, %i Bytes)',
       item.getURL(),
       item.getMimeType(),
-      item.getTotalBytes()
+      item.getTotalBytes(),
     );
     event.preventDefault();
   });
@@ -296,8 +296,8 @@ async function createMainWindow(args, options) {
     mainWindow.on('resize', () =>
       setZoomFactor(
         webContents,
-        computeZoomFactor(mainWindow.getContentBounds(), args.fit, args.zoom)
-      )
+        computeZoomFactor(mainWindow.getContentBounds(), args.fit, args.zoom),
+      ),
     );
 
   setOverflowRules(webContents, args.overflow);
@@ -309,7 +309,7 @@ async function createMainWindow(args, options) {
   if (process.platform === 'darwin') {
     const appRegionOverlayCss = fs.readFileSync(
       path.join(__dirname, '../../css/app-region-overlay.css'),
-      'utf8'
+      'utf8',
     );
     webContents.on('dom-ready', async () => {
       await webContents.insertCSS(appRegionOverlayCss, { cssOrigin: 'user' });
@@ -320,10 +320,10 @@ async function createMainWindow(args, options) {
      * Hide handle in fullscreen mode.
      */
     mainWindow.on('enter-full-screen', () =>
-      setOverlayVisible(webContents, !mainWindow.isFullScreen())
+      setOverlayVisible(webContents, !mainWindow.isFullScreen()),
     );
     mainWindow.on('leave-full-screen', () =>
-      setOverlayVisible(webContents, !mainWindow.isFullScreen())
+      setOverlayVisible(webContents, !mainWindow.isFullScreen()),
     );
   }
 
@@ -334,15 +334,15 @@ async function createMainWindow(args, options) {
   webContents.on('dom-ready', () =>
     setZoomFactor(
       webContents,
-      computeZoomFactor(mainWindow.getContentBounds(), args.fit, args.zoom)
-    )
+      computeZoomFactor(mainWindow.getContentBounds(), args.fit, args.zoom),
+    ),
   );
 
   /**
    * Display error on failed page loads and reload the page after a certain delay if requested.
    */
   webContents.on('did-fail-load', (e, code, desc, url) =>
-    handleFailedLoad(mainWindow, code, desc, url, args.retry)
+    handleFailedLoad(mainWindow, code, desc, url, args.retry),
   );
 
   /**
@@ -368,7 +368,7 @@ async function createMainWindow(args, options) {
     enableReloadingWhenUnresponsive(
       responsivenessCheck,
       reloadCallback,
-      args['reload-unresponsive'] * 1000
+      args['reload-unresponsive'] * 1000,
     );
   }
 
@@ -378,7 +378,7 @@ async function createMainWindow(args, options) {
 async function appReady(args) {
   // either disable default menu (noop on macOS) or set custom menu (based on default)
   Menu.setApplicationMenu(
-    args.menu && !args.kiosk ? extendMenu(Menu.getApplicationMenu()) : null
+    args.menu && !args.kiosk ? extendMenu(Menu.getApplicationMenu()) : null,
   );
 
   const webprefs = {
@@ -390,7 +390,7 @@ async function appReady(args) {
     zoomFactor: computeZoomFactor(
       { width: 800, height: 600 },
       args.fit,
-      args.zoom
+      args.zoom,
     ),
     nodeIntegration: args.integration,
     nodeIntegrationInSubFrames: true,
@@ -401,7 +401,7 @@ async function appReady(args) {
 
   if (args['disable-selection'])
     preloadModules.push(
-      path.join(__dirname, '../renderer/disableSelection.js')
+      path.join(__dirname, '../renderer/disableSelection.js'),
     );
 
   if (args['disable-drag'])

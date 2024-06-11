@@ -6,14 +6,14 @@ const json5 = require('json5');
 function applyChromiumCmdLine(
   ignoreDefaults,
   additionalChromiumSwitches,
-  additionalChromiumArguments
+  additionalChromiumArguments,
 ) {
   // load default command line switches and arguments
   const appCmdLine = json5.parse(
     fs.readFileSync(
       path.join(__dirname, '../../json/defaultAppCommandLine.json5'),
-      'utf8'
-    )
+      'utf8',
+    ),
   );
 
   // process switches
@@ -23,7 +23,7 @@ function applyChromiumCmdLine(
   chromiumSwitches.forEach((s) =>
     'value' in s
       ? app.commandLine.appendSwitch(s.key, s.value)
-      : app.commandLine.appendSwitch(s.key)
+      : app.commandLine.appendSwitch(s.key),
   );
 
   // process arguments

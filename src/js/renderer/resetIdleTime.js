@@ -36,7 +36,7 @@ function requestResetIdleTime(lastEventTimestampMs = performance.now()) {
       // reset after waiting time
       timeoutId = setTimeout(
         () => resetIdleTime(lastEventTimestampMs),
-        waitingPeriodMs
+        waitingPeriodMs,
       );
     }
   }

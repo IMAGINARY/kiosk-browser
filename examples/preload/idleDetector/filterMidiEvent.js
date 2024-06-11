@@ -31,7 +31,7 @@ function filterRepeatedControlChange(messageEvent) {
     } else {
       console.log(
         "Ignoring MIDI control change event because its value didn't change.",
-        messageEvent
+        messageEvent,
       );
       return true;
     }
@@ -40,5 +40,5 @@ function filterRepeatedControlChange(messageEvent) {
 
 kioskBrowser.idleDetector.midi.messageEventFilters.add(filterNoteOff);
 kioskBrowser.idleDetector.midi.messageEventFilters.add(
-  filterRepeatedControlChange
+  filterRepeatedControlChange,
 );

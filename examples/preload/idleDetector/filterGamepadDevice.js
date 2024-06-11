@@ -6,13 +6,13 @@ function deviceFilter(gamepad) {
   if (deviceIds.includes(gamepad.id)) {
     console.log(
       'The following gamepad will NOT be able to interrupt the idle state:',
-      gamepad
+      gamepad,
     );
     return true;
   } else {
     console.log(
       'The following gamepad will be able to interrupt the idle state:',
-      gamepad
+      gamepad,
     );
     return false;
   }

@@ -17,7 +17,7 @@ function stateFilter(gamepad) {
   const curButtons = [...gamepad.buttons.map((b) => b.pressed)];
   const buttonsChanged = curButtons.reduce(
     (acc, cur, i) => acc || lastButtons[i] !== cur,
-    false
+    false,
   );
   lastButtonss[gamepad.index] = curButtons;
   if (buttonsChanged) {

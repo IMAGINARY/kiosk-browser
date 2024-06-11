@@ -30,7 +30,7 @@ function logAndExit(title, error) {
 }
 
 ['uncaughtException', 'unhandledRejection'].forEach((e) =>
-  process.on(e, (error) => logAndExit(e, error))
+  process.on(e, (error) => logAndExit(e, error)),
 );
 
 const yargsParserConfig = {
@@ -56,7 +56,7 @@ const yargsOptions = yargs
       yargs.positional('url', {
         describe: 'The URL to open.',
         type: 'string',
-      })
+      }),
   )
   .wrap(yargs.terminalWidth())
   .help(false)
@@ -114,7 +114,7 @@ async function main(rawArgs) {
   } else {
     logger.error(
       "Detected another instance of '%s'. Please supply a different --app-name-suffix for each instance. Exiting.",
-      app.getName()
+      app.getName(),
     );
     app.exit(-1);
   }
@@ -132,7 +132,7 @@ async function main(rawArgs) {
       'MAP * ~NOTFOUND, EXCLUDE localhost, EXCLUDE 127.0.0.1, EXCLUDE ::1';
     args['append-chrome-switch'].push(
       { key: 'host-rules', value: rules },
-      { key: 'host-resolver-rules', value: rules }
+      { key: 'host-resolver-rules', value: rules },
     );
     args['clear-cache'] = true;
   }
@@ -144,7 +144,7 @@ async function main(rawArgs) {
   applyChromiumCmdLine(
     args['use-minimal-chrome-cli'],
     args['append-chrome-switch'],
-    args['append-chrome-argument']
+    args['append-chrome-argument'],
   );
 
   // Quit when all windows are closed.
