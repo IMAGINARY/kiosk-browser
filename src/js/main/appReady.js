@@ -244,7 +244,7 @@ async function createMainWindow(args, options) {
   remote.enable(webContents);
 
   const adjustWindowBounds = (() => {
-    if (args['cover-displays'].length > 0) {
+    if (args['cover-displays']?.length > 0) {
       const displayCover = computeDisplayCover(
         args['cover-displays'],
         args.fullscreen,
@@ -416,10 +416,10 @@ async function appReady(args) {
     backgroundColor:
       args['background-color'][args.transparent ? 'argb' : 'rgb'],
     show: false,
-    frame: args.frame && args['cover-displays'].length === 0,
+    frame: args.frame && typeof args['cover-displays'] === 'undefined',
     titleBarStyle: 'hidden',
     fullscreenable: true,
-    resizable: args.resize && args['cover-displays'].length === 0,
+    resizable: args.resize && typeof args['cover-displays'] === 'undefined',
     transparent: args.transparent,
     alwaysOnTop: args['always-on-top'],
     webPreferences: webprefs,

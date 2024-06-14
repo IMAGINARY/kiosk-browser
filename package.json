@@ -33,14 +33,14 @@
     "prettier": "^3.3.2"
   },
   "dependencies": {
-    "@electron/remote": "2.0.4",
-    "color": "4.2.0",
-    "finalhandler": "1.1.2",
-    "fs-extra": "10.0.0",
-    "json5": "2.2.0",
-    "serve-static": "1.14.2",
-    "winston": "3.5.1",
-    "yargs": "17.3.1"
+    "@electron/remote": "2.1.2",
+    "color": "4.2.3",
+    "finalhandler": "1.2.0",
+    "fs-extra": "11.2.0",
+    "json5": "2.2.3",
+    "serve-static": "1.15.0",
+    "winston": "3.13.0",
+    "yargs": "17.4.1"
   },
   "scripts": {
     "check-updates": "npm-check-updates",
