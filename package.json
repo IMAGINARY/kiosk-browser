@@ -23,7 +23,7 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "electron": "~21.2.0",
-    "electron-builder": "^23.6.0",
+    "electron-builder": "^24.13.3",
     "eslint": "^8.57.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^9.1.0",
