@@ -1,6 +1,10 @@
 #### Manually added stuff to ignore ####
 tmp/
 dist/
+out
+.DS_Store
+*.log*
+
 # I am using this file for testing quite often
 debug.html
 

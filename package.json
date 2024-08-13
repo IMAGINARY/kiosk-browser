@@ -1,8 +1,8 @@
 {
   "name": "kiosk-browser",
-  "productName": "kiosk-browser",
   "version": "0.17.0",
   "description": "Hardened Kiosk Web Browser",
+  "author": "IMAGINARY gGmbH <info@imaginary.org>",
   "homepage": "https://github.com/IMAGINARY/kiosk-browser",
   "repository": {
     "type": "git",
@@ -12,27 +12,33 @@
     "url": "https://github.com/IMAGINARY/kiosk-browser/issues",
     "email": "info@imaginary.org"
   },
-  "main": "src/js/main/main.js",
+  "main": "./out/main/index.js",
   "keywords": [
     "kiosk",
     "web",
     "browser",
     "electron"
   ],
-  "author": "IMAGINARY gGmbH <info@imaginary.org>",
   "license": "Apache-2.0",
-  "devDependencies": {
-    "electron": "~21.2.0",
-    "electron-builder": "^23.6.0",
-    "eslint": "^8.57.0",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-html": "^8.1.1",
-    "eslint-plugin-import": "^2.29.1",
-    "npm-check-updates": "^16.14.20",
-    "prettier": "^3.3.2"
+  "scripts": {
+    "format": "prettier --write .",
+    "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
+    "typecheck:node": "tsc --noEmit -p ../../tsconfig.node.json --composite false",
+    "typecheck:web": "tsc --noEmit -p ../../tsconfig.web.json --composite false",
+    "typecheck": "npm run typecheck:node && npm run typecheck:web",
+    "start": "electron-vite preview",
+    "dev": "electron-vite dev --sourcemap",
+    "build": "npm run typecheck && electron-vite build",
+    "postinstall": "electron-builder install-app-deps",
+    "build:unpack": "npm run build && electron-builder --dir",
+    "build:win": "npm run build && electron-builder --win",
+    "build:mac": "npm run build && electron-builder --mac",
+    "build:linux": "npm run build && electron-builder --linux",
+    "check-updates": "npm-check-updates"
   },
   "dependencies": {
+    "@electron-toolkit/preload": "^3.0.1",
+    "@electron-toolkit/utils": "^3.0.0",
     "@electron/remote": "2.1.2",
     "color": "4.2.3",
     "finalhandler": "1.2.0",
@@ -42,43 +48,20 @@
     "winston": "3.13.0",
     "yargs": "17.4.1"
   },
-  "scripts": {
-    "check-updates": "npm-check-updates",
-    "postinstall": "electron-builder install-app-deps",
-    "start": "electron .",
-    "pack": "electron-builder --x64 --dir",
-    "dist": "electron-builder --x64",
-    "prettier": "prettier --write ."
-  },
-  "build": {
-    "appId": "org.imaginary.kiosk",
-    "npmRebuild": false,
-    "linux": {
-      "executableName": "kiosk-browser",
-      "target": [
-        "deb",
-        "rpm",
-        "AppImage"
-      ],
-      "category": "Network",
-      "packageCategory": "web"
-    },
-    "deb": {},
-    "rpm": {},
-    "appImage": {},
-    "win": {
-      "icon": "build/icon.ico"
-    },
-    "mac": {
-      "target": [
-        "dmg"
-      ]
-    },
-    "files": [
-      "package.json",
-      "src/**/*",
-      "build/fallbackicon.png",
-      "!**/.DS_Store"
-    ]
+  "devDependencies": {
+    "@electron-toolkit/eslint-config-prettier": "^2.0.0",
+    "@electron-toolkit/eslint-config-ts": "^2.0.0",
+    "@electron-toolkit/tsconfig": "^1.0.1",
+    "@types/node": "^20.14.8",
+    "electron": "^31.0.2",
+    "electron-builder": "^24.13.3",
+    "electron-vite": "^2.3.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-html": "^8.1.1",
+    "eslint-plugin-import": "^2.29.1",
+    "npm-check-updates": "^16.14.20",
+    "prettier": "^3.3.2",
+    "typescript": "^5.5.2",
+    "vite": "^5.3.1"
   }
 }

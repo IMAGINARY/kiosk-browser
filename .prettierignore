@@ -1,3 +1,7 @@
 node_modules
 dist
-src/js/renderer/prototype.min.js
+src/renderer/src/prototype.min.js
+out
+pnpm-lock.yaml
+tsconfig.json
+tsconfig.*.json
