@@ -438,7 +438,7 @@ async function appReady(args) {
 
   // toggle developer tools on SIGUSR1
   logger.info('Send SIGUSR1 to PID %i to open developer Tools', process.pid);
-  process.on('SIGUSR1', () => global.mainWindow.webContents.toggleDevTools());
+  process.on('SIGUSR1', () => mainWindowSingleton.webContents.toggleDevTools());
 }
 
 module.exports = appReady;
