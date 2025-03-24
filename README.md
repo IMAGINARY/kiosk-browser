@@ -202,6 +202,11 @@ Pointing the kiosk-browser to `kiosk://testapp` will bring up a simple app for t
 as well as analyzing common problems with audio and video output such as flipped audio channels or screen tearing.
 Additionally, it displays basic network configuration and other system information.
 
+## Local debugging
+
+The developer console can be opened either via the menu, the `-d`/`--dev` CLI options or by sending the `SIGUSR1`
+signal to the main process.
+
 ## Remote debugging
 
 By default, the kiosk-browser will open the port 9222 on localhost for remote debugging.
