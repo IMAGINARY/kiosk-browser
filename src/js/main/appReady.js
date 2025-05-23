@@ -276,7 +276,10 @@ async function createMainWindow(args, options) {
     event.preventDefault();
   });
 
-  mainWindow.once('ready-to-show', () => {
+  const show = () => {
+    mainWindow.off('ready-to-show', show);
+    webContents.off('did-finish-load', show);
+
     if (args.kiosk) mainWindow.setKiosk(args.kiosk);
 
     if (args.fullscreen) {
@@ -290,7 +293,11 @@ async function createMainWindow(args, options) {
     // also adjust the zoom of the draggable area
     setZoomFactor(webContents, webContents.zoomFactor);
     mainWindow.show();
-  });
+  };
+
+  mainWindow.on('ready-to-show', show);
+  // Workaround for a bug in Electron that causes `ready-to-show` to not be emitted
+  webContents.on('did-finish-load', show);
 
   if (args.fit.forceZoomFactor)
     mainWindow.on('resize', () =>
