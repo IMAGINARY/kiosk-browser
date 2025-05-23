@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.18.1] 2025-05-23
+
 ### Fixed
 
 - fix window frame and title bar being always hidden on Linux
@@ -365,7 +367,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Basic kiosk browser functionality
 
 [library for sending heartbearts]: https://github.com/hilbert/hilbert-heartbeat
-[unreleased]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.18.0...HEAD
+[unreleased]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.18.1...HEAD
+[0.18.1]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.18.0...v0.18.1
 [0.18.0]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.17.0...v0.18.0
 [0.17.0]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.16.1...v0.17.0
 [0.16.1]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.16.0...v0.16.1
