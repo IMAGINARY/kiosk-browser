@@ -424,7 +424,7 @@ async function appReady(args) {
       args['background-color'][args.transparent ? 'argb' : 'rgb'],
     show: false,
     frame: args.frame && typeof args['cover-displays'] === 'undefined',
-    titleBarStyle: 'hidden',
+    titleBarStyle: process.platform === 'darwin' ? 'hidden' : 'default',
     fullscreenable: true,
     resizable: args.resize && typeof args['cover-displays'] === 'undefined',
     transparent: args.transparent,

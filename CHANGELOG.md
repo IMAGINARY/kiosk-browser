@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- fix window frame and title bar being always hidden on Linux
 - add workaround for main app window sometimes not being shown
 
 ## [0.18.0] 2024-08-13
