@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- upgrade to Electron v41.0.2, Node v24.14.0, Chromium v146.0.7680.72
+
 ## [0.18.1] 2025-05-23
 
 ### Fixed
