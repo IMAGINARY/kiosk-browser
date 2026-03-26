@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- provide multiple multiple preload scripts by passing multiple `--preload` options
+
 ## [0.19.0-alpha.1] 2026-03-13
 
 ### Changed

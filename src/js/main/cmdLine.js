@@ -24,6 +24,10 @@ function coerceServe(path, defaultPath) {
   }
 }
 
+function coercePreload(s) {
+  return Array.isArray(s) ? s : [s];
+}
+
 function coerceAppendChromeSwitch(sOrXs) {
   function processSwitch(s) {
     if (s.length === 0) throw new Error('Empty Chrome CLI switch');
@@ -234,6 +238,7 @@ const options = {
   'preload': {
     type: 'string',
     description: 'Preload a JavaScript file into each website',
+    coerce: coercePreload,
   },
   'append-chrome-switch': {
     type: 'string',

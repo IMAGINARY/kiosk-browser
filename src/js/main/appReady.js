@@ -417,7 +417,10 @@ async function appReady(args) {
   if (args['hide-cursor'])
     preloadModules.push(path.join(__dirname, '../renderer/hideCursor.js'));
 
-  if (args.preload) preloadModules.push(path.resolve(args.preload));
+  if (args.preload) {
+    const paths = args.preload.map((preloadPath) => path.resolve(preloadPath));
+    preloadModules.push(...paths);
+  }
 
   const options = {
     backgroundColor:
