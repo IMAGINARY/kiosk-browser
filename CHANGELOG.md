@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.19.0-alpha.2] 2026-03-27
+
 ### Added
 
 - provide multiple multiple preload scripts by passing multiple `--preload` options
@@ -377,7 +379,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Basic kiosk browser functionality
 
 [library for sending heartbearts]: https://github.com/hilbert/hilbert-heartbeat
-[unreleased]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.19.0-alpha.1...HEAD
+[unreleased]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.19.0-alpha.2...HEAD
+[0.19.0-alpha.2]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.19.0-alpha.1...v0.19.0-alpha.2
 [0.19.0-alpha.1]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.18.1...v0.19.0-alpha.1
 [0.18.1]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.18.0...v0.18.1
 [0.18.0]: https://github.com/IMAGINARY/kiosk-browser/compare/v0.17.0...v0.18.0
