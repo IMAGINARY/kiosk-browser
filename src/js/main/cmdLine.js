@@ -345,6 +345,10 @@ const options = {
     requiresArg: true,
     coerce: coerceAppNameSuffix,
   },
+  'title': {
+    type: 'string',
+    description: 'Set the title of the browser window.',
+  },
 };
 
 function assignDefault(option, defaultValue) {

@@ -379,6 +379,13 @@ async function createMainWindow(args, options) {
     );
   }
 
+  if (args.title) {
+    // Set the title provided via command line argument ...
+    mainWindow.setTitle(args.title);
+    // ... prevent web page from changing the title.
+    mainWindow.on('page-title-updated', (e) => e.preventDefault());
+  }
+
   return mainWindow;
 }
 
