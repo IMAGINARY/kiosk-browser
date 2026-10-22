@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.19.0-alpha.3] 2026-10-22
 
-## Added
+### Added
 
 - set browser window title via `--title` option
 
